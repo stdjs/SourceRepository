@@ -1,0 +1,143 @@
+
+/******* grid *********/
+.StdUI_GridView{
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+    border:1px solid #B2AFAC;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.StdUI_GridView.hover{
+    border-color: #6FD6FE;
+}
+.StdUI_GridView.focus{
+    border-color: #3aa7dd;
+}
+
+
+/******* header > resizer********/
+.StdUI_GridView > ._resizer{
+    position: absolute;
+    top:0;
+    background: #3aa7dd;
+    opacity:0.4;
+    filter:alpha(opacity=40);
+    cursor: col-resize;
+}
+
+/******* header > header********/
+.StdUI_GridView > ._header{
+    position: relative;
+    overflow: hidden;
+    width: 200000px;
+    border-bottom: 1px solid #ccc9c7;
+    background: #dfdcd9;
+}
+
+/******* header > columns********/
+.StdUI_GridView > ._header > ._columns{
+    float: left;
+    border-bottom: 1px solid #DBDBDB;
+}
+
+/******* header > columns > column********/
+.StdUI_GridView > ._header > ._columns > ._column{
+    float: left;
+    position: relative;
+    overflow: hidden;
+    border-left: 1px solid transparent;
+    border-right: 1px solid #b9b6b4;
+    border-bottom: 1px solid #DBDBDB;
+}
+.StdUI_GridView > ._header > ._columns > ._column.hover{
+    cursor: pointer;
+    background: #c9dbe1;
+}
+.StdUI_GridView > ._header > ._columns > ._column > ._client{
+    overflow: hidden;
+    word-break:keep-all;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    padding: 0 5px 0 5px;
+    color: #6D6D6D;
+}
+.StdUI_GridView > ._header > ._columns > ._column > ._resizeHandle{
+    position: absolute;
+    right: 0;
+    top:0;
+    height: 100%;
+    width:4px;
+    cursor: col-resize;
+}
+
+/******* body ********/
+.StdUI_GridView > ._body{
+    overflow: auto;
+    position: relative;
+    background: #FCFCFC;
+}
+
+/******* body > block > block  ********/
+.StdUI_GridView > ._body > ._block{
+
+}
+
+/******* body > block > row  ********/
+.StdUI_GridView > ._body > ._block >._row{
+    color: #5E5E5E;
+    overflow: hidden;
+    border-bottom: 1px solid #DADADA;
+}
+/*
+.StdUI_GridView > ._body > ._block > ._row:nth-child(odd){
+    background: #F9F7F5;
+}
+*/
+
+/******* body > block > row:hover ********/
+.StdUI_GridView > ._body > ._block > ._row.hover{
+    background: #DFEFF7;
+    border-bottom-color: #DADADA;
+}
+.StdUI_GridView > ._body > ._block > ._row.hover > ._cell{
+    border-right-color: #DADADA;
+}
+
+/******* body > block > row.selected ********/
+.StdUI_GridView > ._body > ._block > ._row.selected{
+    background: #43ace8;
+}
+.StdUI_GridView > ._body > ._block > ._row.selected > ._cell{
+    color: white;
+}
+
+/******* body > row > cells > cell ********/
+.StdUI_GridView > ._body > ._block > ._row > ._cell{
+    float: left;
+    position: relative;
+    overflow: hidden;
+    word-break:keep-all;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    border-right: 1px solid #DADADA;
+}
+.StdUI_GridView > ._body > ._block > ._row > ._cell.hover{
+    background-color: #FFF0DC;
+}
+.StdUI_GridView > ._body > ._block > ._row > ._cell.selected{
+    background-color: #D4EDFF;
+    border-bottom-color: #C3E7FF;
+}
+
+/******* body > body > input********/
+.StdUI_GridView > ._body > ._input{
+    position: absolute;
+    font-size: 13px;
+    overflow: hidden;
+    padding: 3px;
+    margin: 0;
+    border: 2px solid #009CE6;
+    resize: none;
+    outline:none;
+}

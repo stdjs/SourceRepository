@@ -1,0 +1,35 @@
+/********* switch box ***********/
+.StdUI_SwitchBox{
+    font-family: Lato,"Open Sans",Arial,"Hiragino Sans GB","Microsoft YaHei",STHeiti,"WenQuanYi Micro Hei",SimSun,sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    float: left;
+    overflow: hidden;
+    position: relative;
+    background: #E0E0E0;
+    color: #5E5E5E;
+    cursor: pointer;
+    border: 1px solid #B2AFAC;
+    outline: none;
+    box-shadow: 0 0 2px #AFAFAF;
+}
+.StdUI_SwitchBox > ._sep{
+    float: left;
+    height: 100%;
+    width: 1px;
+    background: #B2AFAC;
+}
+.StdUI_SwitchBox > ._item{
+    float: left;
+    text-align: center;
+    color: #9A9A9A;
+}
+.StdUI_SwitchBox > ._state{
+    position: absolute;
+    text-align: center;
+    color: white;
+    cursor: default;
+    text-shadow: 0 1px 0 #5291B1;
+    background: #3aa7dd;
+    background: linear-gradient(to bottom,#3aa7dd 0%,#1a9edb 100%);
+}

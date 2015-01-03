@@ -1,0 +1,102 @@
+/*********** TabButton widget***************/
+.StdUI_TabButton{
+    font-size: 12px;
+    float: left;
+    position: relative;
+    z-index: 3;
+    padding: 6px 8px 6px 8px;
+    margin-right: 2px;
+    text-decoration: none;
+    overflow: hidden;
+    outline: none;
+    color: #474442;
+    border:1px solid #B2AFAC;
+    border-bottom: 0;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    background: #D3D1CE;
+    background: linear-gradient(to bottom,#D9D6D4 0%,#D3D1CE 100%);
+    transition: all 0.2s;
+    box-shadow: 0 1px 1px #E7E7E7 inset;
+}
+.StdUI_TabButton.hover{
+    border-color: #6FD6FE;
+    background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
+}
+.StdUI_TabButton.selected{
+    background: #E5DFDD;
+    border-color: #B2AFAC;
+}
+
+
+/********* buttonBox **********/
+.StdUI_TabButton > ._buttonBox{
+    overflow: hidden;
+    word-break: keep-all;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td{
+    padding: 0;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td > ._icon{
+    margin: 0 auto;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td > ._icon > img{
+    float: left;
+    width:100%;
+    height: 100%;
+    border: 0;
+    vertical-align: middle;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > ._text{
+    text-align: center;
+    cursor: default;
+}
+
+
+/*********** TabContent widget***************/
+.StdUI_TabContent{
+    display: none;
+    font-size: 12px;
+    clear: both;
+    position: relative;
+    outline: none;
+    overflow: auto;
+}
+
+/*********** Tab Widget **************/
+.StdUI_Tabs{
+    position: relative;
+    z-index: 2;
+    outline: none;
+}
+.StdUI_Tabs > ._tabBar{
+    overflow: hidden;
+}
+.StdUI_Tabs > ._tabBar > ._buttons{
+    float: left;
+}
+.StdUI_Tabs > ._tabBar > ._line{
+    position: relative;
+    z-index: 2;
+    left:0;
+    height:1px;
+    width:100%;
+    background: #B2AFAC;
+}
+.StdUI_Tabs > ._contents{
+    clear: both;
+    position: relative;
+    z-index: 1;
+    background: #E5DFDD;
+    border:1px solid #B2AFAC;
+
+    border-top: 0;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    overflow: hidden;
+    box-shadow: 1px 1px 1px rgba(184,181,179,0.7);
+}

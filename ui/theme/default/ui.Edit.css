@@ -1,0 +1,111 @@
+
+/************ Global Edit State **************/
+.StdUI_LineEdit,
+.StdUI_TextEdit{
+    font-size: 12px;
+    position: relative;
+    border:1px solid #B1B3B0;
+    background: white;
+    overflow: hidden;
+    border-radius: 2px;
+    transition: background 0.12s,border-color 0.2s;
+    outline:none;
+}
+
+.StdUI_LineEdit.hover,
+.StdUI_TextEdit.hover{
+    border-color: #6FD6FF;
+}
+
+.StdUI_LineEdit.focus,
+.StdUI_TextEdit.focus{
+    border-color: #4AABDB;
+}
+
+.StdUI_LineEdit.disabled,
+.StdUI_TextEdit.disabled{
+    color: #ACA9A8;
+    border-color: #C0BDBB;
+    background: #EEEEEE;
+}
+
+.StdUI_LineEdit > input,
+.StdUI_TextEdit > textarea{
+    font-size: 12px;
+    color: #2E2E2E;
+    width: 100%;
+    border: 0;
+    resize: none;
+    outline:none;
+    background: transparent;
+}
+
+.StdUI_LineEdit > ._placeHolder,
+.StdUI_TextEdit > ._placeHolder{
+    position: absolute;
+    left: 5px;
+    top: 0;
+    z-index: 1;
+    background: transparent;
+    color: #757575;
+    cursor: text;
+}
+
+.StdUI_LineEdit.disabled > input,
+.StdUI_TextEdit.disabled > textarea{
+    color: #474442;
+    background: transparent;
+}
+
+.StdUI_LineEdit._state._success,
+.StdUI_TextEdit._state._success{
+    background: #F2FFF0;
+    border-color: #47AC6C;
+}
+
+.StdUI_LineEdit._state._error,
+.StdUI_TextEdit._state._error{
+    background: #FFF3F3;
+    border-color: #D95151;
+}
+
+.StdUI_LineEdit._state._error > input,
+.StdUI_TextEdit._state._error > input{
+    -moz-text-decoration-style:wavy;
+    -moz-text-decoration-color:#f00;
+    -moz-text-decoration-line:underline;
+}
+
+
+/************ Line Edit **************/
+.StdUI_LineEdit{
+    height: 24px;
+    line-height: 24px;
+    padding: 0 5px 0 5px;
+}
+.StdUI_LineEdit > input{
+    margin: 0;
+    padding: 0;
+    height: 24px;
+    line-height: 24px;
+}
+.StdUI_LineEdit > ._placeHolder{
+    width: 3000px;
+    height: 24px;
+    line-height: 24px;
+}
+
+/************ Text Edit **************/
+.StdUI_TextEdit{
+    overflow: hidden;
+    padding: 5px;
+}
+.StdUI_TextEdit > textarea{
+    margin: 0;
+    overflow: auto;
+}
+.StdUI_TextEdit > ._placeHolder{
+    top:5px;
+    left:6px;
+}
+

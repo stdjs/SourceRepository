@@ -1,0 +1,39 @@
+
+/************* Progress *************/
+.StdUI_Progress{
+    font-size: 12px;
+    position: relative;
+    border: 1px solid #B7B7B7;
+    cursor: default;
+    overflow: hidden;
+    background: #F4FAFF;
+    outline: none;
+    border-radius: 2px;
+}
+.StdUI_Progress > ._text{
+    color: #505050;
+    font-weight: bold;
+    overflow: hidden;
+    text-align: center;
+}
+.StdUI_Progress > ._location{
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    width: 0;
+    transition: all 0.2s;
+    background: #57B0DC;
+    background: linear-gradient(to bottom,#5DBDEC 0%,#57B0DC 100%);
+}
+.StdUI_Progress > ._location > ._text{
+    font-weight: bold;
+    color: #226AA5;
+    overflow: hidden;
+    text-align: center;
+    text-shadow: 0 1px 0 #AAD9FF;
+}
+.StdUI_Progress._finished{
+    border-color: #46A9D7;
+    box-shadow: 0 0 4px #57B0DC;
+}

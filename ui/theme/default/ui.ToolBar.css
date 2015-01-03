@@ -1,0 +1,21 @@
+
+/************* ToolBar *************/
+.StdUI_ToolBar{
+    outline: none;
+    overflow: hidden;
+}
+.StdUI_ToolBar > ._buttons{
+    overflow: hidden;
+}
+.StdUI_ToolBar > ._buttons > .StdUI_ToolButton{
+    margin-right: 2px;
+}
+.StdUI_ToolBar > ._buttons > .StdUI_Sep{
+    float: left;
+    outline: none;
+    margin: 4px 5px 4px 5px;
+    width: 1px;
+    border-left: 1px solid #DBD4D0;
+    border-right: 1px solid #DBD4D0;
+    background: #BEBBB8;
+}

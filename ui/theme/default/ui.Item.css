@@ -1,0 +1,24 @@
+
+/************ Item **************/
+.StdUI_Item{
+    overflow: hidden;
+    color: #303030;
+}
+.StdUI_Item.disabled{
+    color: #7F7F7F;
+}
+
+.StdUI_Item > ._icon{
+    float: left;
+}
+.StdUI_Item > ._icon > img{
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+.StdUI_Item > ._text{
+    float: left;
+    font-size: 12px;
+    text-indent: 2px;
+}
+

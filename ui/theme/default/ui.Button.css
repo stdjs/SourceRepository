@@ -1,0 +1,124 @@
+
+/************* Button *************/
+.StdUI_Button{
+    font-family: Lato,"Open Sans",Arial,"Hiragino Sans GB","Microsoft YaHei",STHeiti,"WenQuanYi Micro Hei",SimSun,sans-serif;
+    font-size: 12px;
+    float: left;
+    position: relative;
+    padding: 5px 8px 5px 8px;
+    text-decoration: none;
+    overflow: hidden;
+    outline: none;
+    color: #474442;
+    border:1px solid #B2AFAC;
+    border-radius: 2px;
+    background: #E0DDDA;
+    background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
+    box-shadow: 1px 1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
+    transition: all 0.2s;
+}
+.StdUI_Button.hover{
+    border-color: #3AA7DD;
+}
+.StdUI_Button.press{
+
+}
+.StdUI_Button.focus{
+    border-color: #3192C1;
+    color: white;
+    transition: none;
+    box-shadow: 0 0 4px #3190C0;
+    background: #3499CA;
+    background: linear-gradient(to bottom,#3AAAE2 0%,#3499CA 100%);
+}
+.StdUI_Button.focus.hover{
+    border-color: #3398C9;
+    background: #57B0DC;
+    background: linear-gradient(to bottom,#5DBDEC 0%,#57B0DC 100%);
+}
+.StdUI_Button.focus.press{
+    background: #3190C0;
+    background: linear-gradient(to bottom,#37A3D9 0%,#3190C0 100%);
+}
+
+.StdUI_Button.disabled,
+.StdUI_Button.disabled.checked,
+.StdUI_Button.disabled.focus{
+    color: #989593;
+    background: #D4D0CC;
+    background: linear-gradient(to bottom,#D7D3CF 0%,#D0CCC8 100%);
+    box-shadow: 1px 1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
+    border-color: #C3BDB9;
+}
+.StdUI_Button.disabled.checked{
+    background: #858585;
+}
+.StdUI_Button.checked,
+.StdUI_Button.focus.checked
+{
+    background: #2183B0;
+    color: #F3F3F3;
+}
+.StdUI_Button.checked.hover{
+
+}
+.StdUI_Button.checked.press{
+    background: #1D769F;
+}
+
+
+/*********  buttonBox **********/
+.StdUI_Button > ._buttonBox{
+    overflow: hidden;
+    word-break: keep-all;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.StdUI_Button > ._buttonBox > tbody > tr > td{
+    padding: 0;
+}
+.StdUI_Button > ._buttonBox > tbody > tr > td > ._icon{
+    margin: 0 auto;
+}
+.StdUI_Button > ._buttonBox > tbody > tr > td > ._icon > img{
+    float: left;
+    width:100%;
+    height: 100%;
+    border: 0;
+    vertical-align: middle;
+}
+.StdUI_Button > ._buttonBox > tbody > tr > ._text{
+    text-align: center;
+    cursor: default;
+}
+.StdUI_Button > ._buttonBox._textBesideIcon > tbody > tr > td:first-child{
+    padding-right: 5px;
+}
+
+/********* ToolButton **********/
+.StdUI_ToolButton{
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    padding: 0 4px 0 4px;
+}
+.StdUI_ToolButton.press{
+    background: #57B0DC;
+    color: white;
+    border-color: transparent;
+}
+.StdUI_ToolButton.focus{
+    background: none;
+}
+.StdUI_ToolButton.checked{
+    border-color: transparent;
+}
+.StdUI_ToolButton.disabled,
+.StdUI_ToolButton.disabled.press{
+    color: #989593;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
