@@ -49,7 +49,7 @@ Std.source.response(function(){
             ],
             "ui.Menu":[
                 CSSFile_UI("ui.Menu"),
-                JSFile_UI("Menu")
+                JSFile_UI("ui.Menu")
             ],
             "ui.MenuBar":[
                 CSSFile_UI("ui.MenuBar"),
@@ -104,8 +104,8 @@ Std.source.response(function(){
                 JSFile_UI("ui.GridView")
             ],
             "ui.PropertyGird":[
-                CSSFile_UI("ui.PropertyGird"),
-                JSFile_UI("ui.PropertyGird")
+                CSSFile_UI("ui.PropertyGrid"),
+                JSFile_UI("ui.PropertyGrid")
             ],
             "ui.Video":[
                 CSSFile_UI("ui.Video"),
