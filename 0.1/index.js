@@ -47,10 +47,15 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.List")
             ]
         },
-        "ui.Menu":[
-            CSSFile_UI("ui.Menu"),
-            JSFile_UI("ui.Menu")
-        ],
+        "ui.Menu":{
+            basics:[
+                "ui.Item"
+            ],
+            files:[
+                CSSFile_UI("ui.Menu"),
+                JSFile_UI("ui.Menu")
+            ]
+        },
         "ui.MenuBar":[
             CSSFile_UI("ui.MenuBar"),
             JSFile_UI("ui.MenuBar")
