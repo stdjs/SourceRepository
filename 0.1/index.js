@@ -43,10 +43,12 @@ Std.source.response(function(){
                 CSSFile_UI("ui.DatePicker"),
                 JSFile_UI("ui.DatePicker")
             ],
-            "ui.List":[
-                CSSFile_UI("ui.List"),
-                JSFile_UI("ui.List")
-            ],
+            "ui.List":{
+                files:[
+                    CSSFile_UI("ui.List"),
+                    JSFile_UI("ui.List")
+                ]
+            },
             "ui.Menu":[
                 CSSFile_UI("ui.Menu"),
                 JSFile_UI("ui.Menu")
