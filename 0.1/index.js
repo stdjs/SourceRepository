@@ -42,6 +42,9 @@ Std.source.response("StdJS",function(){
             JSFile_UI("ui.DatePicker")
         ],
         "ui.List":{
+            basics:[
+                "ui.Item"
+            ],
             files:[
                 CSSFile_UI("ui.List"),
                 JSFile_UI("ui.List")
@@ -60,22 +63,42 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.MenuBar"),
             JSFile_UI("ui.MenuBar")
         ],
-        "ui.ComboBox":[
-            CSSFile_UI("ui.ComboBox"),
-            JSFile_UI("ui.ComboBox")
-        ],
-        "ui.ToolBar":[
-            CSSFile_UI("ui.ToolBar"),
-            JSFile_UI("ui.ToolBar")
-        ],
-        "ui.Panel":[
-            CSSFile_UI("ui.Panel"),
-            JSFile_UI("ui.Panel")
-        ],
-        "ui.Window":[
-            CSSFile_UI("ui.Window"),
-            JSFile_UI("ui.Window")
-        ],
+        "ui.ComboBox":{
+            basics:[
+                "ui.Item"
+            ],
+            files:[
+                CSSFile_UI("ui.ComboBox"),
+                JSFile_UI("ui.ComboBox")
+            ]
+        },
+        "ui.ToolBar":{
+            basics:[
+                "ui.Button"
+            ],
+            files:[
+                CSSFile_UI("ui.ToolBar"),
+                JSFile_UI("ui.ToolBar")
+            ]
+        },
+        "ui.Panel":{
+            basics:[
+                "ui.ToolBar"
+            ],
+            files:[
+                CSSFile_UI("ui.Panel"),
+                JSFile_UI("ui.Panel")
+            ]
+        },
+        "ui.Window":{
+            basics:[
+                "ui.Panel","ui.Menu"
+            ],
+            files:[
+                CSSFile_UI("ui.Window"),
+                JSFile_UI("ui.Window")
+            ]
+        },
         "ui.MessageBox":[
             CSSFile_UI("ui.MessageBox"),
             JSFile_UI("ui.MessageBox")
@@ -88,14 +111,24 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.Progress"),
             JSFile_UI("ui.Progress")
         ],
-        "ui.Accordion":[
-            CSSFile_UI("ui.Accordion"),
-            JSFile_UI("ui.Accordion")
-        ],
-        "ui.Tabs":[
-            CSSFile_UI("ui.Tabs"),
-            JSFile_UI("ui.Tabs")
-        ],
+        "ui.Accordion":{
+            basics:[
+                "ui.Item"
+            ],
+            files:[
+                CSSFile_UI("ui.Accordion"),
+                JSFile_UI("ui.Accordion")
+            ]
+        },
+        "ui.Tabs":{
+            basics:[
+                "ui.Button"
+            ],
+            files:[
+                CSSFile_UI("ui.Tabs"),
+                JSFile_UI("ui.Tabs")
+            ]
+        },
         "ui.Slider":[
             CSSFile_UI("ui.Slider"),
             JSFile_UI("ui.Slider")
