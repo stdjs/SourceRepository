@@ -5,6 +5,7 @@ Std.source.response("StdJS",function(){
     function JSFile_UI(name){
         return "ui/" + name + ".js";
     }
+    
     return {
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
