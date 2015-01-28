@@ -152,7 +152,7 @@ Std.source.response("StdJS",function(){
         ],
 	"ui.ImageCutter":{
 	    basics:[
-		"Slider","Button"
+		"ui.Slider","ui.Button"
 	    ],
 	    files:[
 	      JSFile_UI("ui.ImageCutter")
