@@ -149,6 +149,14 @@ Std.source.response("StdJS",function(){
         "ui.Video":[
             CSSFile_UI("ui.Video"),
             JSFile_UI("ui.Video")
-        ]
+        ],
+	"ui.ImageCutter":{
+	    basics:[
+		"Slider","Button"
+	    ],
+	    files:[
+	      JSFile_UI("ui.ImageCutter")
+	    ]
+	}
     };
 });
