@@ -150,13 +150,15 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.Video"),
             JSFile_UI("ui.Video")
         ],
-	"ui.ImageCutter":{
-	    basics:[
-		"ui.Slider","ui.Button"
-	    ],
-	    files:[
-	      JSFile_UI("ui.ImageCutter")
-	    ]
-	}
+        "ui.ImageCutter":{
+            basics:[
+                "ui.Slider","ui.Button"
+            ],
+            files:[
+              JSFile_UI("ui.ImageCutter")
+            ]
+        },
+        "crypto.base64":"crypto/Std.crypto.base64.js",
+        "crypto.md5":"crypto/Std.crypto.md5.js"
     };
 });

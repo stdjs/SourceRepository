@@ -345,6 +345,8 @@ Std.ui.module("ImageCutter",{
                 var reader  = new FileReader;
                 reader.readAsDataURL(files[0]);
                 reader.onload = function(){
+                    that._fileSize = files[0].size;
+                    that._fileName = files[0].name;
                     that.widgets.view.image(reader.result)
                 };
             });
@@ -395,6 +397,18 @@ Std.ui.module("ImageCutter",{
             that.widgets.view.image(url);
 
             return that;
+        },
+        /*
+         * fileName
+        */
+        fileName:function(){
+            return this._fileName;
+        },
+        /*
+         * fileSize
+        */
+        fileSize:function(){
+            return this._fileSize;
         }
     },
     /*[#module option:main]*/
