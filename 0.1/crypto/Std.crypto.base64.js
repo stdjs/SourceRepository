@@ -1,5 +1,5 @@
 /**
- * base64 encode
+ * base64
 */
 Std.crypto.base64 = Std.module(function(){
     var reference = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';

@@ -160,6 +160,7 @@ Std.source.response("StdJS",function(){
         },
         "crypto.base64":"crypto/Std.crypto.base64.js",
         "crypto.md5":"crypto/Std.crypto.md5.js",
-	"crypto.md6":"crypto/Std.crypto.md6.js"
+	    "crypto.md6":"crypto/Std.crypto.md6.js",
+        "crypto.aes":"crypto/Std.crypto.aes.js"
     };
 });
