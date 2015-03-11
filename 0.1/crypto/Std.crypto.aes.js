@@ -151,12 +151,12 @@ Std.crypto.aes = Std.module(function(){
             /*
              * encode aes
             */
-            encode:function(plaintext,password,bits){
+            encode:function(plainText,password,bits){
                 if(!(bits==128 || bits==192 || bits==256)){
                     return '';
                 }
 
-                plaintext = String(plaintext).utf8Encode();
+                plainText = String(plainText).utf8Encode();
                 password  = String(password).utf8Encode();
 
                 var bytes     = bits / 8;
@@ -190,7 +190,7 @@ Std.crypto.aes = Std.module(function(){
                 }
 
                 var keySchedule = keyExpansion(key);
-                var blockCount  = Math.ceil(plaintext.length/blockSize);
+                var blockCount  = Math.ceil(plainText.length/blockSize);
                 var ciphertxt   = new Array(blockCount);
 
                 for (var b=0;b<blockCount;b++){
@@ -201,11 +201,11 @@ Std.crypto.aes = Std.module(function(){
                         counterBlock[15-c-4] = (b/0x100000000 >>> c*8);
                     }
                     var cipherCntr  = cipher(counterBlock,keySchedule);
-                    var blockLength = b < blockCount-1 ? blockSize : (plaintext.length-1) % blockSize+1;
+                    var blockLength = b < blockCount-1 ? blockSize : (plainText.length-1) % blockSize+1;
                     var cipherChar  = new Array(blockLength);
 
                     for(var i=0;i<blockLength;i++){
-                        cipherChar[i] = cipherCntr[i] ^ plaintext.charCodeAt(b*blockSize+i);
+                        cipherChar[i] = cipherCntr[i] ^ plainText.charCodeAt(b*blockSize+i);
                         cipherChar[i] = String.fromCharCode(cipherChar[i]);
                     }
                     ciphertxt[b] = cipherChar.join('');
@@ -215,11 +215,11 @@ Std.crypto.aes = Std.module(function(){
             /*
              * decode aes
             */
-            decode:function(ciphertext,password,bits){
+            decode:function(cipherText,password,bits){
                 if (!(bits==128 || bits==192 || bits==256)){
                     return '';
                 }else{
-                    ciphertext = Std.crypto.base64.decode(String(ciphertext));
+                    cipherText = Std.crypto.base64.decode(String(cipherText));
                     password   = String(password).utf8Encode();
                 }
                 var bytes     = bits / 8;
@@ -233,22 +233,22 @@ Std.crypto.aes = Std.module(function(){
                 key = key.concat(key.slice(0,bytes-16));
 
                 var counterBlock = new Array(8);
-                var ctrTxt       = ciphertext.slice(0, 8);
+                var ctrTxt       = cipherText.slice(0, 8);
 
                 for(var i=0;i<8;i++){
                     counterBlock[i] = ctrTxt.charCodeAt(i);
                 }
 
                 var keySchedule = keyExpansion(key);
-                var blocks      = Math.ceil((ciphertext.length-8) / blockSize);
+                var blocks      = Math.ceil((cipherText.length-8) / blockSize);
                 var ct          = new Array(blocks);
 
                 for(var b=0;b<blocks;b++){
-                    ct[b] = ciphertext.slice(8+b*blockSize, 8+b*blockSize+blockSize);
+                    ct[b] = cipherText.slice(8+b*blockSize, 8+b*blockSize+blockSize);
                 }
-                ciphertext = ct;
+                cipherText = ct;
 
-                var plaintxt = new Array(ciphertext.length);
+                var plaintxt = new Array(cipherText.length);
                 for(var b=0;b<blocks;b++){
                     for(var c=0;c<4;c++){
                         counterBlock[15-c] = ((b) >>> c*8) & 0xff;
@@ -257,10 +257,10 @@ Std.crypto.aes = Std.module(function(){
                         counterBlock[15-c-4] = (((b+1)/0x100000000-1) >>> c*8) & 0xff;
                     }
                     var cipherCntr   = cipher(counterBlock, keySchedule);
-                    var plaintxtByte = new Array(ciphertext[b].length);
+                    var plaintxtByte = new Array(cipherText[b].length);
 
-                    for(var i=0;i<ciphertext[b].length;i++){
-                        plaintxtByte[i] = cipherCntr[i] ^ ciphertext[b].charCodeAt(i);
+                    for(var i=0;i<cipherText[b].length;i++){
+                        plaintxtByte[i] = cipherCntr[i] ^ cipherText[b].charCodeAt(i);
                         plaintxtByte[i] = String.fromCharCode(plaintxtByte[i]);
                     }
                     plaintxt[b] = plaintxtByte.join('');
@@ -269,8 +269,8 @@ Std.crypto.aes = Std.module(function(){
             }
         },
         /*[#module option:main]*/
-        main:function(data){
-
+        main:function(plaintext,password,bits){
+            return Std.crypto.aes(plaintext,password,bits);
         }
     }
 });

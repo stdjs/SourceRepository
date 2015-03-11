@@ -155,9 +155,11 @@ Std.source.response("StdJS",function(){
                 "ui.Slider","ui.Button"
             ],
             files:[
-              JSFile_UI("ui.ImageCutter")
+                JSFile_UI("ui.ImageCutter")
             ]
         },
+        "crypto.sha1":"crypto/Std.crypto.sha1.js",
+        "crypto.sha256":"crypto/Std.crypto.sha256.js",
         "crypto.base64":"crypto/Std.crypto.base64.js",
         "crypto.md5":"crypto/Std.crypto.md5.js",
 	    "crypto.md6":"crypto/Std.crypto.md6.js",
