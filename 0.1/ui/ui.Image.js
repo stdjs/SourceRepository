@@ -27,7 +27,7 @@ Std.ui.module("Image",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Image",
+        defaultClass:"StdUI_Image",
         level:1,
         width:22,
         height:22,

@@ -9,7 +9,7 @@ Std.ui.module("SwitchBox",{
     /*#module option:option]*/
     option:{
         level:2,
-        className:"StdUI_SwitchBox",
+        defaultClass:"StdUI_SwitchBox",
         height:26,
         value:"off",
         items:"off on"

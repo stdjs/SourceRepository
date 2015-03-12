@@ -11,7 +11,7 @@ Std.ui.module("MenuItem",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_MenuItem",
+        defaultClass:"StdUI_MenuItem",
         text:"menu item",
         items:null
     },

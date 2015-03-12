@@ -9,11 +9,11 @@ Std.ui.module("Accordion",{
     /*#module option:option]*/
     option:{
         level:4,
-        className:"StdUI_Accordion",
+        defaultClass:"StdUI_Accordion",
         switchType:"click",
         items:null,
-        template:null,
         height:400,
+        template:null,
         titleHeight:30,
         collapsible:false,
         clientPadding:5
@@ -61,17 +61,15 @@ Std.ui.module("Accordion",{
 
             if(index === undefined){
                 return that.clear();
-            }else{
-                if(isNumber(index)){
-                    that.removeItem(index);
-                }else if(isArray(index)){
-                    for(var i=index.length-1;i>=0;i--){
-                        that.removeItem(index[i]);
-                    }
+            }else if(isNumber(index)){
+                that.removeItem(index);
+            }else if(isArray(index)){
+                for(var i=index.length-1;i>=0;i--){
+                    that.removeItem(index[i]);
                 }
-                if(that.renderState){
-                    that.repaint();
-                }
+            }
+            if(that.renderState){
+                that.repaint();
             }
         }
     },

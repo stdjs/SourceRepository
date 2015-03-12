@@ -20,21 +20,21 @@ Std.ui.module("MenuBar",{
     extend:{
         /*
          * render
-         */
+        */
         render:function(){
             var that = this;
 
         },
         /*
          *  height
-         */
+        */
         height:function(height){
             var that = this;
 
         },
         /*
          *  remove
-         */
+        */
         remove:function(button){
             var that  = this;
             var items = that.items;
@@ -45,7 +45,7 @@ Std.ui.module("MenuBar",{
     public:{
         /*
          * append tool button
-         */
+        */
         append:Std.func(function(data){
             var that  = this;
             var opts  = that.opts;

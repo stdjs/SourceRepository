@@ -7,7 +7,7 @@ Std.ui.module("TabButton",{
     /*[#module option:option]*/
     option:{
         height:30,
-        className:"StdUI_TabButton",
+        defaultClass:"StdUI_TabButton",
         closable:false,
         styleType:"text"    //text,icon,textBesideIcon
     },
@@ -51,7 +51,7 @@ Std.ui.module("TabContent",{
     parent:"widget",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_TabContent"
+        defaultClass:"StdUI_TabContent"
     }
 });
 
@@ -63,13 +63,15 @@ Std.ui.module("Tabs",{
     parent:"widget",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Tabs",
+        defaultClass:"StdUI_Tabs",
         level:4,
         current:0,
         height:300,
         tabBarHeight:32,
         contentPadding:5,
-        items:null
+        items:null,
+        tabAlign:"left",
+        tabPosition:"top"
     },
     /*[#module option:events]*/
     events:"tabChange tabRemove",

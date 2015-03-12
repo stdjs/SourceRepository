@@ -13,7 +13,7 @@ Std.ui.module("ColorPicker",{
     /*[#module option:option]*/
     option:{
         level:3,
-        className:"StdUI_ColorPicker",
+        defaultClass:"StdUI_ColorPicker",
         fixedLayoutWidth:true,
         fixedLayoutHeight:true,
         minWidth:380,

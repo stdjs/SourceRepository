@@ -13,7 +13,7 @@ Std.ui.module("CodeView",{
         level:3,
         minWidth:12,
         minHeight:12,
-        className:"StdUI_CodeView",
+        defaultClass:"StdUI_CodeView",
         value:""
     },
     /*[#module option:private]*/

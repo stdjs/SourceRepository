@@ -14,7 +14,7 @@ Std.ui.module("CodeEdit",{
         level:4,
         minWidth:12,
         minHeight:12,
-        className:"StdUI_CodeEdit",
+        defaultClass:"StdUI_CodeEdit",
         value:""
     },
     /*[#module option:private]*/

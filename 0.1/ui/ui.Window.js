@@ -12,7 +12,7 @@ Std.ui.module("Window",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Panel StdUI_Window",
+        defaultClass:"StdUI_Panel StdUI_Window",
         minWidth:180,
         minHeight:100,
         width:600,

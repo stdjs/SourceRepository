@@ -10,7 +10,7 @@ Std.ui.module("TreeItem",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_TreeItem",
+        defaultClass:"StdUI_TreeItem",
         checked:false,
         editable:false,
         expanded:false,
@@ -489,7 +489,7 @@ Std.ui.module("Tree",{
     parent:"widget",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Tree",
+        defaultClass:"StdUI_Tree",
         level:4,
         items:null,
         itemSize:16,

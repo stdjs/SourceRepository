@@ -319,7 +319,8 @@ Std.ui.module("LineEdit",{
         dataList:null,
         minWidth:12,
         minHeight:12,
-        className:"StdUI_LineEdit"
+        defaultClass:"StdUI_LineEdit",
+        value:0
     },
     /*[#module option:protected]*/
     protected:{
@@ -370,7 +371,7 @@ Std.ui.module("TextEdit",{
         level:4,
         minWidth:15,
         minHeight:20,
-        className:"StdUI_TextEdit"
+        defaultClass:"StdUI_TextEdit"
     },
     /*[#module option:protected]*/
     protected:{

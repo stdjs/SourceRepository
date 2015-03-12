@@ -9,7 +9,7 @@ Std.ui.module("CheckBox",{
     /*[#module option:option]*/
     option:{
         level:1,
-        className:"StdUI_CheckBox",
+        defaultClass:"StdUI_CheckBox",
         text:"CheckBox",
         checked:false
     },

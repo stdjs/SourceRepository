@@ -7,7 +7,7 @@ Std.ui.module("RadioBox",{
     /*[#module option:option]*/
     option:{
         level:1,
-        className:"StdUI_RadioBox",
+        defaultClass:"StdUI_RadioBox",
         text:"RadioBox",
         checked:false
     },

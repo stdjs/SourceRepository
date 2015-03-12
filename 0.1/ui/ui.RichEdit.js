@@ -8,7 +8,7 @@
         },
         /*[#module option:option]*/
         option:{
-            className:"StdUI_RichEdit",
+            defaultClass:"StdUI_RichEdit",
             level:4,
             value:"",
             width:"auto",

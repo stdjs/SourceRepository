@@ -15,7 +15,7 @@ Std.ui.model("slider",{
         max:100,
         min:0,
         value:0,
-        className:"StdUI_Slider",
+        defaultClass:"StdUI_Slider",
         handleWidth:18,
         handleHeight:18
     },

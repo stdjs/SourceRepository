@@ -12,7 +12,7 @@ Std.ui.module("DatePicker",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_DatePicker",
+        defaultClass:"StdUI_DatePicker",
         editable:true,
         value:"",
         minWidth:233,
@@ -468,7 +468,6 @@ Std.ui.module("DatePicker",{
         }
     }
 });
-
 
 /**
  *  date picker plugin,base on datePicker widget

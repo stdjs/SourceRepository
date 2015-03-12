@@ -10,7 +10,7 @@ Std.ui.module("video",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Video",
+        defaultClass:"StdUI_Video",
         autoplay:false,
         preload:true,
         src:null,   //this src address can be a string or array

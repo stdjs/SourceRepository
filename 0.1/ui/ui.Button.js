@@ -18,7 +18,7 @@ Std.ui.module("Button",{
         link:false,
         href:"",
         target:"_blank",
-        className:"StdUI_Button",
+        defaultClass:"StdUI_Button",
         checkable:false,
         checked:false,
         styleType:"text", //textBesideIcon,textUnderIcon,text,icon
@@ -26,7 +26,7 @@ Std.ui.module("Button",{
         iconHeight:18
     },
     /*[#module option:events]*/
-    events:"checked mousedown mouseup click press focus blur",
+    events:"checked mousedown mouseup click press longpress focus blur",
     /*[#module option:extend]*/
     extend:{
         /*
@@ -124,6 +124,9 @@ Std.ui.module("Button",{
                     }
                     that.press().emit("click",e);
                     Std.func(opts.click).call(that,e);
+                },
+                longpress:function(e){
+                    that.emit("longpress",e);
                 }
             });
             return that;

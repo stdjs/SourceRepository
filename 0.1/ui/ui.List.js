@@ -6,7 +6,7 @@ Std.ui.module("ListItem",{
     parent:"Item",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Item StdUI_ListItem",
+        defaultClass:"StdUI_Item StdUI_ListItem",
         iconHeight:16,
         iconWidth:16,
         height:24,
@@ -54,7 +54,7 @@ Std.ui.module("List",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_List",
+        defaultClass:"StdUI_List",
         level:4,
         value:null,
         items:null,

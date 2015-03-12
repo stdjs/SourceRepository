@@ -11,7 +11,7 @@ Std.ui.module("Item",{
     /*[#module option:option]*/
     option:{
         level:2,
-        className:"StdUI_Item",
+        defaultClass:"StdUI_Item",
         text:"",
         icon:null,
         value:null,

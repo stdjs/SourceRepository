@@ -9,7 +9,7 @@ Std.ui.module("MessageBox",{
     events:"ok cancel close yes no abort retry ignore apply",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_MessageBox",
+        defaultClass:"StdUI_MessageBox",
         renderTo:"body",
         type:"information",   //information warning error question
         acceptEsc:true,

@@ -6,7 +6,7 @@ Std.ui.module("ComboBoxItem",{
     parent:"Item",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_ComboBoxItem"
+        defaultClass:"StdUI_ComboBoxItem"
     }
 });
 
@@ -19,7 +19,7 @@ Std.ui.module("ComboBox",{
     /*[#module option:option]*/
     option:{
         level:3,
-        className:"StdUI_ComboBox",
+        defaultClass:"StdUI_ComboBox",
         minWidth:60,
         minHeight:26,
         maxHeight:26,
@@ -27,10 +27,10 @@ Std.ui.module("ComboBox",{
         height:26,
         items:null,
         value:null,
-        template:null,      //item template
-        inputMode:"none",   //none,input
-        valueMode:"text",   //text,index,item
-        textField: "text",
+        template:null,       //item template
+        inputMode : "none",  //none,input
+        valueMode : "text",  //text,index,item
+        textField : "text",
         valueField: "value",
         dataSource:null
     },
@@ -135,9 +135,9 @@ Std.ui.module("ComboBox",{
     /*[#module option:private]*/
     private:{
         /*
-         * trigger list
+         * toggle list
         */
-        triggerList:function(){
+        toggleList:function(){
             var that = this;
 
             if(!that.enable()){
@@ -167,7 +167,7 @@ Std.ui.module("ComboBox",{
                 },
                 click:function(){
                     that.value(currentItem);
-                    that.triggerList();
+                    that.toggleList();
                     that.focus();
                 }
             },e);
@@ -254,7 +254,7 @@ Std.ui.module("ComboBox",{
             that[0].on({
                 mousedown:function(e){
                     if(e.target.nodeName !== "INPUT"){
-                        that.triggerList();
+                        that.toggleList();
                     }
                 },
                 focusin:function(){

@@ -13,7 +13,7 @@ Std.ui.module("PanelTitle",{
     /*[#module option:option]*/
     option:{
         tabIndex:null,
-        className:"StdUI_PanelTitle",
+        defaultClass:"StdUI_PanelTitle",
         minHeight:20,
         height:22,
         level:2,
@@ -183,7 +183,7 @@ Std.ui.module("Panel",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Panel",
+        defaultClass:"StdUI_Panel",
         minWidth:70,
         minHeight:50,
         height:200,
@@ -383,9 +383,9 @@ Std.ui.module("Panel",{
             ]
         });
 
-	if(opts.padding !== null){
-	  that._central[0].css("padding",opts.padding);
-	}
+        if(opts.padding !== null){
+            that._central[0].css("padding",opts.padding);
+        }
         that._client.layout(that._clientLayout);
         that.call_opts({
             menuBar:null,

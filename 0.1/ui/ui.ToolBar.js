@@ -10,7 +10,7 @@ Std.ui.module("ToolBar",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_ToolBar",
+        defaultClass:"StdUI_ToolBar",
         height:30,
         minHeight:28,
         level:3,
@@ -73,13 +73,13 @@ Std.ui.module("ToolBar",{
             if(isWidget(data)){
                 item = data;
             }else if(isString(data)){
-                item = Std.ui.create("ToolButton",{
+                item = Std.ui("ToolButton",{
                     text:data,
                     styleType:opts.styleType
                 });
             }else if(isObject(data)){
                 data.styleType = opts.styleType;
-                item = Std.ui.create(data.ui || "ToolButton",data)
+                item = Std.ui(data.ui || "ToolButton",data)
             }
 
             if(item === null){

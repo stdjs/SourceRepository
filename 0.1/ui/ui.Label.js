@@ -7,7 +7,8 @@ Std.css({
         fontSize:"12px",
         color:"#3B3B3B",
         overflow:"hidden",
-        textOverflow:"ellipsis"
+        textOverflow:"ellipsis",
+        textDecoration: "none"
     }
 });
 
@@ -17,13 +18,15 @@ Std.css({
 Std.ui.module("Label",{
     /*[#module option:parent]*/
     parent:"widget",
+    /*[#module option:nodeName]*/
+    nodeName:"a",
     /*[#module option:action]*/
     action:{
         content:"value"
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Label",
+        defaultClass:"StdUI_Label",
         level:1,
         bold:false,
         underline:false,
@@ -34,6 +37,8 @@ Std.ui.module("Label",{
         fontSize:12,
         lineHeight:null,
         indent:0,
+        href:null,
+        target:null,
         value:"label",
         background:"",
         textFormat:"html"    //html,text
@@ -47,6 +52,22 @@ Std.ui.module("Label",{
         */
         textFormat:function(type){
             return this.opt("textFormat",type);
+        },
+        /*
+         * href
+        */
+        href:function(href){
+            return this.opt("href",href,function(){
+                this[0].attr("href",href);
+            });
+        },
+        /*
+         * target
+        */
+        target:function(href){
+            return this.opt("target",href,function(){
+                this[0].attr("target",href);
+            });
         },
         /*
          * get or set wordwrap
@@ -158,12 +179,12 @@ Std.ui.module("Label",{
     main:function(that){
         that.call_opts({
             bold:false,
-            underline:false,
             indent:0,
+            underline:false,
             background:""
         },true);
 
-        that.call_opts(["fontSize","color","wordwrap","wordnowrap","lineHeight","textAlign"],true);
+        that.call_opts(["fontSize","color","wordwrap","wordnowrap","lineHeight","textAlign","href","target"],true);
         that.call_opts("value");
     }
 });

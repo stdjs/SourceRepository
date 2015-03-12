@@ -10,7 +10,7 @@ Std.ui.module("Progress",{
     },
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Progress",
+        defaultClass:"StdUI_Progress",
         level:3,
         height:26,
         minWidth:35,

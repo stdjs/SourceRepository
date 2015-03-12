@@ -5,7 +5,9 @@ Std.source.response("StdJS",function(){
     function JSFile_UI(name){
         return "ui/" + name + ".js";
     }
-
+    function cryptoJS(name){
+        return "crypto/Std.crypto."+name+".js";
+    }
     return {
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
@@ -138,9 +140,9 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.Tree"),
             JSFile_UI("ui.Tree")
         ],
-        "ui.GridView":[
-            CSSFile_UI("ui.GridView"),
-            JSFile_UI("ui.GridView")
+        "ui.DataGrid":[
+            CSSFile_UI("ui.DataGrid"),
+            JSFile_UI("ui.DataGrid")
         ],
         "ui.PropertyGird":[
             CSSFile_UI("ui.PropertyGrid"),
@@ -158,17 +160,17 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.ImageCutter")
             ]
         },
-        "crypto.sha1":"crypto/Std.crypto.sha1.js",
-        "crypto.sha256":"crypto/Std.crypto.sha256.js",
-        "crypto.base64":"crypto/Std.crypto.base64.js",
-        "crypto.md5":"crypto/Std.crypto.md5.js",
-	    "crypto.md6":"crypto/Std.crypto.md6.js",
+        "crypto.sha1":cryptoJS("sha1"),
+        "crypto.sha256":cryptoJS("sha256"),
+        "crypto.base64":cryptoJS("base64"),
+        "crypto.md5":cryptoJS("md5"),
+	    "crypto.md6":cryptoJS("md6"),
         "crypto.aes":{
             basics:[
                 "crypto.base64"
             ],
             files:[
-                "crypto/Std.crypto.aes.js"
+                cryptoJS("aes")
             ]
         }
     };
