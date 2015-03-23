@@ -125,7 +125,7 @@ Std.ui.module("List",{
          * init List Item events
         */
         initItemEvents:function(){
-            var that       = this;
+            var that = this;
 
             //-------- select
             var selectItem = function(item,index){
@@ -192,7 +192,6 @@ Std.ui.module("List",{
             if(isWidget(index)){
                 that.select(items.indexOf(index));
             }
-
             //----- if data is number
             else if(isNumber(index)){
                 var selectItem = items[index];
@@ -251,10 +250,7 @@ Std.ui.module("List",{
                 }
             }
 
-            if(!isWidget(item)){
-                return;
-            }
-            if(item !== null){
+            if(isWidget(item) && item !== null){
                 that.items.push(item);
                 that.renderState && item.renderTo(that[0]);
             }

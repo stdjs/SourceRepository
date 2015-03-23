@@ -41,6 +41,8 @@ Std.ui.module("SpinBox",{
                                 this.value("");
                             }
                             break;
+                        case keyCode === 9:
+                            break;
                         default:
                             e.preventDefault();
                     }

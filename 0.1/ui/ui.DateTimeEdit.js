@@ -41,7 +41,7 @@ Std.ui.module("DateTimeEdit",{
             if(that._picker){
                 that._picker.remove();
             }
-            that.delDocumentEvents();
+            that.removeDocumentEvents();
         }
     },
     /*[#module option:private]*/
@@ -96,14 +96,14 @@ Std.ui.module("DateTimeEdit",{
                     return;
                 }
                 that.hidePicker();
-                that.delDocumentEvents();
+                that.removeDocumentEvents();
             }));
             return that;
         },
         /*
          * delDocumentEvents
         */
-        delDocumentEvents:function(){
+        removeDocumentEvents:function(){
             var that = this;
 
             if(that._documentEvents){
@@ -147,7 +147,7 @@ Std.ui.module("DateTimeEdit",{
 
             picker[0].removeClass("StdUI_DateTimeEdit_Animate1").addClass("StdUI_DateTimeEdit_Animate2");
 
-            that.delDocumentEvents();
+            that.removeDocumentEvents();
             that._pickerState = false;
 
             return that;

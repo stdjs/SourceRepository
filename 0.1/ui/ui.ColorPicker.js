@@ -5,7 +5,7 @@ Std.ui.module("ColorPicker",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"change submit",
+    events:"change",
     /*[#module option:action]*/
     action:{
         content:"value"
@@ -21,8 +21,7 @@ Std.ui.module("ColorPicker",{
         width:380,
         height:220,
         paletteSize:150,
-        value:"#000",
-        submitText:"Submit"
+        value:"#000"
     },
     /*[#module option:protected]*/
     protected:{
@@ -302,7 +301,7 @@ Std.ui.module("ColorPicker",{
     main:function(that,opts,dom){
         var doms = that.D = {};
 
-        Std.each("client views view palettes palette roll position1 position2 values button colors",function(i,name){
+        Std.each("client views view palettes palette roll position1 position2 values colors",function(i,name){
             doms[name] = newDiv("_"+name);
         });
         Std.each("R G B HEX H S V",function(i,name){
@@ -314,12 +313,6 @@ Std.ui.module("ColorPicker",{
             )
         });
 
-        doms.button.html(opts.submitText).mouse({
-            click:function(){
-                that.emit("submit");
-            }
-        });
-
         dom.append([
             doms.palettes.append([
                 doms.palette.append(doms.position1.append(newDiv("inner"))),
@@ -328,8 +321,7 @@ Std.ui.module("ColorPicker",{
             newDiv("_client").append([
                 doms.colors,
                 doms.views.append([
-                    doms.view,
-                    doms.button
+                    doms.view
                 ])
             ]),
             doms.values

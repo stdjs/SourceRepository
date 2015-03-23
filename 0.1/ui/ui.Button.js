@@ -13,6 +13,7 @@ Std.ui.module("Button",{
     option:{
         level:2,
         icon:null,
+        iconClass:null,
         menu:null,
         text:"Button",
         link:false,
@@ -303,15 +304,24 @@ Std.ui.module("Button",{
                 if(that.opts.styleType === "text"){
                     return;
                 }
-                if(icon.charAt(0) !== '.'){
-                    if(!doms.iconImg){
-                        doms.iconImg = newDom("img").appendTo(doms.icon);
-                    }
-                    doms.iconImg.attr("src",icon);
-                }else{
-                    doms.iconImg && doms.iconImg.remove();
-                    doms.icon.className("_icon" + icon.replace(/\./g,' '));
+                if(!doms.iconImg){
+                    doms.iconImg = newDom("img").appendTo(doms.icon);
                 }
+                doms.iconImg.attr("src",icon);
+            });
+        },
+        /*
+         * icon class name
+         */
+        iconClass:function(className){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("iconClass",className,function(){
+                if(that.opts.styleType === "text"){
+                    return;
+                }
+                doms.icon.className("_icon " + className);
             });
         },
         /*
@@ -331,6 +341,7 @@ Std.ui.module("Button",{
                 that.initElements();
                 that.call_opts("text").call_opts({
                     icon:null,
+                    iconClass:null,
                     checked:false,
                     link:false
                 },true);
@@ -358,7 +369,7 @@ Std.ui.module("ToolButton",{
     parent:"Button",
     /*[#module option:option]*/
     option:{
-        className:"StdUI_Button StdUI_ToolButton",
+        defaultClass:"StdUI_Button StdUI_ToolButton",
         tabIndex:null,
         height:32,
         iconWidth:24,

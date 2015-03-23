@@ -130,7 +130,7 @@ Std.ui.module("Accordion",{
         */
         createItem:function(data){
             var that    = this;
-            var header  = that.createItemHeader(data.text,data.icon);
+            var header  = that.createItemHeader(data.text,data.icon,data.iconClass);
             var client  = that.createItemClient(data.content);
 
             return {
@@ -144,22 +144,22 @@ Std.ui.module("Accordion",{
         /*
          * create item header
         */
-        createItemHeader:function(text,icon){
+        createItemHeader:function(text,icon,iconClass){
             var elements = {
                 main:newDiv("_title").height(this.opts.titleHeight)
             };
 
-            if(isString(icon)){
+            if(isString(icon) || isString(iconClass)){
                 elements.main.append(
                     elements.icon = newDiv("_icon")
                 );
-                if(icon.charAt(0) !== '.'){
+                if(iconClass){
+                    elements.icon.addClass(iconClass);
+                }
+                if(icon){
                     newDom("img").appendTo(elements.icon).attr("src",icon);
-                }else{
-                    elements.icon.className("_icon" + icon.replace(/\./g,' '));
                 }
             }
-
             elements.main.append([
                 elements.text  = newDiv("_text").html(text),
                 elements.arrow = newDiv("_arrow")
@@ -178,7 +178,8 @@ Std.ui.module("Accordion",{
 
             if(isString(data)){
                 widget = Std.ui("widget",{
-                    html:data
+                    html:data,
+                    tabIndex:null
                 });
             }else if(isObject(data)){
                 if(opts.template !== null){
@@ -189,7 +190,9 @@ Std.ui.module("Accordion",{
                 }else if(isWidget(data)){
                     widget = client;
                 }else{
-                    widget = Std.ui(data.ui || "widget",data);
+                    widget = Std.ui(data.ui || "widget",Std.extend({
+                        tabIndex:null
+                    },data));
                 }
             }
 
@@ -197,10 +200,7 @@ Std.ui.module("Accordion",{
                 widget[0].padding(widget.opts.padding = opts.clientPadding);
                 widget.appendTo(client);
             }
-            return {
-                main:client,
-                widget:widget
-            };
+            return {main:client, widget:widget};
         },
         /*
          * init events

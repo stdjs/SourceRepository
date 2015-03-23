@@ -10,12 +10,12 @@ Std.ui.module("ToolBar",{
     },
     /*[#module option:option]*/
     option:{
-        defaultClass:"StdUI_ToolBar",
         height:30,
         minHeight:28,
         level:3,
         items:null,
-        styleType:"textBesideIcon" //textBesideIcon,textUnderIcon
+        styleType:"textBesideIcon", //textBesideIcon,textUnderIcon
+        defaultClass:"StdUI_ToolBar"
     },
     /*[#module option:extend]*/
     extend:{

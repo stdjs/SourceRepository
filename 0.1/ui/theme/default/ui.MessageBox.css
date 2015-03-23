@@ -68,7 +68,10 @@
     word-wrap:break-word;
 }
 .StdUI_MessageBox > ._body > ._client > ._content > ._text{
-    margin-top: 14px;
+    margin-top: 12px;
+}
+.StdUI_MessageBox > ._body > ._client > ._content > ._input{
+    margin-top: 8px;
 }
 .StdUI_MessageBox > ._body > ._client > ._content > ._informativeText{
     font-weight: bold;

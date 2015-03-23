@@ -1,8 +1,8 @@
 /**
  * canvas widget module
 */
-
 Std.ui.module("canvas",{
+    /*[#module option:nodeName]*/
     nodeName:"canvas",
     /*[#module option:widget]*/
     parent:"widget",
@@ -13,30 +13,102 @@ Std.ui.module("canvas",{
     },
     /*[#module option:public]*/
     public:{
-        canvas:function(){
-            return this[0].dom;
-        },
-        context:function(){
-            return this.tmp.context;
-        },
+        /*
+         * move to
+        */
         moveTo:function(x,y){
-            return this.context().moveTo(x,y);
+            return this.context.moveTo(x,y);
         },
+        /*
+         * createImageData
+        */
         createImageData:function(w,h){
-            return this.context().createImageData(w,h);
+            return this.context.createImageData(w,h);
         },
+        /*
+         *  measureText
+        */
+        measureText:function(text){
+            return this.context.measureText(text);
+        },
+        /*
+         * createPattern
+        */
+        createPattern:function(image,type){
+            return this.context.createPattern(image,type || "no-repeat");
+        },
+        /*
+         *  drawImage
+         */
+        drawImage:function(img,sx,sy,swidth,sheight,x,y,width,height){
+            this.context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+
+            return this;
+        },
+        /*
+         *  getImageData
+         */
+        getImageData:function(x,y,width,height){
+            return this.context.getImageData(x,y,width,height);
+        },
+        /*
+         *  putImageData
+         */
+        putImageData:function(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight){
+            this.context.drawImage(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
+            return this;
+        },
+        /*
+         *  rotate
+        */
+        rotate:function(angle){
+            this.context.rotate(angle);
+
+            return this;
+        },
+        /*
+         *  translate
+        */
+        translate:function(x,y){
+            this.context.rotate(x,y);
+
+            return this;
+        },
+        /*
+         * isPointInPath
+        */
+        isPointInPath:function(x,y){
+            if(x == undefined || y == undefined){
+                return false;
+            }
+            return this.context.isPointInPath(x,y);
+        },
+        /*
+         *  scale
+         */
+        scale:function(arg1,arg2){
+            var that    = this;
+            var context = that.context;
+
+            if(arg2 === undefined){
+                context.scale(arg1,arg1);
+            }else{
+                context.scale(arg1,arg2);
+            }
+            return that;
+        },
+        /*
+         * lineTo
+        */
         lineTo:function(arg1,arg2){
             var that    = this;
-            var context = that.context();
+            var context = that.context;
 
-            if(arg1 == undefined){
-                return that;
-            }else if(arg2 == undefined){
+            if(arg2 == undefined){
                 if(isArray(arg1)){
                     Std.each(arg1,function(i,value){
                         that.lineTo(value);
                     });
-                    return that;
                 }else if(isString(arg1)){
                     var value = arg1.split(",");
                     if(value.length == 2){
@@ -50,63 +122,65 @@ Std.ui.module("canvas",{
             }
             return that;
         },
+        /*
+         * quadraticCurveTo
+        */
         quadraticCurveTo:function(arg1,arg2,arg3,arg4){
             var that    = this;
-            var context = that.context();
+            var context = that.context;
 
-            switch(argments.length){
-                case 1:
-                    if(isArray(arg1)){
-                        Std.each(arg1,function(i,value){
-                            that.quadraticCurveTo(value);
-                        });
-                        return that;
-                    }else if(isString(arg1)){
-                        var values = arg1.split(",");
-                        if(values.length == 4){
-                            context.quadraticCurveTo(values[0],values[1],values[2],values[3]);
-                        }
-                    }else if(isPlainObject(arg1)){
-                        context.quadraticCurveTo(arg1.cpx || 0,arg1.cpy || 0,arg1.x || 0,arg1.y || 0);
+            if(arguments.length === 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.quadraticCurveTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length == 4){
+                        context.quadraticCurveTo(values[0],values[1],values[2],values[3]);
                     }
-                    break;
-                case 4:
-                    context.quadraticCurveTo(arg1,arg2,arg3,arg4);
-                    break;
+                }else if(isPlainObject(arg1)){
+                    context.quadraticCurveTo(arg1.cpx || 0,arg1.cpy || 0,arg1.x || 0,arg1.y || 0);
+                }
+            }else{
+                context.quadraticCurveTo.apply(context,arguments);
             }
+
             return that;
         },
+        /*
+         * bezierCurveTo
+        */
         bezierCurveTo:function(arg1,arg2,arg3,arg4,arg5,arg6){
             var that    = this;
-            var context = that.context();
+            var context = that.context;
 
-            switch(argments.length){
-                case 1:
-                    if(isArray(arg1)){
-                        Std.each(arg1,function(i,value){
-                            that.bezierCurveTo(value);
-                        });
-                        return that;
-                    }else if(isString(arg1)){
-                        var values = arg1.split(",");
-                        if(values.length == 6){
-                            context.bezierCurveTo(values[0],values[1],values[2],values[3],values[4],values[5]);
-                        }
-                    }else if(isPlainObject(arg1)){
-                        context.bezierCurveTo(arg1.cp1x || 0,arg1.cp1y || 0,arg1.cp2x || 0,arg1.cp2y || 0,arg1.x || 0,arg1.y || 0);
+            if(arguments.length === 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.bezierCurveTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length == 6){
+                        context.bezierCurveTo(values[0],values[1],values[2],values[3],values[4],values[5]);
                     }
-                    break;
-                case 6:
-                    context.bezierCurveTo(arg1,arg2,arg3,arg4,arg5,arg6);
-                    break;
+                }else if(isPlainObject(arg1)){
+                    context.bezierCurveTo(arg1.cp1x || 0,arg1.cp1y || 0,arg1.cp2x || 0,arg1.cp2y || 0,arg1.x || 0,arg1.y || 0);
+                }
+            }else{
+                context.bezierCurveTo.apply(context,arguments);
             }
             return that;
         },
+        /*
+         * createLinearGradient
+        */
         createLinearGradient:function(arg1,arg2,arg3,arg4){
             var that    = this;
-            var context = that.context();
+            var context = that.context;
 
-            switch(argments.length){
+            switch(arguments.length){
                 case 1:
                     if(isString(arg1)){
                         var values = arg1.split(",");
@@ -123,20 +197,14 @@ Std.ui.module("canvas",{
             }
             return false;
         },
-        createPattern:function(image,type){
-            var that    = this;
-            var context = that.context();
-
-            if(image == undefined){
-                return false;
-            }
-            return context.createPattern(image,type || "no-repeat");
-        },
+        /*
+         * createRadialGradient
+        */
         createRadialGradient:function(arg1,arg2,arg3,arg4,arg5,arg6){
             var that    = this;
-            var context = that.context();
+            var context = that.context;
 
-            switch(argments.length){
+            switch(arguments.length){
                 case 1:
                     if(isString(arg1)){
                         var values = arg1.split(",");
@@ -153,17 +221,19 @@ Std.ui.module("canvas",{
             }
             return false;
         },
+        /*
+         * arc
+        */
         arc:function(arg1,arg2,arg3,arg4,arg5,arg6){
             var that    = this;
-            var context = that.context();
-            var args    = argments;
+            var args    = arguments;
+            var context = that.context;
 
             if(args.length == 1){
                 if(isArray(arg1)){
                     Std.each(arg1,function(i,value){
                         that.arc(value);
                     });
-                    return that;
                 }else if(isString(arg1)){
                     var values = arg1.split(",");
                     if(values.length >= 5){
@@ -177,17 +247,19 @@ Std.ui.module("canvas",{
             }
             return that;
         },
+        /*
+         * arcTo
+        */
         arcTo:function(arg1,arg2,arg3,arg4,arg5){
             var that    = this;
-            var context = that.context();
-            var args    = argments;
+            var context = that.context;
+            var args    = arguments;
 
             if(args.length == 1){
                 if(isArray(arg1)){
                     Std.each(arg1,function(i,value){
                         that.arcTo(value);
                     });
-                    return that;
                 }else if(isString(arg1)){
                     var values = arg1.split(",");
                     if(values.length == 5){
@@ -196,71 +268,28 @@ Std.ui.module("canvas",{
                 }else if(isPlainObject(arg1)){
                     context.arcTo(arg1.x1 || 0,arg1.y1 || 0,arg1.x2 || 0,arg1.y2 || 0,arg1.r || 50);
                 }
-            }else if(args.length == 5){
-                context.arcTo(arg1,arg2,arg3,arg4,arg5)
-            }
-            return that;
-        },
-        isPointInPath:function(x,y){
-            if(x == undefined || y == undefined){
-                return false;
-            }
-            return this.context().isPointInPath(x,y);
-        },
-        scale:function(arg1,arg2){
-            var that    = this;
-            var context = that.context();
-
-            if(arg1 == undefined){
-                return that;
-            }else if(arg2 == undefined){
-                context.scale(arg1,arg1);
             }else{
-                context.scale(arg1,arg2);
+                context.arcTo.apply(context,args);
             }
-            return that;
-        },
-        rotate:function(angle){
-            var that    = this;
-            var context = that.context();
-
-            context.rotate(angle);
-
-            return that;
-        },
-        translate:function(x,y){
-            var that    = this;
-            var context = that.context();
-
-            context.rotate(x,y);
-
-            return that;
-        },
-        measureText:function(text){
-            return this.context().measureText(text);
-        },
-        drawImage:function(img,sx,sy,swidth,sheight,x,y,width,height){
-            var that    = this;
-            var context = that.context();
-
-            context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
-
-            return that;
-        },
-        getImageData:function(x,y,width,height){
-            return this.context().getImageData(x,y,width,height);
-        },
-        putImageData:function(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight){
-            var that    = this;
-            var context = that.context();
-
-            context.drawImage(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
-
             return that;
         }
     },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.context = dom[0].getContext(opts.context);
+
+        dom.html(opts.notSupportText);
+    },
     /*[#module option:entrance]*/
     entrance:function(widget){
+        Std.each("stroke fill beginPath closePath clip save restore toDataURL",function(i,name){
+            widget[name] = function(){
+                var that = this;
+                that.context[name].apply(that,arguments);
+                return that;
+            }
+        });
+
         Std.each("shadowColor shadowBlur fillStyle strokeStyle shadowOffsetX shadowOffsetY " +
             "lineCap lineJoin lineWidth miterLimit font textAlign textBaseline " +
             "globalAlpha globalCompositeOperation",
@@ -268,7 +297,7 @@ Std.ui.module("canvas",{
             function(i,name){
                 widget[name] = function(value){
                     var that    = this;
-                    var context = that.context();
+                    var context = that.context;
 
                     if(value == undefined){
                         return context[name];
@@ -276,81 +305,42 @@ Std.ui.module("canvas",{
                     context[name] = value;
                     return that;
                 }
-            });
+            }
+        );
 
-        Std.each("stroke fill beginPath closePath clip save restore toDataURL",function(i,name){
-            widget[name] = function(){
-                var that = this;
-                that.context()[name]();
+        Std.each("transform setTransform",function(i,name){
+            widget[name] = function(value){
+                var that    = this;
+                var args    = arguments;
+                var context = that.context;
+
+                if(args.length == 1){
+                    if(isArray(value)){
+                        Std.each(value,function(i,value){
+                            that[name](value);
+                        });
+                        return that;
+                    }else if(isString(value)){
+                        var values = value.split(",");
+                        if(values.length == 6){
+                            context[name](values[0],values[1],values[2],values[3],values[4],values[5]);
+                        }
+                    }else if(isPlainObject(value)){
+                        context[name](value.a || 0,value.b || 0,value.c || 0,value.d || 0,value.e || 0,value.f || 0);
+                    }
+                }else if(args.length == 6){
+                    context[name].apply(context,args);
+                }
                 return that;
             }
         });
 
-        Std.each("rect fillRect strokeRect clearRect",function(i,name){
-            widget[name] = function(arg1,arg2,arg3,arg4){
-                var that    = this;
-                var context = that.context();
-
-                switch(argments.length){
-                    case 1:
-                        if(isArray(arg1)){
-                            Std.each(arg1,function(i,value){
-                                that[name](value);
-                            });
-                            return that;
-                        }else if(isString(arg1)){
-                            var values = arg1.split(",");
-                            if(values.length == 4){
-                                context[name](values[0],values[1],values[2],values[3]);
-                            }
-                        }else if(isPlainObject(arg1)){
-                            context[name](arg1.x || 0,arg1.y || 0,arg1.width || 0,arg1.height || 0);
-                        }
-                        break;
-                    case 2:
-                        context[name](0,0,arg1,arg2);
-                        break;
-                    case 4:
-                        context[name](arg1,arg2,arg3,arg4);
-                        break;
-                }
-                return that;
-            }
-        },' ');
-
-        Std.each("transform setTransform",function(i,name){
-            widget[name] = function(arg1,arg2,arg3,arg4,arg5,arg6){
-                var that    = this;
-                var context = that.context();
-                var args    = argments;
-
-                if(args.length == 1){
-                    if(isArray(arg1)){
-                        Std.each(arg1,function(i,value){
-                            that[name](value);
-                        });
-                        return that;
-                    }else if(isString(arg1)){
-                        var values = arg1.split(",");
-                        if(values.length == 6){
-                            context[name](values[0],values[1],values[2],values[3],values[4],values[5]);
-                        }
-                    }else if(isPlainObject(arg1)){
-                        context[name](arg1.a || 0,arg1.b || 0,arg1.c || 0,arg1.d || 0,arg1.e || 0,arg1.f || 0);
-                    }
-                }else if(args.length == 6){
-                    context[name](arg1,arg2,arg3,arg4,arg5,arg6)
-                }
-                return that;
-            }
-        },' ');
-
         Std.each("fillText strokeText",function(i,name){
             widget[name] = function(arg1,arg2,arg3,maxWidth){
                 var that    = this;
-                var context = that.context();
+                var context = that.context;
 
-                switch(argments.length){
+                switch(arguments.length){
                     case 1:
                         if(isString(arg1)){
                             context[name](arg1,0,0);
@@ -366,22 +356,42 @@ Std.ui.module("canvas",{
                     case 2:
                         context[name](arg1,arg2,0);
                         break;
-                    case 3:
-                        context[name](arg1,arg2,arg3);
-                        break;
-                    case 4:
-                        context[name](arg1,arg2,arg3,maxWidth);
-                        break;
+                    default:
+                        context[name].apply(context,arguments);
                 }
                 return that;
             }
-        },' ');
-    },
-    /*[#module option:main]*/
-    main:function(that,opts,dom){
-        that.tmp = {
-            context:SDOM.getContent(opts.context)
-        };
-        dom.html(opts.notSupportText);
+        });
+
+
+        Std.each("rect fillRect strokeRect clearRect",function(i,name){
+            widget[name] = function(arg1,arg2,arg3,arg4){
+                var that    = this;
+                var context = that.context;
+
+                switch(arguments.length){
+                    case 1:
+                        if(isArray(arg1)){
+                            Std.each(arg1,function(i,value){
+                                that[name](value);
+                            });
+                        }else if(isString(arg1)){
+                            var values = arg1.split(",");
+                            if(values.length == 4){
+                                context[name](values[0],values[1],values[2],values[3]);
+                            }
+                        }else if(isPlainObject(arg1)){
+                            context[name](arg1.x || 0,arg1.y || 0,arg1.width || 0,arg1.height || 0);
+                        }
+                        break;
+                    case 2:
+                        context[name](0,0,arg1,arg2);
+                        break;
+                    default:
+                        context[name].apply(context,arguments);
+                }
+                return that;
+            }
+        });
     }
 });

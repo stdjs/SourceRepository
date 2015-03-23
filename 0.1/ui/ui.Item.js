@@ -14,6 +14,7 @@ Std.ui.module("Item",{
         defaultClass:"StdUI_Item",
         text:"",
         icon:null,
+        iconClass:null,
         value:null,
         template:null,
         tabIndex:null,
@@ -28,6 +29,7 @@ Std.ui.module("Item",{
             //------init default option
             that.call_opts({
                 icon:null,
+                iconClass:null,
                 text:"",
                 value:null
             },true);
@@ -101,15 +103,24 @@ Std.ui.module("Item",{
                 if(!doms.icon){
                     that.initIcon();
                 }
-                if(icon.charAt(0) !== '.'){
-                    if(!doms.iconImg){
-                        doms.iconImg = newDom("img").appendTo(doms.icon);
-                    }
-                    doms.iconImg.attr("src",icon);
-                }else{
-                    doms.iconImg && doms.iconImg.remove();
-                    doms.icon.className("_icon" + icon.replace(/\./g,' '));
+                if(!doms.iconImg){
+                    doms.iconImg = newDom("img").appendTo(doms.icon);
                 }
+                doms.iconImg.attr("src",icon);
+            });
+        },
+        /*
+         * icon class name
+        */
+        iconClass:function(className){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("iconClass",className,function(){
+                if(!doms.icon){
+                    that.initIcon();
+                }
+                doms.icon.className("_icon " + className);
             });
         }
     },
@@ -139,7 +150,7 @@ Std.ui.module("TemplateItem",{
     /*[#module option:option]*/
     option:{
         level:2,
-        className:"StdUI_TemplateItem",
+        defaultClass:"StdUI_TemplateItem",
         text:"",
         data:null,
         value:null,
@@ -183,7 +194,6 @@ Std.ui.module("TemplateItem",{
                 if(isObject(template)){
                     template.renderTo(that,data);
                 }
-
                 that.text(data[opts.textField]);
                 that.value(data[opts.valueField]);
             });

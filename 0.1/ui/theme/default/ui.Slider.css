@@ -39,20 +39,22 @@
 }
 
 /************* HSlider *************/
-.StdUI_Slider.horizontal > ._client{
+.StdUI_Slider._horizontal > ._client{
     height: 5px;
 }
-.StdUI_Slider.horizontal > ._client > ._progress{
+.StdUI_Slider._horizontal > ._client > ._progress{
     height: 100%;
     width:0;
 }
 
 /************* VSlider *************/
-.StdUI_Slider.vertical > ._client{
+.StdUI_Slider._vertical > ._client{
     width: 5px;
     height: 100%;
 }
-.StdUI_Slider.vertical > ._client > ._progress{
+.StdUI_Slider._vertical > ._client > ._progress{
+    position: absolute;
+    bottom:0;
     height: 0;
     width: 100%;
 }

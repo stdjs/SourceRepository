@@ -130,7 +130,6 @@ Std.ui.module("Window",{
 
             windowObj.on("resize",that._windowResize = function(){
                 that.rect(0,0,windowObj.width(),windowObj.height());
-                that._layout.update();
             });
 
             return that;
@@ -142,18 +141,19 @@ Std.ui.module("Window",{
             var that = this;
             var opts = that.opts;
 
-            that._titleBar.append({
+            that.appendTitleButton({
                 min:"_min",
                 max:"_max",
                 close:"_close"
-            }).on({
+            }).on("titleButtonClick",function(name){
+                that.titleButtonClick(name);
+            });
+
+            that.D.TitleBar.on({
                 dblclick:function(){
                     if(opts.maximizable){
                         that.maximize(!opts.maximize);
                     }
-                },
-                buttonClick:function(name){
-                    that.titleButtonClick(name);
                 }
             });
             return that;
@@ -167,13 +167,13 @@ Std.ui.module("Window",{
             var menuItems = [
                 {
                     text:"Restore",
-                    icon:"._restore",
+                    iconClass:"_restore",
                     click:function(){
                         that.restore();
                     }
                 },{
                     text:"Minimize",
-                    icon:"._min",
+                    iconClass:"_min",
                     enable:opts.minimizable,
                     click:function(){
                         that.minimize(true);
@@ -181,7 +181,7 @@ Std.ui.module("Window",{
                 },{
                     ui:"MenuItem",
                     text:"Maximize",
-                    icon:"._max",
+                    iconClass:"_max",
                     enable:opts.maximizable,
                     click:function(){
                         that.maximize(true);
@@ -204,7 +204,7 @@ Std.ui.module("Window",{
                 {ui:"sep"},
                 {
                     text:"Close",
-                    icon:"._close",
+                    iconClass:"_close",
                     css:{
                         fontWeight:"bold"
                     },
@@ -214,9 +214,10 @@ Std.ui.module("Window",{
                 }
             ];
 
-            that._titleBar.plugin("contextMenu",{
+            that.plugin("contextMenu",{
                 width:160,
                 items:menuItems,
+                handle:that.D.TitleBar,
                 on:{
                     show:function(){
                         var items = this.menu.items;
@@ -236,7 +237,7 @@ Std.ui.module("Window",{
             var that = this;
 
             return that.opt("minimizable",state,function(){
-                that._titleBar.items.min.visible(state);
+                that.titleButtons("min").visible(state);
             });
         },
         /*
@@ -246,7 +247,7 @@ Std.ui.module("Window",{
             var that = this;
 
             return that.opt("maximizable",state,function(){
-                that._titleBar.items.max.visible(state);
+                that.titleButtons("max").visible(state);
             });
         },
         /*
@@ -256,7 +257,7 @@ Std.ui.module("Window",{
             var that = this;
 
             return that.opt("closable",state,function(){
-                that._titleBar.items.close.visible(state);
+                that.titleButtons("close").visible(state);
             });
         },
         /*
@@ -269,7 +270,7 @@ Std.ui.module("Window",{
                 if(!that.plugin("resize")){
                     that.plugin("resize",{
                         on:{
-                            stop:function(){that._layout.update()}
+                            stop:function(){}
                         }
                     });
                 }
@@ -285,7 +286,7 @@ Std.ui.module("Window",{
             return that.opt("draggable",state,function(){
                 if(!that.plugin("drag")){
                     that.plugin("drag",{
-                        handle:that._titleBar
+                        handle:that.D.TitleBar
                     });
                 }
                 that.plugin("drag").draggable(state);
@@ -356,7 +357,6 @@ Std.ui.module("Window",{
                     top  : lastRect.top,
                     left : lastRect.left
                 });
-                that._layout.update()
             }
             if(that._windowResize){
                 Std.dom(window).off("resize",that._windowResize);

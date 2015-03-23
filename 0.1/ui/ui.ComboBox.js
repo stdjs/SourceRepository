@@ -312,9 +312,9 @@ Std.ui.module("ComboBox",{
                     data:read.data,
                     type:read.type
                 }).on("success",function(responseJSON){
-                    that.emit("dataSourceLoad",responseJSON)
-                        .append(Std.mold.dataPath(responseJSON,read.dataPath))
-                        .call_opts({value:null},true);
+                    that.emit("dataSourceLoad",responseJSON);
+                    that.append(Std.mold.dataPath(responseJSON,read.dataPath));
+                    that.call_opts({value:null},true);
                 });
             }
 
@@ -411,15 +411,15 @@ Std.ui.module("ComboBox",{
                 doms.content && doms.content.remove();
 
                 if(that._currentMode !== ""){
-                    that.removeClass(that._currentMode);
+                    that.removeClass("_"+that._currentMode);
                 }
 
                 if(mode === "input"){
-                    doms.input   = newDom("input", "_input").appendTo(that[0]);
+                    doms.input   = newDom("input","_input").appendTo(that[0]);
                 }else if(mode === "none"){
                     doms.content = newDiv("_content").appendTo(that[0]);
                 }
-                that.addClass(that._currentMode = mode);
+                that.addClass("_" + (that._currentMode = mode));
             });
         },
         /*
@@ -444,7 +444,7 @@ Std.ui.module("ComboBox",{
                     return doms.content.text();
                 }
                 if(isWidget(value)){
-                    data = value.ui === "TemplateItem" ? value.text() : value[0].clone().className(value.opts.className)
+                    data = value.ui === "TemplateItem" ? value.text() : value[0].clone().className(value.opts.defaultClass)
                 }
                 doms.content && doms.content.html(data);
             }
@@ -478,7 +478,7 @@ Std.ui.module("ComboBox",{
                 doms.input   && doms.input.value(item.text());
             }else if(inputMode === "none"){
                 doms.content && doms.content.html(
-                    item.ui === "TemplateItem" ? item.text(): item[0].clone().className(item.opts.className)
+                    item.ui === "TemplateItem" ? item.text(): item[0].clone().className(item.opts.defaultClass)
                 );
             }
 
@@ -520,7 +520,7 @@ Std.ui.module("ComboBox",{
                 doms.input && doms.input.value(item.text());
             }else if(inputMode === "none"){
                 doms.content && doms.content.html(
-                    item.ui === "TemplateItem" ? item.text(): item[0].clone().className(item.opts.className)
+                    item.ui === "TemplateItem" ? item.text(): item[0].clone().className(item.opts.defaultClass)
                 );
             }
             return that.select(index);
@@ -541,7 +541,7 @@ Std.ui.module("ComboBox",{
                 that.initList();
             }
 
-            doms.handle.addClass("open");
+            doms.handle.addClass("_open");
             doms.list.show().css({
                 left     : offset.x,
                 top      : offset.y + that.height(),
@@ -581,7 +581,7 @@ Std.ui.module("ComboBox",{
                 return that;
             }
 
-            doms.handle.removeClass("open");
+            doms.handle.removeClass("_open");
             doms.list && doms.list.css("overflow","hidden").animate({
                 100:{
                     height:0,

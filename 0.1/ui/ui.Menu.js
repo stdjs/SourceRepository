@@ -126,13 +126,9 @@ Std.ui.module("MenuItem",{
             if(state === undefined){
                 return that._childVisible;
             }
-
-            //------
             if(state === that._childVisible){
                 return that;
             }
-
-            //------
             if(that._childVisible === true){
                 that.showChild();
             }else{
@@ -293,15 +289,17 @@ Std.ui.module("Menu",{
         initKeyboard:function(){
             var that = this;
 
-            that[0].on("keydown",function(e){
-                var currentItem  = that._currentItem;
-                var index        = that.items.indexOf(currentItem);
-                if(index == -1){
-                    return;
-                }
-                that.keyEvent(e.keyCode,currentItem,index);
+            that[0].on({
+                keydown:function(e){
+                    var currentItem  = that._currentItem;
+                    var index        = that.items.indexOf(currentItem);
+                    if(index == -1){
+                        return;
+                    }
+                    that.keyEvent(e.keyCode,currentItem,index);
+                },
+                contextmenu:Std.func(false)
             });
-
             return that;
         },
         /*
@@ -323,19 +321,14 @@ Std.ui.module("Menu",{
                 if(!item.enable() || item.ui === "sep"){
                     return;
                 }
-                //-------item click
+
+                //-------events
                 if(eventName === "click"){
                     that.emit("itemPress",item.emit("press"));
-                }
-                //-------item mouseenter
-                else if(eventName == "mouseenter"){
+                }else if(eventName == "mouseenter"){
                     that.select(item);
-                }
-                //-------item mouseleave
-                else if(eventName == "mouseleave"){
-                    if(!item.childVisible()){
-                        that.select(false);
-                    }
+                }else if(eventName == "mouseleave" && !item.childVisible()){
+                    that.select(false);
                 }
             });
 

@@ -5,13 +5,14 @@ Std.ui.module("CheckBox",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"checked",
+    events:"change checked",
     /*[#module option:option]*/
     option:{
         level:1,
         defaultClass:"StdUI_CheckBox",
         text:"CheckBox",
-        checked:false
+        checked:false,
+        value:null
     },
     /*[#module option:action]*/
     action:{
@@ -27,7 +28,9 @@ Std.ui.module("CheckBox",{
 
             that[0].mouse({
                 click:function(){
-                    that.checked(!that.checked());
+                    if(that.enable()){
+                        that.checked(!that.checked());
+                    }
                 }
             });
         }
@@ -47,7 +50,11 @@ Std.ui.module("CheckBox",{
         */
         checked:function(state){
             return this.opt("checked",state,function(){
-                this.toggleClass("checked",state).emit("checked",state);
+                this.toggleClass("checked",state).emit("change",state);
+
+                if(state === true){
+                    this.emit("checked");
+                }
             });
         }
     },
@@ -55,7 +62,7 @@ Std.ui.module("CheckBox",{
     main:function(that,opts,dom){
         dom.append([
             that[1] = newDiv("_icon StdUI_CheckBox_Icon"),
-            that[2] = newDiv("_text")
+            that[2] = newDom("label","_text")
         ]);
 
         that.call_opts({

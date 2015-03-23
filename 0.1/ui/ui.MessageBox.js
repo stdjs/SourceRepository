@@ -1,12 +1,12 @@
 /**
  * MessageBox widget module
- * fixme:type:error  ,IE css 兼容性未处理
+ * fixme:type:error,IE css 兼容性未处理
 */
 Std.ui.module("MessageBox",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"ok cancel close yes no abort retry ignore apply",
+    events:"ok cancel close yes no abort retry ignore disagree apply buttonClick",
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_MessageBox",
@@ -16,10 +16,14 @@ Std.ui.module("MessageBox",{
         closable:true,
         draggable:true,
         title:null,
+        value:null,
         text:"null",
         timeout:0,
         buttons:"ok",
         buttonsAlign:"right",
+        inputType:null,
+        inputWidth:"auto",
+        inputHeight:"auto",
         detailedText:"",
         defaultButton:"ok",
         informativeText:null
@@ -32,18 +36,26 @@ Std.ui.module("MessageBox",{
     },
     /*[#module option:extend]*/
     extend:{
+        /*
+         * render
+        */
         render:function(){
             var that = this;
             var opts = that.opts;
 
             that.initLocker();
-            that.move("central");
-            that.focus();
-            that.updateLayout();
 
             if(opts.defaultButton){
                 that.defaultButton(opts.defaultButton);
             }
+            if(that.input !== null){
+                that.input.renderTo(that.D.BodyClientContentInput);
+                that.input.focus(100);
+            }else{
+                that.focus(100);
+            }
+            that.updateLayout();
+            that.move("central");
         },
         /*
          * extend remove
@@ -52,8 +64,9 @@ Std.ui.module("MessageBox",{
             var that   = this;
             var locker = that._locker;
 
-            locker && locker.remove();
-
+            if(locker){
+                locker.remove();
+            }
             Std.dom(window).off("keyup",that._keyupHandle);
         }
     },
@@ -63,9 +76,8 @@ Std.ui.module("MessageBox",{
          * init keyboard
         */
         initKeyboard:function(){
-            var that    = this;
-            var opts    = that.opts;
-            var buttons = that._buttons;
+            var that = this;
+            var opts = that.opts;
 
             Std.dom(window).on("keyup",that._keyupHandle || (that._keyupHandle = function(e){
                 var target  = Std.dom(e.target);
@@ -83,12 +95,11 @@ Std.ui.module("MessageBox",{
 
                 }
                 //-----center and space
-                else if(keyCode == 13 || keyCode == 32 && target.hasClass("_button")){
+                else if((keyCode == 13 || keyCode == 32) && target.hasClass("_button")){
                     var button = that._buttons[that._defaultButton];
                     button && button.emit("click")
                 }
             }));
-
             return that;
         },
         /*
@@ -110,10 +121,10 @@ Std.ui.module("MessageBox",{
          * init locker
         */
         initLocker:function(){
-            var that     = this;
-            var color    = "black";
-            var opacity  = 0.1;
-            var parent   = that[0].offsetParent();
+            var that    = this;
+            var color   = "black";
+            var opacity = 0.1;
+            var parent  = that[0].offsetParent();
 
             switch(that.opts.type){
                 case "warning":
@@ -135,16 +146,19 @@ Std.ui.module("MessageBox",{
 
             that._locker = Std.ui("locker",{
                 renderTo:parent.contains("body") ? "body" : parent,
-                opacity:opacity,
-                visible:true,
+                opacity :opacity,
+                visible :true,
                 background:color
             });
-
             return that;
         }
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * input
+        */
+        input:null,
         /*
          * message box title
         */
@@ -199,10 +213,22 @@ Std.ui.module("MessageBox",{
             return that.opt("icon",icon,function(){
                 if(!that._hasIcon){
                     that._hasIcon = true;
-                    that.D.BodyClientIcon = newDiv("_icon");
-                    that.D.BodyClient.prepend(that.D.BodyClientIcon);
+                    that.D.BodyClient.prepend(that.D.BodyClientIcon = newDiv("_icon"));
                 }
             });
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+
+            if(value === undefined){
+                return that.input.value();
+            }
+            that.input.value(value);
+
+            return that;
         },
         /*
          * informative text
@@ -213,9 +239,25 @@ Std.ui.module("MessageBox",{
             return that.opt("informativeText",text,function(){
                 if(!that._hasInformativeText){
                     that._hasInformativeText = true;
-                    that.D.BodyClientContent.prepend(that.D.InformativeText  = newDiv("_informativeText"));
+                    that.D.BodyClientContent.prepend(that.D.InformativeText = newDiv("_informativeText"));
                 }
                 that.D.InformativeText.html(text);
+            });
+        },
+        /*
+         * input type
+        */
+        inputType:function(type){
+            var that = this;
+
+            return that.opt("inputType",type,function(){
+                if(that.input !== null){
+                    that.input.remove();
+                }
+                that.input = Std.ui(type,{
+                    width:that.opts.inputWidth,
+                    height:that.opts.inputHeight
+                });
             });
         },
         /*
@@ -231,10 +273,11 @@ Std.ui.module("MessageBox",{
                 var button = newDiv("_button").mouse({
                     unselect:true
                 }).html(buttonName.toUpperCase()).attr({
-                    tabindex:1,
+                    tabindex:0,
                     buttonName:buttonName
                 }).on("click",function(){
                     that.emit(buttonName);
+                    that.emit("buttonClick",buttonName);
                     that.remove();
                 });
 
@@ -259,7 +302,7 @@ Std.ui.module("MessageBox",{
             return that;
         },
         /*
-         *  detailed text
+         * detailed text
         */
         detailedText:function(text){
             var that = this;
@@ -275,7 +318,7 @@ Std.ui.module("MessageBox",{
             return that;
         },
         /*
-         *  closable
+         * closable
         */
         closable:function(closable){
             var that = this;
@@ -301,7 +344,7 @@ Std.ui.module("MessageBox",{
             });
         },
         /*
-         *  draggable
+         * draggable
         */
         draggable:function(state){
             var that = this;
@@ -329,6 +372,7 @@ Std.ui.module("MessageBox",{
             BodyClient:newDiv("_client"),
             BodyClientContent:newDiv("_content"),
             BodyClientContentText:newDiv("_text"),
+            BodyClientContentInput:newDiv("_input"),
 
             Buttons:newDiv("_buttons"),
             ButtonSpacing:newDiv("_buttonSpacing"),
@@ -348,7 +392,10 @@ Std.ui.module("MessageBox",{
         ]);
 
         that.D.BodyClient.append(that.D.BodyClientContent);
-        that.D.BodyClientContent.append(that.D.BodyClientContentText);
+        that.D.BodyClientContent.append([
+            that.D.BodyClientContentText,
+            that.D.BodyClientContentInput
+        ]);
 
         //--------
         dom.append([
@@ -380,6 +427,7 @@ Std.ui.module("MessageBox",{
             timeout:0,
             draggable:false,
             closable:false,
+            inputType:null,
             detailedText:"",
             informativeText:null
         },true);

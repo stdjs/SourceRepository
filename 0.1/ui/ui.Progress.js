@@ -1,7 +1,7 @@
 /**
- * progress widget module
+ * progress model
 */
-Std.ui.module("Progress",{
+Std.model("ui.Progress",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:action]*/
@@ -12,13 +12,11 @@ Std.ui.module("Progress",{
     option:{
         defaultClass:"StdUI_Progress",
         level:3,
-        height:26,
-        minWidth:35,
-        minHeight:15,
         min:0,
         max:100,
         value:0,
-        text:"%.2f%%"
+        text:"%.2f%%",
+        color:"blue"  //blue,red,black,green,gray
     },
     /*[#module option:events]*/
     events:"finished change",
@@ -26,7 +24,7 @@ Std.ui.module("Progress",{
     extend:{
         /*
          * extend width
-        */
+         */
         width:function(width){
             var that = this;
             var doms = that.D;
@@ -34,13 +32,12 @@ Std.ui.module("Progress",{
             if(!isNumber(width)){
                 width = that.width();
             }
-
             doms.texts.width(width - that.boxSize.width);
             that.refresh();
         },
         /*
          * extend height
-        */
+         */
         height:function(height){
             var that = this;
             var doms = this.D;
@@ -57,7 +54,7 @@ Std.ui.module("Progress",{
     private:{
         /*
          * update progress
-        */
+         */
         updateProgress:function(){
             var that  = this;
             var opts  = that.opts;
@@ -75,13 +72,13 @@ Std.ui.module("Progress",{
     public:{
         /*
          * refresh
-        */
+         */
         refresh:function(){
             return this.value(this.opts.value);
         },
         /*
          * min
-        */
+         */
         min:function(min){
             return this.opt("min",min,function(){
                 this.refresh();
@@ -89,7 +86,7 @@ Std.ui.module("Progress",{
         },
         /*
          * max
-        */
+         */
         max:function(max){
             return this.opt("max",max,function(){
                 this.refresh();
@@ -97,7 +94,7 @@ Std.ui.module("Progress",{
         },
         /*
          * range
-        */
+         */
         range:function(min,max){
             var that = this;
             var opts = that.opts;
@@ -109,7 +106,7 @@ Std.ui.module("Progress",{
         },
         /*
          * get or set percent
-        */
+         */
         percent:function(percent){
             var that = this;
             var opts = that.opts;
@@ -121,7 +118,7 @@ Std.ui.module("Progress",{
         },
         /*
          * progress text
-        */
+         */
         text:function(text){
             var that = this;
             var doms = that.D;
@@ -137,7 +134,7 @@ Std.ui.module("Progress",{
         },
         /*
          * get or set value
-        */
+         */
         value:function(value){
             var that = this;
             var opts = that.opts;
@@ -176,5 +173,47 @@ Std.ui.module("Progress",{
             )
         ]);
         doms.texts = Std.dom.united([doms.text,doms.text2]);
+    }
+});
+
+/**
+ * horizontal progress widget module
+*/
+Std.ui.module("HProgress",{
+    /*[#module option:model]*/
+    model:"ui.Progress",
+    /*[#module option:option]*/
+    option:{
+        height:26,
+        minWidth:35,
+        minHeight:15
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * direction
+        */
+        direction:"horizontal"
+    }
+});
+
+/**
+ * vertical progress widget module
+*/
+Std.ui.module("VProgress",{
+    /*[#module option:model]*/
+    model:"ui.Progress",
+    /*[#module option:option]*/
+    option:{
+        width:26,
+        minHeight:35,
+        minWidth:15
+    },
+    /*[#module option:private]*/
+    protected:{
+        /*
+         * direction
+        */
+        direction:"vertical"
     }
 });

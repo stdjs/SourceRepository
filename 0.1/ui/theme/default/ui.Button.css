@@ -5,7 +5,7 @@
     font-size: 12px;
     float: left;
     position: relative;
-    padding: 5px 8px 5px 8px;
+    padding: 4px 8px 4px 8px;
     text-decoration: none;
     overflow: hidden;
     outline: none;
@@ -15,7 +15,7 @@
     background: #E0DDDA;
     background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
     box-shadow: 1px 1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
-    transition: all 0.2s;
+    transition: background 0.2s,box-shadow 0.2s,border 0.2s;
 }
 .StdUI_Button.hover{
     border-color: #3AA7DD;

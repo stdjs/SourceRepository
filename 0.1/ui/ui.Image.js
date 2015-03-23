@@ -62,7 +62,7 @@ Std.ui.module("Image",{
         */
         toBase64:function(gray){
             var that      = this;
-            var canvas    = newDom("canvas").dom;
+            var canvas    = document.createElement("canvas");
             var context   = canvas.getContext("2d");
 
             canvas.width  = that._image.width;
@@ -89,7 +89,7 @@ Std.ui.module("Image",{
             return canvas.toDataURL();
         },
         /*
-         * get or set image value
+         * get or set image address
         */
         value:function(value){
             var that = this;
@@ -102,11 +102,10 @@ Std.ui.module("Image",{
                     that[0].append(doms.img = newDom("img"));
                 }
                 Std.loader.image(value,function(state,imageObject){
-                    if(state === false){
-                        return;
+                    if(state !== false){
+                        doms.img.attr("src",value).show();
+                        that.emit("load",that._image = imageObject).gray(that.opts.gray);
                     }
-                    doms.img.attr("src",value).show();
-                    that.emit("load",that._image = imageObject).gray(that.opts.gray);
                 });
             });
         },
@@ -121,7 +120,7 @@ Std.ui.module("Image",{
 
                 if(isEmpty(imageSrc) || that._image === null){
                     return;
-                }else if(!isFunction(Worker)){
+                }else if(typeof(Worker) !== "function"){
                     that[0].css("filter",state ? "progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)" : "");
                 }else{
                     that.D.img.attr("src",state ? that.toBase64(true) : imageSrc);

@@ -1,7 +1,7 @@
 /**
  * ui: edit model
 */
-Std.ui.model("edit",{
+Std.model("ui.Edit",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:action]*/
@@ -312,7 +312,7 @@ Std.ui.model("edit",{
 */
 Std.ui.module("LineEdit",{
     /*[#module option:model]*/
-    model:"edit",
+    model:"ui.Edit",
     /*[#module option:option]*/
     option:{
         level:3,
@@ -365,7 +365,7 @@ Std.ui.module("LineEdit",{
 */
 Std.ui.module("TextEdit",{
     /*[#module option:model]*/
-    model:"edit",
+    model:"ui.Edit",
     /*[#module option:option]*/
     option:{
         level:4,

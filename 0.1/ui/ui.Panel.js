@@ -1,177 +1,4 @@
 /**
- * panel title module
-*/
-Std.ui.module("PanelTitle",{
-    /*[#module option:parent]*/
-    parent:"widget",
-    /*[#module option:events]*/
-    events:"buttonClick",
-    /*[#module option:action]*/
-    action:{
-        content:"text"
-    },
-    /*[#module option:option]*/
-    option:{
-        tabIndex:null,
-        defaultClass:"StdUI_PanelTitle",
-        minHeight:20,
-        height:22,
-        level:2,
-        icon:null,
-        text:"title",
-        items:null
-    },
-    /*[#module option:extend]*/
-    extend:{
-        /*
-         * extend height
-        */
-        height:function(height){
-            this.D.text.lineHeight(this.height());
-        },
-        /*
-         * remove button
-        */
-        remove:function(button){
-            var items = this.items;
-
-            if(isString(button) && button in items){
-                items[button].remove();
-                delete items[button];
-            }
-        }
-    },
-    /*[#module option:private]*/
-    private:{
-        /*
-         * create button
-        */
-        createButton:function(name,data){
-            var item = this.items[name] = newDiv("_button").data(name,data);
-
-            if(isObject(data)){
-                item.set(data);
-            }else if(isString(data)){
-                item.addClass(data);
-            }
-            return item;
-        },
-        /*
-         * init events
-        */
-        initEvents:function(){
-            var that = this;
-
-            that[0].on("mouseenter","._button",function(e){
-                this.mouse({
-                    auto:false,
-                    down:function(e){
-                        e.stopPropagation();
-                    },
-                    click:function(){
-                        for(var name in that.items){
-                            if(that.items[name].contains(this)){
-                                that.emit("buttonClick",[name,this],true);
-                            }
-                        }
-                    }
-                },e);
-            });
-            return that;
-        }
-    },
-    /*[#module option:public]*/
-    public:{
-        /*
-         * get or set title text
-        */
-        text:function(text){
-            var that = this;
-
-            return that.opt("text",text,function(){
-                that.D.text.html(text);
-            });
-        },
-        /*
-         * get or set title icon
-        */
-        icon:function(icon){
-            var that = this;
-            var doms = that.D;
-
-            return that.opt("icon",icon,function(){
-                if(icon.charAt(0) !== '.'){
-                    if(!doms.iconImg){
-                        doms.iconImg = newDom("img").appendTo(doms.icon);
-                    }
-                    doms.iconImg.attr("src",icon);
-                }else{
-                    doms.iconImg && doms.iconImg.remove();
-                    doms.icon.className("_icon" + icon.replace(/\./g,' '));
-                }
-            });
-        },
-        /*
-         * insert button
-        */
-        insertBefore:Std.func(function(name,data,targetName){
-            var that  = this;
-            var item  = that.createButton(name,data);
-            var items = that.items;
-
-            if(item !== null && targetName in items){
-                this.D.buttons.insertBefore(items[targetName]);
-            }
-        },{
-            each:[isArray]
-        }),
-        /*
-         * insert button
-        */
-        insertAfter:Std.func(function(name,data,targetName){
-            var that  = this;
-            var item  = that.createButton(name,data);
-            var items = that.items;
-
-            if(item !== null && targetName in items){
-                this.D.buttons.insertAfter(items[targetName]);
-            }
-        },{
-            each:[isArray]
-        }),
-        /*
-         * append button
-        */
-        append:Std.func(function(name,data){
-            var that = this;
-            var item = that.createButton(name,data);
-
-            if(item !== null){
-                this.D.buttons.append(item);
-            }
-        },{
-            each:[isObject]
-        })
-    },
-    /*[#module option:main]*/
-    main:function(that,opts,dom){
-        var doms   = that.D = {};
-        that.items = {};
-
-        dom.append([
-            doms.icon    = newDiv("_icon"),
-            doms.text    = newDiv("_text"),
-            doms.buttons = newDiv("_buttons")
-        ]);
-
-        that.initEvents().call_opts({
-            text:"",
-            icon:null
-        },true);
-    }
-});
-
-/**
  * panel widget module
 */
 Std.ui.module("Panel",{
@@ -181,6 +8,8 @@ Std.ui.module("Panel",{
     action:{
         content:"html"
     },
+    /*[#module option:events]*/
+    events:"titleButtonClick",
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_Panel",
@@ -192,18 +21,18 @@ Std.ui.module("Panel",{
         title:"panel",
         menuBar:null,
         toolBar:null,
+        titleHeight:22,
         titleButtons:null,
-	    padding:null
+	    clientPadding:8
     },
     /*[#module option:protected]*/
     protected:{
-        layout:null,
         titleBar:null,
         menuBar:null,
         toolBar:null,
         client:null,
-        clientLayout:null,
-        central:null
+        central:null,
+        titleButtons:null
     },
     /*[#module option:extend]*/
     extend:{
@@ -212,9 +41,12 @@ Std.ui.module("Panel",{
         */
         render:function(){
             var that = this;
-            var opts = that.opts;
 
-            that._layout.render().update();
+            if(that._toolBar){
+                that._toolBar.render();
+            }
+            that._central.render();
+            that.initEvents();
         },
         /*
          * extend remove
@@ -222,9 +54,28 @@ Std.ui.module("Panel",{
         remove:function(){
             var that = this;
 
-            if(that._layout){
-                that._layout.remove();
+            that._central.remove();
+            that._toolBar && that._toolBar.remove();
+        },
+        /*
+         * extend height
+        */
+        height:function(height){
+            var that         = this;
+            var opts         = that.opts;
+            var clientHeight = (isNumber(height) ? height : that.height()) - that.boxSize.height - opts.titleHeight;
+
+            if(opts.clientPadding){
+                clientHeight -= opts.clientPadding * 2;
             }
+            if(that._toolBar){
+                clientHeight -= that._toolBar.height();
+            }
+            if(that._menuBar){
+                clientHeight -= that._menuBar.height();
+            }
+            that.D.Client.height(clientHeight);
+            that._central.emit("resize");
         }
     },
     /*[#module option:private]*/
@@ -234,27 +85,103 @@ Std.ui.module("Panel",{
         */
         initEvents:function(){
             var that  = this;
+            var doms  = that.D;
             var state = false;
 
             that[0].on({
+                focusin:function(){
+                    that.addClass("focus");
+                },
                 mousedown:function(){
                     that.focus();
                 },
                 mouseenter:function(){
-                    if(state == true){
-                        return;
+                    if(state == false){
+                        that[0].on("focusout",function(){
+                            that.removeClass("focus");
+                        });
+                        doms.TitleBar.unselect(state = true);
+                        that._toolBar && that._toolBar[0].unselect(true);
                     }
-                    that[0].on("focusout",function(){
-                        that.removeClass("focus");
-                    });
-                    that._titleBar[0].unselect(state = true);
-                    that._toolBar && that._toolBar[0].unselect(true);
-                },
-                focusin:function(){
-                    that.addClass("focus");
                 }
             });
             return that;
+        },
+        /*
+         * init events
+        */
+        initTitleEvents:function(){
+            var that = this;
+            var doms = that.D;
+
+            doms.TitleBar.on("mouseenter","._buttons > ._button",function(e){
+                this.mouse({
+                    auto:false,
+                    down:function(e){
+                        e.stopPropagation();
+                    },
+                    click:function(){
+                        var titleButtons = that._titleButtons;
+
+                        for(var name in titleButtons){
+                            if(titleButtons[name].contains(this)){
+                                that.emit("titleButtonClick",[name,this],true);
+                            }
+                        }
+                    }
+                },e);
+            });
+            return that;
+        },
+        /*
+         * init title
+        */
+        initTitle:function(){
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
+
+            doms.TitleBar = newDiv("_title").outerHeight(opts.titleHeight).append([
+                doms.TitleIcon    = newDiv("_icon"),
+                doms.TitleText    = newDiv("_text").html(opts.title),
+                doms.TitleButtons = newDiv("_buttons")
+            ]).appendTo(that[0]);
+
+            return that;
+        },
+        /*
+         * init client
+        */
+        initClient:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.D.Client = newDiv("_client").append(
+                that._central = Std.ui("widget",{
+                    defaultClass:"_central",
+                    appendTo:that[0],
+                    tabIndex:null
+                })
+            ).appendTo(that[0]);
+
+            if(opts.clientPadding){
+                that.D.Client.padding(opts.clientPadding);
+            }
+
+            return that;
+        },
+        /*
+         * create title button
+        */
+        createTitleButton:function(name,data){
+            var item = this._titleButtons[name] = newDiv("_button").data(name,data);
+
+            if(isObject(data)){
+                item.set(data);
+            }else if(isString(data)){
+                item.addClass(data);
+            }
+            return item;
         }
     },
     /*[#module option:public]*/
@@ -264,7 +191,44 @@ Std.ui.module("Panel",{
         */
         title:function(text){
             return this.opt("title",text,function(){
-                this._titleBar.text(text);
+                this.titleText(text);
+            });
+        },
+        /*
+         * client padding
+        */
+        clientPadding:function(padding){
+            return this.opt("clientPadding",padding,function(){
+                this.D.Client && this.D.Client.padding(padding);
+            });
+        },
+        /*
+         * get or set title text
+         */
+        titleText:function(text){
+            var that = this;
+
+            return that.opt("text",text,function(){
+                that.D.TitleText.html(text);
+            });
+        },
+        /*
+         * get or set title icon
+        */
+        titleIcon:function(icon){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("icon",icon,function(){
+                if(icon.charAt(0) !== '.'){
+                    if(!doms.TitleIconImg){
+                        doms.TitleIconImg = newDom("img").appendTo(doms.TitleIcon);
+                    }
+                    doms.TitleIconImg.attr("src",icon);
+                }else{
+                    doms.TitleIconImg && doms.TitleIconImg.remove();
+                    doms.TitleIcon.className("_icon" + icon.replace(/\./g,' '));
+                }
             });
         },
         /*
@@ -319,18 +283,14 @@ Std.ui.module("Panel",{
             var that = this;
 
             if(data === undefined){
-                return that._toolBar;
+                return that._toolBar || null;
             }
             if(isWidget(data)){
                 that._toolBar = data;
             }else if(isObject(data)){
                 that._toolBar = Std.ui.create("ToolBar",data);
             }
-            that._clientLayout.insert(that._toolBar,that._menuBar ? 1 : 0);
-
-            if(that.renderState){
-                that._layout.update();
-            }
+            that[0].insertBefore(that._toolBar,that.D.Client);
 
             return that;
         },
@@ -339,7 +299,7 @@ Std.ui.module("Panel",{
         */
         titleButtons:function(name,data){
             var that  = this;
-            var items = that._titleBar.items;
+            var items = that._titleButtons;
 
             if(name === undefined){
                 return items;
@@ -347,52 +307,65 @@ Std.ui.module("Panel",{
             if(isString(name) && data === undefined){
                 return items[name];
             }
-            that._titleBar.append(name,data);
+            that.appendTitleButton(name,data);
 
             return that;
-        }
+        },
+        /*
+         * insert title button before
+        */
+        insertTitleButtonBefore:Std.func(function(name,data,targetName){
+            var that  = this;
+            var item  = that.createTitleButton(name,data);
+            var items = that._titleButtons;
+
+            if(item !== null && targetName in items){
+                this.D.TitleButtons.insertBefore(items[targetName]);
+            }
+        },{
+            each:[isArray]
+        }),
+        /*
+         * insert title button after
+         */
+        insertTitleButtonAfter:Std.func(function(name,data,targetName){
+            var that  = this;
+            var item  = that.createTitleButton(name,data);
+            var items = that._titleButtons;
+
+            if(item !== null && targetName in items){
+                this.D.TitleButtons.insertAfter(items[targetName]);
+            }
+        },{
+            each:[isArray]
+        }),
+        /*
+         * append title button
+        */
+        appendTitleButton:Std.func(function(name,data){
+            var that = this;
+            var item = that.createTitleButton(name,data);
+
+            if(item !== null){
+                this.D.TitleButtons.append(item);
+            }
+        },{
+            each:[isObject]
+        })
     },
     /*[#module option:main]*/
     main:function(that,opts,dom){
-        that._layout = Std.ui("VBoxLayout",{
-            parent:that,
-            spacing:0,
-            items:[
-                that._titleBar = Std.ui("PanelTitle",{
-                    text:opts.title
-                }),
-                that._client   = Std.ui("widget",{
-                    level:4,
-                    className:"StdUI_PanelClient"
-                })
-            ]
-        });
+        that.D             = {};
+        that._titleButtons = {};
 
-        that._clientLayout = Std.ui("VBoxLayout",{
-            spacing:0,
-            items:[
-                that._central = Std.ui("widget",{
-                    level:4,
-                    className:"StdUI_PanelCentral",
-                    on:{
-                        load:function(e){
-                            that.emit("load",e);
-                        }
-                    }
-                })
-            ]
-        });
+        that.initTitle();
+        that.initClient();
+        that.initTitleEvents();
 
-        if(opts.padding !== null){
-            that._central[0].css("padding",opts.padding);
-        }
-        that._client.layout(that._clientLayout);
         that.call_opts({
             menuBar:null,
             toolBar:null,
             titleButtons:null
         },true);
-
-        that.initEvents();
     }
 });

@@ -1,7 +1,7 @@
 /**
  *  slider model
 */
-Std.ui.model("slider",{
+Std.model("ui.Slider",{
     /*[#module option:widget]*/
     parent:"widget",
     /*[#module option:events]*/
@@ -53,15 +53,16 @@ Std.ui.model("slider",{
          * update progress
         */
         updateProgress:function(size){
-            var that        = this;
-            var arrangement = that.arrangement;
+            var that = this;
 
-            if(arrangement === "horizontal"){
-                that.D.progress.width(size);
-            }else if(arrangement === "vertical"){
-                that.D.progress.height(size);
+            switch(that._direction){
+                case "horizontal":
+                    that.D.progress.width(size);
+                    break;
+                case "vertical":
+                    that.D.progress.height(size);
+                    break;
             }
-
             return that;
         },
         /*
@@ -74,27 +75,25 @@ Std.ui.model("slider",{
             var boxSize     = 0;
             var handleSize  = 0;
             var cssName     = "";
-            var arrangement = that.arrangement;
+            var position    = null;
+            var valueRange  = opts.max - opts.min;
+            var direction   = that._direction;
 
-            if(arrangement === "horizontal"){
+            if(direction === "horizontal"){
                 size       = that.width();
                 cssName    = "left";
                 boxSize    = that.boxSize.width;
                 handleSize = opts.handleWidth;
-            }else if(arrangement === "vertical"){
+                position   = Math.round((size - boxSize - handleSize) / valueRange * (value - opts.min));
+                that.D.handle.css(cssName,position);
+            }else if(direction === "vertical"){
                 size       = that.height();
                 cssName    = "top";
                 boxSize    = that.boxSize.height;
                 handleSize = opts.handleHeight;
+                position   = Math.round((size - boxSize - handleSize) / valueRange * (value - opts.min));
+                that.D.handle.css(cssName,(size - boxSize - handleSize) / valueRange * (valueRange - value - opts.min));
             }
-
-            var position = Math.round(
-                (size - boxSize - handleSize)
-                /
-                (opts.max - opts.min) * (value - opts.min)
-            );
-
-            that.D.handle.css(cssName,position);
             that.updateProgress(position + handleSize / 2);
 
             return that.emit("change",opts.value = value);
@@ -141,50 +140,50 @@ Std.ui.model("slider",{
          * init drag
         */
         initDrag:function(){
-            var that        = this;
-            var opts        = that.opts;
-            var clientSize  = 0;
-            var handleSize  = 0;
+            var that       = this;
+            var opts       = that.opts;
+            var clientSize = 0;
+            var handleSize = 0;
             var offset,page,direction;
 
-            var loadSize    = function(){
+            var loadSize = function(){
                 offset = that[0].offset();
-                if(that.arrangement === "horizontal"){
+                if(that._direction === "horizontal"){
                     page       = "pageX";
                     direction  = "x";
                     handleSize = opts.handleWidth;
                     clientSize = that.width() - that.boxSize.width;
-                }else if(that.arrangement === "vertical"){
+                }else if(that._direction === "vertical"){
                     page       = "pageY";
                     direction  = "y";
                     handleSize = opts.handleHeight;
                     clientSize = that.height() - that.boxSize.height;
                 }
             };
-            var mousemove   = function(e){
+            var mousemove = function(e){
                 var pos   = e[page] - offset[direction];
                 var value = 0;
 
-                if(pos < 0){
-                    value = opts.min;
-                }else if(pos > clientSize){
-                    value = opts.max;
-                }else{
+                if(page === "pageX"){
                     value = opts.min + Math.round((pos - handleSize / 2) / (clientSize - handleSize) * (opts.max - opts.min));
+                }else if(page === "pageY"){
+                    value = opts.min + Math.round((clientSize - pos - handleSize / 2) / (clientSize - handleSize) * (opts.max - opts.min));
                 }
                 that.value(value);
             };
 
             that[0].mouse({
                 down:function(e){
-                    if(e.which === 1){
-                        loadSize();
-                        this.on("mousemove",mousemove(e) || mousemove);
-                        that.emit("dragStart");
+                    if(e.which !== 1){
+                        return;
                     }
+                    loadSize();
+                    Std.dom(document).on("mousemove",mousemove(e) || mousemove);
+                    e.preventDefault();
+                    that.emit("dragStart");
                 },
                 up:function(){
-                    this.off("mousemove",mousemove);
+                    Std.dom(document).off("mousemove",mousemove);
                     that.emit("dragStop");
                 }
             });
@@ -204,25 +203,21 @@ Std.ui.model("slider",{
          * min
         */
         min:function(n){
-            var that = this;
-
-            return that.opt("min",n,function(){
-                that.refresh();
+            return this.opt("min",n,function(){
+                this.refresh();
             });
         },
         /*
          * max
          */
         max:function(n){
-            var that = this;
-
-            return that.opt("max",n,function(){
-                that.refresh();
+            return this.opt("max",n,function(){
+                this.refresh();
             });
         },
         /*
          * slider range
-         */
+        */
         range:function(min,max){
             var that = this;
             var opts = that.opts;
@@ -264,7 +259,7 @@ Std.ui.model("slider",{
     main:function(that,opts,dom){
         var doms = that.D = {};
 
-        dom.addClass(that.arrangement).append([
+        dom.addClass("_" + that._direction).append([
             doms.client = newDiv("_client").append(
                 doms.progress = newDiv("_progress")
             ),
@@ -278,15 +273,18 @@ Std.ui.model("slider",{
 */
 Std.ui.module("HSlider",{
     /*[#module option:model]*/
-    model:"slider",
+    model:"ui.Slider",
     /*[#module option:option]*/
     option:{
         level:3,
         height:22
     },
-    /*[#module option:private]*/
-    private:{
-        arrangement:"horizontal"
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * direction
+        */
+        direction:"horizontal"
     },
     /*[#module option:extend]*/
     extend:{
@@ -312,10 +310,10 @@ Std.ui.module("HSlider",{
 
 /**
  *  vertical slider widget module
- */
+*/
 Std.ui.module("VSlider",{
     /*[#module option:model]*/
-    model:"slider",
+    model:"ui.Slider",
     /*[#module option:option]*/
     option:{
         level:3,
@@ -323,8 +321,11 @@ Std.ui.module("VSlider",{
         height:200
     },
     /*[#module option:private]*/
-    private:{
-        arrangement:"vertical"
+    protected:{
+        /*
+         * direction
+        */
+        direction:"vertical"
     },
     /*[#module option:extend]*/
     extend:{

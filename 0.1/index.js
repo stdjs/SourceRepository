@@ -123,13 +123,13 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.Accordion")
             ]
         },
-        "ui.Tabs":{
+        "ui.TabPanel":{
             basics:[
                 "ui.Button"
             ],
             files:[
-                CSSFile_UI("ui.Tabs"),
-                JSFile_UI("ui.Tabs")
+                CSSFile_UI("ui.TabPanel"),
+                JSFile_UI("ui.TabPanel")
             ]
         },
         "ui.Slider":[

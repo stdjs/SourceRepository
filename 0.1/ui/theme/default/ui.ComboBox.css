@@ -42,24 +42,26 @@
     float: right;
     height: 24px;
     width: 22px;
+    cursor: pointer;
     transition: all 0.14s;
     background: url("images/StdUI_Global.png") -3px 2px no-repeat;
 }
-.StdUI_ComboBox > ._handle.open{
+.StdUI_ComboBox > ._handle._open{
     transform: rotate(180deg);
 }
 
-.StdUI_ComboBox.input{
+/******** ComboBox : input mode **********/
+.StdUI_ComboBox._input{
     border:1px solid #B1B3B0;
     background: white;
 }
-.StdUI_ComboBox.input.hover,
-.StdUI_ComboBox.input.hover{
+.StdUI_ComboBox._input.hover,
+.StdUI_ComboBox._input.hover{
     border-color: #6FD6FF;
 }
 
-.StdUI_ComboBox.input.focus,
-.StdUI_ComboBox.input.focus{
+.StdUI_ComboBox._input.focus,
+.StdUI_ComboBox._input.focus{
     border-color: #4AABDB;
 }
 
