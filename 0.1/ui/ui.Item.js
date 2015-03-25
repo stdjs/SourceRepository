@@ -143,6 +143,8 @@ Std.ui.module("Item",{
 Std.ui.module("TemplateItem",{
     /*[#module option:parent]*/
     parent:"widget",
+    /*[#module option:events]*/
+    events:"templateRender",
     /*[#module option:action]*/
     action:{
         content:"text"
@@ -195,6 +197,7 @@ Std.ui.module("TemplateItem",{
 
                 if(isObject(template)){
                     template.renderTo(that,data);
+                    that.emit("templateRender");
                 }
                 that.text(data[opts.textField]);
                 that.value(data[opts.valueField]);
@@ -204,7 +207,7 @@ Std.ui.module("TemplateItem",{
     /*[#module option:main]*/
     main:function(that,opts,dom){
         that.D = {};
-        
+
         //------
         if(isFunction(opts.click)){
             dom.on("click",function(){
