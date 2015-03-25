@@ -177,7 +177,16 @@ Std.ui.module("TemplateItem",{
          * template
         */
         template:function(template){
-            return this.opt("template",template);
+            var that = this;
+            var opts = that.opts;
+
+            return that.opt("template",template,function(){
+                if(isString(template)){
+                    opts.template = Std.template(template);
+                }else if(template instanceof Std.template){
+                    opts.template = template;
+                }
+            });
         },
         /*
          * get or set text
@@ -208,6 +217,9 @@ Std.ui.module("TemplateItem",{
     main:function(that,opts,dom){
         that.D = {};
 
+        if(opts.template){
+            that.template(opts.template);
+        }
         //------
         if(isFunction(opts.click)){
             dom.on("click",function(){
