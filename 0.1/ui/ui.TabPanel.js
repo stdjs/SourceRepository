@@ -46,7 +46,7 @@ Std.ui.module("TabButton",{
 /**
  *  Tabs widget
 */
-Std.ui.module("Tabs",{
+Std.ui.module("TabPanel",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:option]*/
