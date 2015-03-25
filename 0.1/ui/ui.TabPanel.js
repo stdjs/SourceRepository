@@ -649,7 +649,7 @@ Std.ui.module("TabPanel",{
             if(isString(index)){
                 index = that.convertIndex(index,reference);
             }
-            if(index !== -1){
+            if(index !== -1 && index < that.items.length){
                 that.activeTab(index);
                 that.emit("tabSelect",index);
             }
