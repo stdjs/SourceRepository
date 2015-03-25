@@ -11,7 +11,6 @@
     border-radius: 2px;
 }
 .StdUI_Progress > ._text{
-    color: #505050;
     font-weight: bold;
     overflow: hidden;
     text-align: center;
@@ -23,17 +22,80 @@
     overflow: hidden;
     width: 0;
     transition: all 0.2s;
-    background: #57B0DC;
-    background: linear-gradient(to bottom,#5DBDEC 0%,#57B0DC 100%);
 }
 .StdUI_Progress > ._location > ._text{
     font-weight: bold;
-    color: #226AA5;
     overflow: hidden;
     text-align: center;
-    text-shadow: 0 1px 0 #AAD9FF;
 }
-.StdUI_Progress._finished{
+.StdUI_Progress.-finished{
+    transition: all 0.5s;
+}
+
+/************* blue Progress *************/
+.StdUI_Progress.-blue > ._location{
+    background: #57B0DC;
+    background: linear-gradient(to bottom,#5DBDEC 0%,#57B0DC 100%);
+}
+.StdUI_Progress.-blue > ._text{
+    color: #505050;
+}
+.StdUI_Progress.-blue > ._location > ._text{
+    text-shadow: 0 1px 0 #AAD9FF;
+    color: #226AA5;
+}
+.StdUI_Progress.-blue.-finished{
     border-color: #46A9D7;
     box-shadow: 0 0 4px #57B0DC;
+}
+
+/************* red Progress *************/
+.StdUI_Progress.-red > ._location{
+    background: #CC2D22;
+    background: linear-gradient(to bottom,#D16055 0%,#CC2D22 100%);
+}
+.StdUI_Progress.-red > ._text{
+    color: #505050;
+}
+.StdUI_Progress.-red > ._location > ._text{
+    text-shadow: 0 1px 0 #FF9090;
+    color: #911805;
+}
+.StdUI_Progress.-red.-finished{
+    border-color: #DA4537;
+    box-shadow: 0 0 4px #D14949;
+}
+
+/************* black Progress *************/
+.StdUI_Progress.-black > ._location{
+    background: #303030;
+    background: linear-gradient(to bottom,#444444 0%,#303030 100%);
+}
+.StdUI_Progress.-black > ._text{
+    color: #505050;
+}
+.StdUI_Progress.-black > ._location > ._text{
+    text-shadow: 0 1px 0 #4B4B4B;
+    color: #F2F2F2;
+}
+.StdUI_Progress.-black.-finished{
+    border-color: #444444;
+    box-shadow: 0 0 4px #444444;
+}
+
+/************* black Progress *************/
+.StdUI_Progress.-green > ._location{
+    background: #45AD56;
+    background: linear-gradient(to bottom,#76C182 0%,#45AD56 100%);
+}
+.StdUI_Progress.-green > ._text{
+    color: #505050;
+}
+.StdUI_Progress.-green > ._location > ._text{
+    text-shadow: 0 1px 0 #AAD9FF;
+    color: #057705;
+}
+.StdUI_Progress.-green.-finished{
+    border-color: #62BB71;
+    box-shadow: 0 0 4px #62C171;
 }

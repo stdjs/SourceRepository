@@ -54,6 +54,19 @@
     background-repeat: no-repeat;
 
 }
+.StdUI_Panel > ._title > ._buttons > ._button._collapse{
+    background-position: -189px -356px;
+}
+.StdUI_Panel > ._title > ._buttons > ._button._collapse:hover{
+    background-position: -221px -356px;
+}
+.StdUI_Panel > ._title > ._buttons > ._button._collapse._open{
+    background-position: -205px -356px;
+}
+.StdUI_Panel > ._title > ._buttons > ._button._collapse._open:hover{
+    background-position: -237px -356px;
+}
+
 .StdUI_Panel > ._title > ._buttons > ._button._min{
     background-position: -125px -31px;
 }
@@ -78,15 +91,19 @@
 .StdUI_Panel > ._title > ._buttons > ._button._close:hover{
     background-position: -257px -96px;
 }
-.StdUI_Panel > .StdUI_ToolBar{
+
+.StdUI_Panel > ._body{
+    overflow: hidden;
+}
+.StdUI_Panel > ._body > .StdUI_ToolBar{
     padding: 0 2px 0 2px;
 }
-.StdUI_Panel > ._client{
+.StdUI_Panel > ._body > ._client{
     font-size: 12px;
     position: relative;
     outline: none;
 }
-.StdUI_Panel > ._client > ._central{
+.StdUI_Panel > ._body > ._client > ._central{
     overflow: auto;
     position: relative;
     width: 100%;

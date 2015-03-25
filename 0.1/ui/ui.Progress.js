@@ -106,7 +106,7 @@ Std.model("ui.Progress",{
         },
         /*
          * get or set percent
-         */
+        */
         percent:function(percent){
             var that = this;
             var opts = that.opts;
@@ -115,6 +115,19 @@ Std.model("ui.Progress",{
                 return Std.convert.percent(int(opts.value - opts.min),opts.max - opts.min);
             }
             return that.value(int((opts.max - opts.min) * percent / 100));
+        },
+        /*
+         * color
+        */
+        color:function(color){
+            var that = this;
+            var opts = that.opts;
+
+            if(color === undefined){
+                return opts.color;
+            }
+            that[0].removeClass("-"+opts.color).addClass("-"+(opts.color = color));
+            return that;
         },
         /*
          * progress text
@@ -149,10 +162,10 @@ Std.model("ui.Progress",{
                 value = opts.min;
             }
 
-            if(opts.value != opts.max && opts.max == value){
-                that.addClass("_finished").emit("finished");
+            if(opts.max == value){
+                that.addClass("-finished").emit("finished");
             }else if(opts.value == opts.max && opts.max != value){
-                that.removeClass("_finished");
+                that.removeClass("-finished");
             }
 
             if(opts.value !== value){
@@ -166,7 +179,7 @@ Std.model("ui.Progress",{
     main:function(that,opts,dom){
         var doms = that.D = {};
 
-        dom.append([
+        dom.addClass("-"+opts.color).append([
             doms.text      = newDiv("_text"),
             doms.location  = newDiv("_location").append(
                 doms.text2 = newDiv("_text")

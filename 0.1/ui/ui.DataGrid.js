@@ -5,10 +5,10 @@ Std.ui.module("DataGrid",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"clear selectionModeChange itemClick itemDblClick columnDropStart columnDropStop",
+    events:"clear selectionModeChange cellChange itemClick itemDblClick columnDropStart columnDropStop removeColumn removeRow updateRow",
     /*[#module option:option]*/
     option:{
-        defaultClass:"StdUI_GridView",
+        defaultClass:"StdUI_DataGrid",
         level:4,
         height:300,
         minWidth:120,
@@ -405,19 +405,23 @@ Std.ui.module("DataGrid",{
             };
             that[2].delegate("mouseenter","._block > ._row > ._cell",function(e){
                 var selectionMode = opts.selectionMode;
+                var cellPosition  = null;
                 var cell          = this.mouse({
                     auto:false,
                     classStatus:opts.hoverMode === "cell",
                     dblclick:function(e){
                         if(opts.cellEditable){
-                            that.editCell(this);
+                            that.editCell(this,function(text){
+                                that.emit("cellChange",[cellPosition,text],true);
+                            });
                         }
                     },
                     down:function(e){
                         var startIndex      = cell.index();
                         var startRowIndex   = cell.parent().index();
                         var startBlockIndex = cell.parent("._block").index();
-                        var cellPosition    = sprintf("%d:%d",startBlockIndex * 10 + startRowIndex,startIndex);
+
+                        cellPosition = sprintf("%d:%d",startBlockIndex * 10 + startRowIndex,startIndex);
 
                         if(selectionMode === "cells" && e.ctrlKey){
                             if(selectionMode === "cells" && e.which === 1){
@@ -453,7 +457,7 @@ Std.ui.module("DataGrid",{
             };
 
             that[2].delegate("mouseenter","._block > ._row",function(e){
-                var row           = this.mouse({
+                var row = this.mouse({
                     auto:false,
                     classStatus:opts.hoverMode === "row",
                     down:function(e){
@@ -517,11 +521,11 @@ Std.ui.module("DataGrid",{
             var offsetLeft = headOffset.x - 6 + index + (index === that._columns.length ? that._columnPositions[index - 1].end : that._columnPositions[index].begin);
 
             that.hideColumnDropPosition();
-            that.D.columnPos1 = newDiv("StdUI_GridView_ColumnPosition _top").appendTo("body").css({
+            that.D.columnPos1 = newDiv("StdUI_DataGrid_ColumnPosition _top").appendTo("body").css({
                 top:headOffset.y - 12,
                 left:offsetLeft
             });
-            that.D.columnPos2 = newDiv("StdUI_GridView_ColumnPosition _bottom").appendTo("body").css({
+            that.D.columnPos2 = newDiv("StdUI_DataGrid_ColumnPosition _bottom").appendTo("body").css({
                 top:headOffset.y + opts.headerHeight,
                 left:offsetLeft
             });
@@ -598,22 +602,20 @@ Std.ui.module("DataGrid",{
                 }
                 cells[y] = that.paintCell(children[y],rowData.cells[y]);
             }
-            var row   = {
-                row:rowElement,
-                cells:cells,
-                blockID:blockID
-            };
+            return {row:rowElement, cells:cells, blockID:blockID};
         },
         /*
          * edit cell
         */
-        editCell:function(cell){
+        editCell:function(cell,callback){
             var that     = this;
             var position = cell.position();
             var input    = newDom("input","_input").value(cell.text()).on({
                 blur:function(){
-                    cell.html(this.value());
+                    var value = this.value();
+                    cell.html(value);
                     input.remove();
+                    Std.func(callback).call(that,value)
                 },
                 keypress:function(e){
                     if(e.keyCode === 13){
@@ -912,7 +914,7 @@ Std.ui.module("DataGrid",{
                 '>':cellData
             };
 
-            CSSData[".StdUI_GridView." + that.objectName] = {
+            CSSData[".StdUI_DataGrid.StdUI_" + that.objectName] = {
                 '>':{
                     "._header":{
                         '>':{
@@ -942,6 +944,23 @@ Std.ui.module("DataGrid",{
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * row
+        */
+        row:function(pos){
+            return this._rows[pos]
+        },
+        /*
+         * cell
+        */
+        cell:function(rowPos,cellPos){
+            if(isString(rowPos)){
+                var data = rowPos.split(":");
+                rowPos  = ~~data[0];
+                cellPos = ~~data[1];
+            }
+            return this._rows[rowPos].cells[cellPos];
+        },
         /*
          * get row index
         */
@@ -1177,6 +1196,14 @@ Std.ui.module("DataGrid",{
             var rowIndex    = -1;
             var selectedRow = that._selectedRow;
 
+            if(pos === undefined){
+                if(that.selectionMode() == "row"){
+                    for(var name in selectedRow){
+                        return selectedRow[name];
+                    }
+                }
+                return selectedRow;
+            }
             if(isString(row) && pos === undefined){
                 rowIndex = that.rowIndex(row);
             }else if(isString(pos)){
@@ -1203,6 +1230,14 @@ Std.ui.module("DataGrid",{
             var selectedCell = that._selectedCell;
             var cellIndex    = -1;
 
+            if(index === undefined){
+                if(that.selectionMode() == "cell"){
+                    for(var name in selectedCell){
+                        return selectedCell[name];
+                    }
+                }
+                return selectedCell;
+            }
             if(isString(index)){
                 cellIndex = index.split(':');
             }
@@ -1249,8 +1284,22 @@ Std.ui.module("DataGrid",{
             }else if(isObject(index)){
                 for(var name in index){
                     data = index[name];
-                    name = name.split(':');
-                    that._rows[name[0]].cells[name[1]] = data;
+                    that._rows[(name = name.split(':'))[0]].cells[name[1]] = data;
+                }
+            }
+            return that.refresh();
+        },
+        /*
+         * update row
+        */
+        updateRow:function(index,data){
+            var that = this;
+
+            if(isNumber(index)){
+                that._rows[index] = data;
+            }else if(isObject(index)){
+                for(var name in index){
+                    that._rows[~~name] = data;
                 }
             }
             return that.refresh();
@@ -1318,18 +1367,27 @@ Std.ui.module("DataGrid",{
             }
             that._columnCount = that._columns.length;
 
-            return that.refresh();
+            return that.refresh().emit("removeColumn",data);
         },
         /*
          * remove row
         */
-        removeRow:function(data){
+        removeRow:function(row){
             var that = this;
 
-            that._rows.remove(data);
-            that._rowCount = that._rows.length;
+            if(row === "select"){
+                var indexs = [];
+                Std.each(that._selectedRow,function(index){
+                    indexs.push(~~index);
+                    that._rowCount--;
+                });
+                that._rows.remove(indexs);
+            }else if(isNumber(row)){
+                that._rows.remove(row);
+                that._rowCount = that._rows.length;
+            }
 
-            return that.refresh();
+            return that.refresh().emit("removeRow",row);
         },
         /*
          * clear selected
@@ -1374,7 +1432,7 @@ Std.ui.module("DataGrid",{
             that._rows.clear();
             that.clearRowBlocks();
 
-            return that;
+            return that.emit("clear");
         },
         /*
          * clearRowBlocks
@@ -1392,10 +1450,9 @@ Std.ui.module("DataGrid",{
     },
     /*[#module option:main]*/
     main:function(that,opts,dom){
-        that.addClass(that.objectName);
+        that.addClass("StdUI_" + that.objectName);
         that.D               = {};
         that.CSSStyle        = new Std.css;
-
         that._rows           = [];
         that._columns        = [];
         that._rowBlocks      = [];

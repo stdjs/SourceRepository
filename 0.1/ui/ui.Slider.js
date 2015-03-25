@@ -15,6 +15,7 @@ Std.model("ui.Slider",{
         max:100,
         min:0,
         value:0,
+        color:"#5FA8DB",
         defaultClass:"StdUI_Slider",
         handleWidth:18,
         handleHeight:18
@@ -40,8 +41,8 @@ Std.model("ui.Slider",{
                 height : opts.handleHeight - that.handleBoxSize.height
             });
 
+            that.call_opts("color");
             that.on("resize",that.refresh.bind(that));
-
             that.refresh();
             that.initDrag();
             that.initEvents();
@@ -213,6 +214,14 @@ Std.model("ui.Slider",{
         max:function(n){
             return this.opt("max",n,function(){
                 this.refresh();
+            });
+        },
+        /*
+         * color
+        */
+        color:function(color){
+            return this.opt("color",color,function(){
+                this.D.progress.css("background",color);
             });
         },
         /*

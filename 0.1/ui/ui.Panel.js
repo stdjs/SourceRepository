@@ -13,17 +13,19 @@ Std.ui.module("Panel",{
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_Panel",
+        width:300,
+        height:200,
         minWidth:70,
         minHeight:50,
-        height:200,
-        width:300,
         level:4,
         title:"panel",
         menuBar:null,
         toolBar:null,
         titleHeight:22,
         titleButtons:null,
-	    clientPadding:8
+	    clientPadding:8,
+        collapsible:false,
+        collapsed:false
     },
     /*[#module option:protected]*/
     protected:{
@@ -47,6 +49,9 @@ Std.ui.module("Panel",{
             }
             that._central.render();
             that.initEvents();
+            that.call_opts({
+                collapsed:false
+            },true);
         },
         /*
          * extend remove
@@ -81,6 +86,18 @@ Std.ui.module("Panel",{
     /*[#module option:private]*/
     private:{
         /*
+         * title button click
+         */
+        titleButtonClick:function(name){
+            var that = this;
+            var opts = that.opts;
+
+            if(name === "collapse"){
+                that.collapsed(!opts.collapsed,true);
+            }
+            return that;
+        },
+        /*
          * init events
         */
         initEvents:function(){
@@ -113,6 +130,10 @@ Std.ui.module("Panel",{
         initTitleEvents:function(){
             var that = this;
             var doms = that.D;
+
+            that.on("titleButtonClick",function(name){
+                that.titleButtonClick(name);
+            });
 
             doms.TitleBar.on("mouseenter","._buttons > ._button",function(e){
                 this.mouse({
@@ -150,6 +171,18 @@ Std.ui.module("Panel",{
             return that;
         },
         /*
+         * init body
+        */
+        initBody:function(){
+            var that = this;
+
+            that[0].append(
+                that.D.body = newDiv("_body")
+            );
+
+            return that;
+        },
+        /*
          * init client
         */
         initClient:function(){
@@ -162,7 +195,7 @@ Std.ui.module("Panel",{
                     appendTo:that[0],
                     tabIndex:null
                 })
-            ).appendTo(that[0]);
+            ).appendTo(that.D.body);
 
             if(opts.clientPadding){
                 that.D.Client.padding(opts.clientPadding);
@@ -192,6 +225,18 @@ Std.ui.module("Panel",{
         title:function(text){
             return this.opt("title",text,function(){
                 this.titleText(text);
+            });
+        },
+        /*
+         * collapsible
+        */
+        collapsible:function(collapsible){
+            var that = this;
+
+            return that.opt("collapsible",collapsible,function(){
+                if(collapsible === true){
+                    that.appendTitleButton("collapse","_collapse");
+                }
             });
         },
         /*
@@ -290,9 +335,39 @@ Std.ui.module("Panel",{
             }else if(isObject(data)){
                 that._toolBar = Std.ui.create("ToolBar",data);
             }
-            that[0].insertBefore(that._toolBar,that.D.Client);
+            that.D.body.insertBefore(that._toolBar,that.D.Client);
 
             return that;
+        },
+        /*
+         * collapse
+        */
+        collapsed:function(state,animate){
+            var that      = this;
+            var showBody  = function(){
+                that.height(that.opts.height);
+                that.D.body.removeStyle("height");
+            };
+            var hideBody  = function(){
+                that.D.body.css({zIndex:-1, position:"absolute", visibility:"hidden"});
+            };
+            var animateTo = function(height,callback){
+                that.D.body.animate({
+                    to:{
+                        height:height
+                    }
+                },150,callback)
+            };
+            return that.opt("collapsed",state,function(){
+                if(state === true){
+                    that[0].removeStyle("height");
+                    animate === true ? animateTo(0,hideBody) : hideBody();
+                }else{
+                    that.D.body.height(0).removeStyle(["visibility","position","zIndex"]);
+                    animate === true ? animateTo(that.height() - that.boxSize.height - that.opts.titleHeight,showBody) : showBody();
+                }
+                that.titleButtons("collapse").toggleClass("_open",state);
+            });
         },
         /*
          * title buttons
@@ -359,13 +434,15 @@ Std.ui.module("Panel",{
         that._titleButtons = {};
 
         that.initTitle();
+        that.initBody();
         that.initClient();
         that.initTitleEvents();
 
         that.call_opts({
             menuBar:null,
             toolBar:null,
-            titleButtons:null
+            titleButtons:null,
+            collapsible:false
         },true);
     }
 });

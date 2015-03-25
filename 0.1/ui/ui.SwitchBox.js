@@ -12,7 +12,9 @@ Std.ui.module("SwitchBox",{
         defaultClass:"StdUI_SwitchBox",
         height:26,
         value:"off",
-        items:"off on"
+        items:"off on",
+        styleType:"default",
+        color:"blue"
     },
     /*#module option:action]*/
     action:{
@@ -142,6 +144,18 @@ Std.ui.module("SwitchBox",{
             });
         },
         /*
+         * style type
+        */
+        styleType:function(styleType){
+            var that = this;
+
+            return that.opt("styleType",styleType,function(){
+                if(styleType === "default"){
+
+                }
+            });
+        },
+        /*
          * repaint
         */
         repaint:function(){
@@ -152,6 +166,7 @@ Std.ui.module("SwitchBox",{
 
             for(var i=0;i<that.length;i++){
                 var itemWidth = 0;
+
                 if(width === "auto"){
                     itemWidth = items[i].dom.outerWidth() + 16;
                 }else{

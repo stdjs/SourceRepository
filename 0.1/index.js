@@ -9,10 +9,11 @@ Std.source.response("StdJS",function(){
         return "crypto/Std.crypto."+name+".js";
     }
     return {
+        "ui.Canvas":JSFile_UI("ui.Canvas"),
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),
-        "ui.ToolTip":JSFile_UI("ui.ToolTip"),
+        "ui.ToolTip":JSFile_UI("ui.ToolTip"),	    
         "ui.CheckBox":[
             CSSFile_UI("ui.CheckBox"),
             JSFile_UI("ui.CheckBox")
@@ -20,6 +21,10 @@ Std.source.response("StdJS",function(){
         "ui.RadioBox":[
             CSSFile_UI("ui.RadioBox"),
             JSFile_UI("ui.RadioBox")
+        ],
+	"ui.SpinBox":[
+            CSSFile_UI("ui.SpinBox"),
+            JSFile_UI("ui.SpinBox")
         ],
         "ui.SwitchBox":[
             CSSFile_UI("ui.SwitchBox"),
@@ -29,6 +34,17 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.Edit"),
             JSFile_UI("ui.Edit")
         ],
+	"ui.TextEdit":[
+            CSSFile_UI("ui.Edit"),
+            JSFile_UI("ui.Edit")
+        ],
+	"ui.DateTimeEdit":{
+	    basics:["ui.LineEdit","ui.DatePicker"],
+	    files:[
+		CSSFile_UI("ui.DateTimeEdit"),
+		JSFile_UI("ui.DateTimeEdit")
+	    ]
+	},
         "ui.Button":[
             CSSFile_UI("ui.Button"),
             JSFile_UI("ui.Button")
@@ -160,11 +176,13 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.ImageCutter")
             ]
         },
+	
+	
         "crypto.sha1":cryptoJS("sha1"),
         "crypto.sha256":cryptoJS("sha256"),
         "crypto.base64":cryptoJS("base64"),
         "crypto.md5":cryptoJS("md5"),
-	    "crypto.md6":cryptoJS("md6"),
+	"crypto.md6":cryptoJS("md6"),
         "crypto.aes":{
             basics:[
                 "crypto.base64"

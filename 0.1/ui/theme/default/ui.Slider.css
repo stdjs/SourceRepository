@@ -1,5 +1,5 @@
 
-/************* HSlider *************/
+/************* slider *************/
 .StdUI_Slider{
     position: relative;
     overflow: hidden;
@@ -37,6 +37,7 @@
 .StdUI_Slider.focus > ._handle{
     border-color: #5FA8DB;
 }
+
 
 /************* HSlider *************/
 .StdUI_Slider._horizontal > ._client{

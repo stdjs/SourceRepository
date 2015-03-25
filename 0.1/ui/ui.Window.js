@@ -69,6 +69,26 @@ Std.ui.module("Window",{
             that.focus(1);
         },
         /*
+         * title button click
+        */
+        titleButtonClick:function(name){
+            var that = this;
+            var opts = that.opts;
+
+            switch(name){
+                case "min":
+                    that.minimize(true);
+                    break;
+                case "max":
+                    that.maximize(!opts.maximize);
+                    break;
+                case "close":
+                    that.close();
+                    break;
+            }
+            return that;
+        },
+        /*
          * extend visible
         */
         visible:function(state){
@@ -89,26 +109,6 @@ Std.ui.module("Window",{
     },
     /*[#module option:private]*/
     private:{
-        /*
-         * title button click
-        */
-        titleButtonClick:function(name){
-            var that = this;
-            var opts = that.opts;
-
-            switch(name){
-                case "min":
-                    that.minimize(true);
-                    break;
-                case "max":
-                    that.maximize(!opts.maximize);
-                    break;
-                case "close":
-                    that.close();
-                    break;
-            }
-            return that;
-        },
         /*
          * init locker
         */
