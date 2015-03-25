@@ -52,7 +52,7 @@ Std.ui.module("MessageBox",{
                 that.input.renderTo(that.D.BodyClientContentInput);
                 that.input.focus(100);
             }else{
-                that.focus(100);
+                that.focus();
             }
             that.updateLayout();
             that.move("central");
