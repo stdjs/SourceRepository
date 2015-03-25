@@ -45,12 +45,12 @@ Std.ui.module("MessageBox",{
 
             that.initLocker();
 
-            if(opts.defaultButton){
-                that.defaultButton(opts.defaultButton);
-            }
+
             if(that.input !== null){
                 that.input.renderTo(that.D.BodyClientContentInput);
                 that.input.focus(100);
+            }else if(opts.defaultButton){
+                that.defaultButton(opts.defaultButton);
             }else{
                 that.focus();
             }
