@@ -7,6 +7,7 @@ Std.ui.module("TabButton",{
     /*[#module option:option]*/
     option:{
         height:30,
+        level:4,
         closable:false,
         styleType:"text",    //text,icon,textBesideIcon
         defaultClass:"StdUI_TabButton"

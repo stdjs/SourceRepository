@@ -4,10 +4,6 @@
 Std.ui.module("Panel",{
     /*[#module option:parent]*/
     parent:"widget",
-    /*[#module option:action]*/
-    action:{
-        content:"html"
-    },
     /*[#module option:events]*/
     events:"titleButtonClick",
     /*[#module option:option]*/
@@ -26,6 +22,17 @@ Std.ui.module("Panel",{
 	    clientPadding:8,
         collapsible:false,
         collapsed:false
+    },
+    /*[#module option:action]*/
+    action:{
+        /*
+         * content
+         */
+        content:"html",
+        /*
+         * children
+         */
+        children:"append"
     },
     /*[#module option:protected]*/
     protected:{

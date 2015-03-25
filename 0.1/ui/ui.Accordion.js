@@ -28,6 +28,10 @@ Std.ui.module("Accordion",{
     /*#module option:action]*/
     action:{
         /*
+         * children
+         */
+        children:"append",
+        /*
          * childNodes
         */
         childNodes:function(element,childNodes){
