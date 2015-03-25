@@ -164,7 +164,9 @@ Std.ui.module("TemplateItem",{
         render:function(){
             var that = this;
 
-            that.data(that.opts.data);
+            that.call_opts({
+                data:null
+            },true);
         }
     },
     /*[#module option:public]*/
@@ -202,11 +204,7 @@ Std.ui.module("TemplateItem",{
     /*[#module option:main]*/
     main:function(that,opts,dom){
         that.D = {};
-
-        //------
-        if(opts.template){
-            that.template(opts.template);
-        }
+        
         //------
         if(isFunction(opts.click)){
             dom.on("click",function(){
