@@ -519,15 +519,18 @@ Std.ui.module("DataGrid",{
             var opts       = that.opts;
             var headOffset = that[1].offset();
             var offsetLeft = headOffset.x - 6 + index + (index === that._columns.length ? that._columnPositions[index - 1].end : that._columnPositions[index].begin);
+            var zIndex     = Std.ui.status.zIndex + 1;
 
             that.hideColumnDropPosition();
             that.D.columnPos1 = newDiv("StdUI_DataGrid_ColumnPosition _top").appendTo("body").css({
                 top:headOffset.y - 12,
-                left:offsetLeft
+                left:offsetLeft,
+                zIndex:zIndex
             });
             that.D.columnPos2 = newDiv("StdUI_DataGrid_ColumnPosition _bottom").appendTo("body").css({
                 top:headOffset.y + opts.headerHeight,
-                left:offsetLeft
+                left:offsetLeft,
+                zIndex:zIndex
             });
             return that;
         },

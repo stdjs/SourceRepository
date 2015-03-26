@@ -174,6 +174,12 @@ Std.ui.module("TemplateItem",{
     /*[#module option:public]*/
     public:{
         /*
+         * get or set text
+        */
+        text:function(text){
+            return this.opt("text",text);
+        },
+        /*
          * template
         */
         template:function(template){
@@ -187,12 +193,6 @@ Std.ui.module("TemplateItem",{
                     opts.template = template;
                 }
             });
-        },
-        /*
-         * get or set text
-        */
-        text:function(text){
-            return this.opt("text",text);
         },
         /*
          * data

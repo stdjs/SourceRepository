@@ -319,8 +319,7 @@ Std.ui.module("LineEdit",{
         dataList:null,
         minWidth:12,
         minHeight:12,
-        defaultClass:"StdUI_LineEdit",
-        value:0
+        defaultClass:"StdUI_LineEdit"
     },
     /*[#module option:protected]*/
     protected:{

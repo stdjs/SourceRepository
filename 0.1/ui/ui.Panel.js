@@ -138,10 +138,6 @@ Std.ui.module("Panel",{
             var that = this;
             var doms = that.D;
 
-            that.on("titleButtonClick",function(name){
-                that.titleButtonClick(name);
-            });
-
             doms.TitleBar.on("mouseenter","._buttons > ._button",function(e){
                 this.mouse({
                     auto:false,
@@ -150,7 +146,6 @@ Std.ui.module("Panel",{
                     },
                     click:function(){
                         var titleButtons = that._titleButtons;
-
                         for(var name in titleButtons){
                             if(titleButtons[name].contains(this)){
                                 that.emit("titleButtonClick",[name,this],true);

@@ -253,7 +253,7 @@ Std.ui.module("ComboBox",{
 
             that[0].on({
                 mousedown:function(e){
-                    if(e.target.nodeName !== "INPUT"){
+                    if(e.which === 1 && e.target.nodeName !== "INPUT"){
                         that.toggleList();
                     }
                 },
