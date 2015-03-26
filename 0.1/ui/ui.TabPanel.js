@@ -592,13 +592,7 @@ Std.ui.module("TabPanel",{
                     defaultClass:"StdUI_TabContent",
                     html:config.content
                 });
-            }else if(isLayout(config.content)){
-                content = Std.ui("widget",{
-                    tabIndex:null,
-                    defaultClass:"StdUI_TabContent",
-                    layout:config.content
-                });
-            }else if(isObject(config.content)){
+            }else if(isWidget(config.content)){
                 content = Std.ui("widget",{
                     tabIndex:null,
                     defaultClass:"StdUI_TabContent",
@@ -607,6 +601,17 @@ Std.ui.module("TabPanel",{
                         items:[config.content]
                     }
                 });
+            }else if(isLayout(config.content)){
+                content = Std.ui("widget",{
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent",
+                    layout:config.content
+                });
+            }else if(isObject(config.content)){
+                content = Std.ui(config.content.ui || "widget",Std.extend({
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent"
+                },config.content));
             }
 
             return {button:button,content:content};
