@@ -593,7 +593,7 @@ Std.ui.module("TabPanel",{
                     html:config.content
                 });
             }else if(isWidget(config.content)){
-                content = config.content;
+                content = config.content.addClass("StdUI_TabContent");
             }else if(isLayout(config.content)){
                 content = Std.ui("widget",{
                     tabIndex:null,
