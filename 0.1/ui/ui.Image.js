@@ -3,6 +3,7 @@
 */
 Std.css({
     ".StdUI_Image":{
+        outline:"none",
         overflow:"hidden",
         '>':{
             img:{
