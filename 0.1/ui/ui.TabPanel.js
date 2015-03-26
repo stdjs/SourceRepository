@@ -592,8 +592,6 @@ Std.ui.module("TabPanel",{
                     defaultClass:"StdUI_TabContent",
                     html:config.content
                 });
-            }else if(isWidget(config.content)){
-                content = config.content.addClass("StdUI_TabContent");
             }else if(isLayout(config.content)){
                 content = Std.ui("widget",{
                     tabIndex:null,
@@ -601,10 +599,14 @@ Std.ui.module("TabPanel",{
                     layout:config.content
                 });
             }else if(isObject(config.content)){
-                content = Std.ui(config.content.ui || "widget",Std.extend({
+                content = Std.ui("widget",{
                     tabIndex:null,
-                    defaultClass:"StdUI_TabContent"
-                },config.content));
+                    defaultClass:"StdUI_TabContent",
+                    layout:{
+                        ui:"VBoxLayout",
+                        items:[config.content]
+                    }
+                });
             }
 
             return {button:button,content:content};
