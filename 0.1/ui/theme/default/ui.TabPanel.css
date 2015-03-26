@@ -54,7 +54,7 @@
 }
 
 /*********** TabContent widget***************/
-.StdUI_TabContent{
+.StdUI_Tabs > ._contents > .StdUI_TabContent{
     font-size: 12px;
     clear: both;
     position: absolute;
@@ -65,7 +65,7 @@
     overflow: auto;
     visibility: hidden;
 }
-.StdUI_TabContent._visible{
+.StdUI_Tabs > ._contents > .StdUI_TabContent._visible{
     visibility: visible;
     position: relative;
     z-index: 1;
