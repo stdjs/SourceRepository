@@ -47,7 +47,7 @@ Std.ui.module("Image",{
 
             return that.opt("zoom",state,function(){
                 if(!doms.img){
-                    that[0].append(doms.img = newDom("img"));
+                    return;
                 }
                 doms.img && doms.img.css(state ? {
                     width:"100%",
@@ -101,6 +101,7 @@ Std.ui.module("Image",{
 
                 if(!doms.img){
                     that[0].append(doms.img = newDom("img"));
+                    that.zoom(that.opts.zoom);
                 }
                 Std.loader.image(value,function(state,imageObject){
                     if(state !== false){
@@ -133,7 +134,8 @@ Std.ui.module("Image",{
     /*[#module option:main]*/
     main:function(that){
         that.D = {};
-        that.call_opts("value");
-        that.call_opts("zoom",true);
+        that.call_opts({
+            value:""
+        });
     }
 });

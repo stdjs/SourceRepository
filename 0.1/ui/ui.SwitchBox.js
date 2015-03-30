@@ -71,6 +71,20 @@ Std.ui.module("SwitchBox",{
             return iconElement;
         },
         /*
+         * refreshCurrentIndex
+        */
+        refreshCurrent:function(){
+            var that = this;
+
+            for(var i=0;i<that.length;i++){
+                if(that.items[i].name === that.value()){
+                    that._current = i;
+                    break;
+                }
+            }
+            return that;
+        },
+        /*
          * refresh state
         */
         refreshState:function(){
@@ -84,21 +98,6 @@ Std.ui.module("SwitchBox",{
                 left  : current.dom.offsetLeft(),
                 width : width !== "auto" ? width / that.length - that.boxSize.width  : that.items[that._current].dom.outerWidth()
             });
-
-            return that;
-        },
-        /*
-         * refreshCurrentIndex
-        */
-        refreshCurrent:function(){
-            var that = this;
-
-            for(var i=0;i<that.length;i++){
-                if(that.items[i].name === that.value()){
-                    that._current = i;
-                    break;
-                }
-            }
             return that;
         },
         /*

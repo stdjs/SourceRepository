@@ -336,6 +336,12 @@ Std.ui.module("ComboBox",{
             return this.opt("valueField",field);
         },
         /*
+         * value mode
+        */
+        valueMode:function(valueMode){
+            return this.opt("valueMode",valueMode);
+        },
+        /*
          * value valid
         */
         valid:function(){
@@ -505,7 +511,7 @@ Std.ui.module("ComboBox",{
                 item = value;
             }
             index == -1 && that.items.each(function(i,tempItem){
-                if(tempItem.value() !== value){
+                if(tempItem.value() != value){
                     return;
                 }
                 item  = tempItem;

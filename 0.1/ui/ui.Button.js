@@ -12,12 +12,12 @@ Std.ui.module("Button",{
     /*[#module option:option]*/
     option:{
         level:2,
+        text:"Button",
+        href:"",
+        menu:null,
+        link:false,
         icon:null,
         iconClass:null,
-        menu:null,
-        text:"Button",
-        link:false,
-        href:"",
         target:"_blank",
         defaultClass:"StdUI_Button",
         checkable:false,
@@ -362,8 +362,9 @@ Std.ui.module("Button",{
 
 /**
  *  toolButton widget
- */
+*/
 Std.ui.module("ToolButton",{
+    /*[#module option:nodeName]*/
     nodeName:"a",
     /*[#module option:parent]*/
     parent:"Button",
@@ -375,18 +376,5 @@ Std.ui.module("ToolButton",{
         iconWidth:24,
         iconHeight:24,
         text:"btn"
-    },
-    /*[#module option:public]*/
-    public:{
-        initEvents:function(){
-
-        }
-    },
-    /*[#module option:main]*/
-    main:function(that,opts,dom){
-
     }
 });
-
-
-

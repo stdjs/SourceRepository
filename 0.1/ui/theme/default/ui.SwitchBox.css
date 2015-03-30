@@ -1,6 +1,5 @@
 /********* switch box ***********/
 .StdUI_SwitchBox{
-    font-family: Lato,"Open Sans",Arial,"Hiragino Sans GB","Microsoft YaHei",STHeiti,"WenQuanYi Micro Hei",SimSun,sans-serif;
     font-size: 12px;
     font-weight: bold;
     float: left;
@@ -23,6 +22,8 @@
     float: left;
     text-align: center;
     color: #9A9A9A;
+    background-color: #F0F0F0;
+    box-shadow: 0 0 3px #CBCBCB inset;
 }
 .StdUI_SwitchBox > ._state{
     position: absolute;

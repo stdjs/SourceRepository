@@ -103,7 +103,7 @@ Std.ui.module("SpinBox",{
                 return float(doms.input.value());
             }
             if(!isNumber(value)){
-                value = 0;
+                value = float(value);
             }
             if(opts.min !== "infinite" && value < opts.min){
                 value = opts.min;
@@ -112,7 +112,7 @@ Std.ui.module("SpinBox",{
                 value = opts.max;
             }
             that.placeHolderState(value === "");
-            doms.input.value(value);
+            doms.input.value(value + "");
 
             return that;
         }
