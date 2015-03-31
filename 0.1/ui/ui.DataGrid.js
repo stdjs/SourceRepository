@@ -527,8 +527,8 @@ Std.ui.module("DataGrid",{
                     data:read.data,
                     type:read.type || "get"
                 }).on("success",function(responseJSON){
-                    that.emit("dataSourceLoad",responseJSON);
                     that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                    that.emit("dataSourceLoad",responseJSON);
                 });
             }
 
@@ -1158,7 +1158,11 @@ Std.ui.module("DataGrid",{
             columns.move(from,to > from ? --to : to);
 
             for(var i=0;i<that._rowCount;i++){
-                that._rows[i].cells.move(from,to);
+                var cells = that._rows[i].cells;
+
+                if(isArray(cells)){
+                    cells.move(from,to);
+                }
             }
             return that.resetColumnClass().refresh();
         },
@@ -1173,7 +1177,11 @@ Std.ui.module("DataGrid",{
             columns.swap(sourceIndex,targetIndex);
 
             for(var i=0;i<that._rowCount;i++){
-                that._rows[i].cells.swap(sourceIndex,targetIndex);
+                var cells = that._rows[i].cells;
+
+                if(isArray(cells)){
+                    cells.swap(sourceIndex,targetIndex);
+                }
             }
             return that.resetColumnClass().refresh();
         },
