@@ -61,15 +61,6 @@ Std.ui.module("Panel",{
             },true);
         },
         /*
-         * extend remove
-        */
-        remove:function(){
-            var that = this;
-
-            that._central.remove();
-            that._toolBar && that._toolBar.remove();
-        },
-        /*
          * extend height
         */
         height:function(height){
@@ -88,6 +79,15 @@ Std.ui.module("Panel",{
             }
             that.D.Client.height(clientHeight);
             that._central.emit("resize");
+        },
+        /*
+         * extend remove
+        */
+        remove:function(){
+            var that = this;
+
+            that._central.remove();
+            that._toolBar && that._toolBar.remove();
         }
     },
     /*[#module option:private]*/

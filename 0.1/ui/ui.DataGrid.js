@@ -5,7 +5,7 @@ Std.ui.module("DataGrid",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"clear selectionModeChange cellChange itemClick itemDblClick columnDropStart columnDropStop removeColumn removeRow updateRow",
+    events:"clear selectionModeChange cellChange itemClick itemDblClick columnDropStart columnDropStop removeColumn removeRow updateRow dataSourceLoad",
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_DataGrid",
@@ -512,6 +512,29 @@ Std.ui.module("DataGrid",{
             return that;
         },
         /*
+         * init data source
+        */
+        initDataSource:function(){
+            var that       = this;
+            var opts       = that.opts;
+            var dataSource = opts.dataSource;
+            var read       = dataSource.read;
+            var write      = dataSource.write;
+
+            if(dataSource.type === "ajax" && isObject(read)){
+                Std.ajax.json({
+                    url:read.url,
+                    data:read.data,
+                    type:read.type || "get"
+                }).on("success",function(responseJSON){
+                    that.emit("dataSourceLoad",responseJSON);
+                    that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                });
+            }
+
+            return that;
+        },
+        /*
          * show column drop position
         */
         showColumnDropPosition:function(index){
@@ -569,7 +592,7 @@ Std.ui.module("DataGrid",{
          * update Cell
         */
         paintCell:function(element,data){
-            if(isString(data)){
+            if(isString(data) || isNumber(data)){
                 element.innerHTML = data;
             }else if(isObject(data)){
                 if(isWidget(data) || data.ui){
@@ -596,16 +619,28 @@ Std.ui.module("DataGrid",{
          * paint cell
         */
         paintRow:function(rowIndex,blockID,rowElement,rowData){
-            var that  = this;
-            var cells = [];
+            var that     = this;
+            var cells    = [];
+            var rowCells = rowData.cells;
 
+            if(!isArray(rowCells) && isObject(rowCells)){
+                var cellsArray = new Array(that._columnCount);
+                for(var name in rowCells){
+                    var columnIndex = that.column(name);
+                    if(columnIndex !== -1){
+                        cellsArray[columnIndex] = rowCells[name];
+                    }
+                }
+                rowCells = cellsArray;
+            }
             for(var y=0,children=rowElement.childNodes,cellCount=children.length;y<cellCount;y++){
-                if(!rowData || !rowData.cells[y]){
+                if(!rowData || !rowCells[y]){
                     continue;
                 }
-                cells[y] = that.paintCell(children[y],rowData.cells[y]);
+                cells[y] = that.paintCell(children[y],rowCells[y]);
             }
-            return {row:rowElement, cells:cells, blockID:blockID};
+
+            return {row:rowElement,cells:cells,blockID:blockID};
         },
         /*
          * edit cell
@@ -952,6 +987,23 @@ Std.ui.module("DataGrid",{
         */
         row:function(pos){
             return this._rows[pos]
+        },
+        /*
+         * column
+        */
+        column:function(pos){
+            var that = this;
+
+            if(isNumber(pos)){
+                return that._columns[pos];
+            }else if(isString(pos)){
+                for(var i=0;i<that._columnCount;i++){
+                    if(pos === that._columns[i].name){
+                        return i;
+                    }
+                }
+            }
+            return -1;
         },
         /*
          * cell
@@ -1468,9 +1520,13 @@ Std.ui.module("DataGrid",{
         that.initEvents();
         that.call_opts("rowNumbers",true);
 
+
         if(isArray(opts.items)){
             that._rows.mergeArray(opts.items);
             that._rowCount += opts.items.length;
+        }
+        if(opts.dataSource !== null){
+            that.initDataSource();
         }
     }
 });
