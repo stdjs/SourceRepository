@@ -60,12 +60,12 @@ Std.ui.module("ToolBar",{
             }
         }
     },
-    /*[#module option:public]*/
-    public:{
+    /*[#module option:private]*/
+    private:{
         /*
-         * append tool button
+         * create tool
         */
-        append:Std.func(function(data){
+        createTool:function(data){
             var that  = this;
             var opts  = that.opts;
             var item  = null;
@@ -82,18 +82,49 @@ Std.ui.module("ToolBar",{
                 item = Std.ui(data.ui || "ToolButton",data)
             }
 
-            if(item === null){
-                return;
-            }else if(that.renderState){
-                item.renderTo(that.D.buttons);
-            }else{
-                item.appendTo(that.D.buttons);
+            if(isWidget(item)){
+                item.parent(that);
             }
-            item.parent(that);
-            that.items.push(item);
+            return item;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * append tool button
+        */
+        append:Std.func(function(data){
+            var that = this;
+            var item = that.createTool(data);
+
+            if(item !== null){
+                item.appendTo(that.D.buttons);
+                if(that.renderState){
+                    item.render();
+                }
+                that.items.push(item);
+            }
         },{
             each:[isArray]
         }),
+        /*
+         * insert tool button
+        */
+        insert:function(data,pos){
+            var that   = this;
+            var length = that.items.length;
+
+            if(pos < length){
+                var item = that.createTool(data);
+                if(item !== null){
+                    that.D.buttons.insertBefore(item,that.items[pos]);
+                    that.items.insert(item,pos);
+                }
+            }else if(pos === length){
+                that.append(data);
+            }
+            return that;
+        },
         /*
          * clear tool buttons
         */
