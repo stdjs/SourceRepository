@@ -515,24 +515,7 @@ Std.ui.module("DataGrid",{
          * init data source
         */
         initDataSource:function(){
-            var that       = this;
-            var opts       = that.opts;
-            var dataSource = opts.dataSource;
-            var read       = dataSource.read;
-            var write      = dataSource.write;
-
-            if(dataSource.type === "ajax" && isObject(read)){
-                Std.ajax.json({
-                    url:read.url,
-                    data:read.data,
-                    type:read.type || "get"
-                }).on("success",function(responseJSON){
-                    that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
-                    that.emit("dataSourceLoad",responseJSON);
-                });
-            }
-
-            return that;
+            return this.reload();
         },
         /*
          * show column drop position
@@ -1408,6 +1391,31 @@ Std.ui.module("DataGrid",{
             that.updateRowBlocks();
 
             return that.repaint();
+        },
+        /*
+         * reload
+        */
+        reload:function(){
+            var that       = this;
+            var opts       = that.opts;
+            var dataSource = opts.dataSource;
+            var read       = dataSource.read;
+
+            if(dataSource.type === "ajax" && isObject(read)){
+                Std.ajax.json({
+                    url:read.url,
+                    data:read.data,
+                    type:read.type || "get",
+                    success:function(responseJSON){
+                        that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                        that.emit("dataSourceLoad",responseJSON);
+                    }
+                });
+            }
+            if(that.renderState){
+                that.refresh();
+            }
+            return that;
         },
         /*
          * remove column
