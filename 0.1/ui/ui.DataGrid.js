@@ -415,6 +415,7 @@ Std.ui.module("DataGrid",{
                                 that.emit("cellChange",[cellPosition,text],true);
                             });
                         }
+                        that.emit("itemDblClick",cellPosition);
                     },
                     down:function(e){
                         var startIndex      = cell.index();
@@ -457,14 +458,18 @@ Std.ui.module("DataGrid",{
             };
 
             that[2].delegate("mouseenter","._block > ._row",function(e){
-                var row = this.mouse({
+                var startIndex,startBlockIndex,rowPosition;
+                var selectionMode = opts.selectionMode;
+                var row           = this.mouse({
                     auto:false,
                     classStatus:opts.hoverMode === "row",
+                    dblclick:function(){
+                        that.emit("itemDblClick",rowPosition);
+                    },
                     down:function(e){
-                        var startIndex      = row.index();
-                        var startBlockIndex = row.parent().index();
-                        var rowPosition     = sprintf("%d:%d",startBlockIndex,startIndex);
-                        var selectionMode   = opts.selectionMode;
+                        startIndex      = row.index();
+                        startBlockIndex = row.parent().index();
+                        rowPosition     = sprintf("%d:%d",startBlockIndex,startIndex);
 
                         if(selectionMode === "rows" && e.ctrlKey){
                             if(e.which === 1){
