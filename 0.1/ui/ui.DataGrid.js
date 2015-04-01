@@ -1401,7 +1401,8 @@ Std.ui.module("DataGrid",{
             var dataSource = opts.dataSource;
             var read       = dataSource.read;
 
-            if(dataSource.type === "ajax" && isObject(read)){
+            if(dataSource && dataSource.type === "ajax" && isObject(read)){
+                that.clear();
                 Std.ajax.json({
                     url:read.url,
                     data:read.data,
