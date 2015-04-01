@@ -31,6 +31,7 @@ Std.ui.module("DataGrid",{
         cellBorder:true,
         cellTextAlign:"left",
         cellDroppable:false,
+        contextMenu:null,
         stripeRows:false,
         hoverMode:"row",     //row,cell
         selectionMode:"row", //row,rows,cell,cells,checkedRows,column,columns,none
@@ -85,11 +86,14 @@ Std.ui.module("DataGrid",{
         */
         render:function(){
             var that = this;
-            var opts = that.opts;
-
+            
+            that.call_opts({
+                contextMenu:null
+            },true);
             that.updateRowBlocks();
             that.repaint();
             that.updateStyle();
+
         },
         /*
          * height
@@ -521,6 +525,18 @@ Std.ui.module("DataGrid",{
 
             that.initHeaderEvents();
             that.initBodyEvents();
+
+            return that;
+        },
+        /*
+         * init context menu
+        */
+        initContextMenu:function(){
+            var that = this;
+
+            that._contextMenu = Std.plugin("contextMenu",Std.extend({
+                handle:that[2]
+            },that.opts.contextMenu));
 
             return that;
         },
@@ -1549,7 +1565,6 @@ Std.ui.module("DataGrid",{
         that.initBody();
         that.initEvents();
         that.call_opts("rowNumbers",true);
-
 
         if(isArray(opts.items)){
             that._rows.mergeArray(opts.items);
