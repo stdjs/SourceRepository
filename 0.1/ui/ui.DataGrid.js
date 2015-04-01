@@ -1281,11 +1281,13 @@ Std.ui.module("DataGrid",{
             var selectedRow = that._selectedRow;
 
             if(pos === undefined){
+                /*
                 if(that.selectionMode() == "row"){
                     for(var name in selectedRow){
                         return selectedRow[name];
                     }
                 }
+                */
                 return selectedRow;
             }
             if(isString(row) && pos === undefined){
@@ -1306,6 +1308,9 @@ Std.ui.module("DataGrid",{
             }
             return that;
         },
+        /*
+         *
+        */
         /*
          * select cell
         */
