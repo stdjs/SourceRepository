@@ -534,10 +534,11 @@ Std.ui.module("DataGrid",{
         */
         initContextMenu:function(){
             var that = this;
+            var opts = that.opts;
 
-            that._contextMenu = Std.plugin("contextMenu",Std.extend({
+            Std.plugin("contextMenu",Std.extend({
                 handle:that[2]
-            },that.opts.contextMenu));
+            },opts.contextMenu));
 
             return that;
         },
