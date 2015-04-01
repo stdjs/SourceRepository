@@ -145,7 +145,6 @@ Std.ui.module("DataGrid",{
         */
         initBody:function(){
             var that = this;
-            var opts = that.opts;
 
             that[0].append(
                 that[2] = newDiv("_body")
@@ -355,7 +354,7 @@ Std.ui.module("DataGrid",{
                     },
                     down:function(e){
                         var selectionMode = opts.selectionMode;
-                        if(opts.columnDroppable){
+                        if(opts.columnDroppable && e.which == 1){
                             that.initColumnDropEvent(this);
                             e.preventDefault();
                         }
@@ -534,11 +533,10 @@ Std.ui.module("DataGrid",{
         */
         initContextMenu:function(){
             var that = this;
-            var opts = that.opts;
 
-            Std.plugin("contextMenu",Std.extend({
+            that.plugin("contextMenu",Std.extend({
                 handle:that[2]
-            },opts.contextMenu));
+            },that.opts.contextMenu));
 
             return that;
         },
@@ -904,7 +902,6 @@ Std.ui.module("DataGrid",{
                     (that._rowCount - (rowBlocks.length-1) * 10) * (that.opts.rowHeight)
                 ).dom;
             }
-
             return that;
         },
         /*
@@ -1000,7 +997,24 @@ Std.ui.module("DataGrid",{
          * row
         */
         row:function(pos){
-            return this._rows[pos]
+            return this._rows[this.rowIndex(pos)];
+        },
+        /*
+         * cell
+        */
+        cell:function(rowPos,cellPos){
+            var that = this;
+
+            if(isString(rowPos)){
+                var data = rowPos.split(":");
+                rowPos  = ~~data[0];
+                cellPos = ~~data[1];
+            }
+            var cells = this._rows[rowPos].cells;
+            if(!isArray(cellPos) && isObject(cells)){
+                cellPos = that._columns[cellPos].name;
+            }
+            return cells[cellPos];
         },
         /*
          * column
@@ -1020,21 +1034,10 @@ Std.ui.module("DataGrid",{
             return -1;
         },
         /*
-         * cell
-        */
-        cell:function(rowPos,cellPos){
-            if(isString(rowPos)){
-                var data = rowPos.split(":");
-                rowPos  = ~~data[0];
-                cellPos = ~~data[1];
-            }
-            return this._rows[rowPos].cells[cellPos];
-        },
-        /*
          * get row index
         */
         rowIndex:function(pos){
-            return ~~(pos = pos.split(':'))[0] * 10 + ~~pos[1];
+            return isNumber(pos) ? pos : ~~(pos = pos.split(':'))[0] * 10 + ~~pos[1];
         },
         /*
          * columnResizable
@@ -1243,20 +1246,24 @@ Std.ui.module("DataGrid",{
          * sort column
         */
         sortColumn:function(columnIndex,type){
-            var that    = this;
-            var column  = that._columns[columnIndex];
-
+            var that     = this;
+            var column   = that._columns[columnIndex];
+            var getIndex = function(cells,index){
+                if(isArray(cells)){
+                    return index;
+                }
+                return column.name;
+            };
             if(that._sortHandle !== null){
                 that._sortHandle.remove();
             }
-
             if(type === "desc"){
                 that._rows.sort(function(x,y){
-                    return x.cells[columnIndex] < y.cells[columnIndex];
+                    return x.cells[getIndex(x.cells,columnIndex)] < y.cells[getIndex(y.cells,columnIndex)];
                 });
             }else if(type === "asc"){
                 that._rows.sort(function(x,y){
-                    return x.cells[columnIndex] > y.cells[columnIndex];
+                    return x.cells[getIndex(x.cells,columnIndex)] > y.cells[getIndex(y.cells,columnIndex)];
                 });
             }
             column.sortType = type;
