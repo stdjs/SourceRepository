@@ -86,14 +86,15 @@ Std.ui.module("DataGrid",{
         */
         render:function(){
             var that = this;
-            
-            that.call_opts({
-                contextMenu:null
-            },true);
+            var opts = that.opts;
+
             that.updateRowBlocks();
             that.repaint();
             that.updateStyle();
 
+            if(opts.contextMenu){
+                that.initContextMenu();
+            }
         },
         /*
          * height
