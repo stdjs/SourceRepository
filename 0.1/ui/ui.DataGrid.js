@@ -5,7 +5,7 @@ Std.ui.module("DataGrid",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"clear selectionModeChange cellChange itemClick itemDblClick columnDropStart columnDropStop removeColumn removeRow updateRow dataSourceLoad",
+    events:"clear selectionModeChange cellChange columnClick rowClick cellClick columnDblClick rowDblClick cellDblClick columnDropStart columnDropStop removeColumn removeRow updateRow dataSourceLoad",
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_DataGrid",
@@ -336,16 +336,17 @@ Std.ui.module("DataGrid",{
          * init header events
         */
         initHeaderEvents:function(){
-            var that = this;
-            var opts = that.opts;
-
-            that.D.columns.on("mouseenter","._column",function(e){
+            var that       = this;
+            var opts       = that.opts;
+            var mouseenter = function(e){
+                var columnIndex = this.index();
                 this.mouse({
                     auto:false,
                     dblclick:function(){
                         if(opts.columnEditable){
                             that.editColumn(this);
                         }
+                        that.emit("columnDblClick",columnIndex);
                     },
                     down:function(e){
                         var selectionMode = opts.selectionMode;
@@ -359,8 +360,7 @@ Std.ui.module("DataGrid",{
                         }
                     },
                     click:function(){
-                        var index    = this.index();
-                        var sortType = that._columns[index].sortType;
+                        var sortType = that._columns[columnIndex].sortType;
 
                         switch(sortType){
                             case "asc":
@@ -373,11 +373,13 @@ Std.ui.module("DataGrid",{
                                 sortType = "asc";
                         }
                         if(opts.columnSortable){
-                            that.sortColumn(index,sortType);
+                            that.sortColumn(columnIndex,sortType);
                         }
+                        that.emit("columnClick",columnIndex);
                     }
                 },e);
-            }).delegate("mouseenter","._column > ._resizeHandle",function(e){
+            };
+            that.D.columns.on("mouseenter","._column",mouseenter).delegate("mouseenter","._column > ._resizeHandle",function(e){
                 opts.columnResizable && this.mouse({
                     auto:false,
                     unselect:true,
@@ -409,13 +411,16 @@ Std.ui.module("DataGrid",{
                 var cell          = this.mouse({
                     auto:false,
                     classStatus:opts.hoverMode === "cell",
+                    click:function(){
+                        that.emit("cellClick",cellPosition);
+                    },
                     dblclick:function(e){
                         if(opts.cellEditable){
                             that.editCell(this,function(text){
                                 that.emit("cellChange",[cellPosition,text],true);
                             });
                         }
-                        that.emit("itemDblClick",cellPosition);
+                        that.emit("cellDblClick",cellPosition);
                     },
                     down:function(e){
                         var startIndex      = cell.index();
@@ -463,8 +468,11 @@ Std.ui.module("DataGrid",{
                 var row           = this.mouse({
                     auto:false,
                     classStatus:opts.hoverMode === "row",
+                    click:function(){
+                        that.emit("rowClick",rowPosition);
+                    },
                     dblclick:function(){
-                        that.emit("itemDblClick",rowPosition);
+                        that.emit("rowDblClick",rowPosition);
                     },
                     down:function(e){
                         startIndex      = row.index();
