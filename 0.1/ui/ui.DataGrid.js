@@ -1038,13 +1038,11 @@ Std.ui.module("DataGrid",{
         */
         rowIndex:function(pos){
             if(isString(pos)){
-                switch((pos = pos.split(':')).length){
-                    case 1:
-                        pos = ~~pos[0];
-                        break;
-                    case 2:
-                        pos = ~~pos[0] * 10 + ~~pos[1];
-                        break;
+                var length = (pos = pos.split(':')).length;
+                if(length == 1){
+                    pos = ~~pos[0];
+                }else if(length == 2){
+                    pos = ~~pos[0] * 10 + ~~pos[1];
                 }
             }
             return pos;
@@ -1291,13 +1289,6 @@ Std.ui.module("DataGrid",{
             var selectedRow = that._selectedRow;
 
             if(pos === undefined){
-                /*
-                if(that.selectionMode() == "row"){
-                    for(var name in selectedRow){
-                        return selectedRow[name];
-                    }
-                }
-                */
                 return selectedRow;
             }
             if(isString(row) && pos === undefined){
@@ -1319,8 +1310,26 @@ Std.ui.module("DataGrid",{
             return that;
         },
         /*
-         *
+         * selectedRow
         */
+        selectedRow:function(){
+            var that          = this;
+            var selectedRow   = that._selectedRow;
+            var selectionMode = that.selectionMode();
+
+            if(selectionMode == "row"){
+                for(var name in selectedRow){
+                    return selectedRow[name];
+                }
+            }else if(selectionMode == "rows"){
+                var list = [];
+                for(var name in selectedRow){
+                    list.push(name);
+                }
+                return list;
+            }
+            return null;
+        },
         /*
          * select cell
         */
@@ -1348,6 +1357,27 @@ Std.ui.module("DataGrid",{
                 selectedCell[index] = cell.addClass("selected");
             }
             return that;
+        },
+        /*
+         * selected cell
+        */
+        selectedCell:function(){
+            var that          = this;
+            var selectedCell  = that._selectedCell;
+            var selectionMode = that.selectionMode();
+
+            if(selectionMode == "cell"){
+                for(var name in selectedCell){
+                    return selectedCell[name];
+                }
+            }else if(selectionMode == "cells"){
+                var list = [];
+                for(var name in selectedCell){
+                    list.push(name);
+                }
+                return list;
+            }
+            return null;
         },
         /*
          * select column
