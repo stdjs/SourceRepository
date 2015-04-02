@@ -641,7 +641,7 @@ Std.ui.module("ComboBox",{
     main:function(that,opts,dom){
         that.D     = {};
         that.items = [];
-
+        
         that.inputMode(opts.inputMode);
         that.initEvents();
         that.initHandle();
