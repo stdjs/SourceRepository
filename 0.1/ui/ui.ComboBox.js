@@ -296,29 +296,6 @@ Std.ui.module("ComboBox",{
                 item.renderTo(doms.list);
             });
             return that;
-        },
-        /*
-         * init data source
-         */
-        initDataSource:function(){
-            var that       = this;
-            var opts       = that.opts;
-            var dataSource = opts.dataSource;
-            var read       = dataSource.read;
-
-            if(dataSource.type === "ajax" && isObject(read)){
-                Std.ajax.json({
-                    url:read.url,
-                    data:read.data,
-                    type:read.type
-                }).on("success",function(responseJSON){
-                    that.emit("dataSourceLoad",responseJSON);
-                    that.append(Std.mold.dataPath(responseJSON,read.dataPath));
-                    that.call_opts({value:null},true);
-                });
-            }
-
-            return that;
         }
     },
     /*[#module option:public]*/
@@ -354,8 +331,18 @@ Std.ui.module("ComboBox",{
             return Std.is(validator,that.value());
         },
         /*
-         * select
+         * data source
          */
+        dataSource:function(dataSource){
+            var that = this;
+
+            return that.opt("dataSource",dataSource,function(){
+                that.reload();
+            });
+        },
+        /*
+         * select
+        */
         select:function(item){
             var that = this;
 
@@ -404,6 +391,26 @@ Std.ui.module("ComboBox",{
                 return null;
             }
             return that;
+        },
+        /*
+         * reload
+        */
+        reload:function(){
+            var that       = this;
+            var dataSource = that.dataSource();
+            var read       = dataSource.read;
+
+            if(dataSource.type === "ajax" && isObject(read)){
+                Std.ajax.json({
+                    url:read.url,
+                    data:read.data,
+                    type:read.type
+                }).on("success",function(responseJSON){
+                    that.emit("dataSourceLoad",responseJSON);
+                    that.append(Std.mold.dataPath(responseJSON,read.dataPath));
+                    that.call_opts({value:null},true);
+                });
+            }
         },
         /*
          * input mode
@@ -632,13 +639,12 @@ Std.ui.module("ComboBox",{
                 }
             }
 
-            if(!isWidget(item)){
-                return;
+            if(isWidget(item)){
+                if(that.D.list){
+                    item.renderTo(that.D.list);
+                }
+                that.items.push(item.parent(that));
             }
-            if(that.D.list){
-                item.renderTo(that.D.list);
-            }
-            that.items.push(item.parent(that));
         },{
             each:[isArray]
         })
@@ -651,15 +657,13 @@ Std.ui.module("ComboBox",{
         that.inputMode(opts.inputMode);
         that.initEvents();
         that.initHandle();
+        that.call_opts("dataSource",true);
 
         if(opts.template !== null){
             that.template(opts.template);
         }
         if(opts.items !== null){
             that.append(opts.items);
-        }
-        if(opts.dataSource !== null){
-            that.initDataSource();
         }
     }
 });

@@ -528,12 +528,6 @@ Std.ui.module("DataGrid",{
             return that;
         },
         /*
-         * init data source
-        */
-        initDataSource:function(){
-            return this.reload();
-        },
-        /*
          * show column drop position
         */
         showColumnDropPosition:function(index){
@@ -980,6 +974,14 @@ Std.ui.module("DataGrid",{
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * data source
+        */
+        dataSource:function(dataSource){
+            return this.opt("dataSource",dataSource,function(){
+                this.reload();
+            });
+        },
         /*
          * row
         */
@@ -1541,7 +1543,6 @@ Std.ui.module("DataGrid",{
                 that._rows.remove(row);
                 that._rowCount = that._rows.length;
             }
-
             return that.refresh().emit("removeRow",row);
         },
         /*
@@ -1618,7 +1619,10 @@ Std.ui.module("DataGrid",{
         that.initHeader();
         that.initBody();
         that.initEvents();
-        that.call_opts("rowNumbers",true);
+        that.call_opts({
+            rowNumbers:false,
+            dataSource:null
+        },true);
 
         if(isArray(opts.items)){
             that._rows.mergeArray(opts.items);
