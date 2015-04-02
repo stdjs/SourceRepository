@@ -1037,7 +1037,17 @@ Std.ui.module("DataGrid",{
          * get row index
         */
         rowIndex:function(pos){
-            return isNumber(pos) ? pos : ~~(pos = pos.split(':'))[0] * 10 + ~~pos[1];
+            if(isString(pos)){
+                switch((pos = pos.split(':')).length){
+                    case 1:
+                        pos = ~~pos[0];
+                        break;
+                    case 2:
+                        pos = ~~pos[0] * 10 + ~~pos[1];
+                        break;
+                }
+            }
+            return pos;
         },
         /*
          * columnResizable
