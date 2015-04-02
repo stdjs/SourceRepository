@@ -91,10 +91,9 @@ Std.ui.module("DataGrid",{
             that.updateRowBlocks();
             that.repaint();
             that.updateStyle();
-
-            if(opts.contextMenu){
-                that.initContextMenu();
-            }
+            that.call_opts({
+                contextMenu:null
+            },true);
         },
         /*
          * height
@@ -525,18 +524,6 @@ Std.ui.module("DataGrid",{
 
             that.initHeaderEvents();
             that.initBodyEvents();
-
-            return that;
-        },
-        /*
-         * init context menu
-        */
-        initContextMenu:function(){
-            var that = this;
-
-            that.plugin("contextMenu",Std.extend({
-                handle:that[2]
-            },that.opts.contextMenu));
 
             return that;
         },
@@ -1139,6 +1126,18 @@ Std.ui.module("DataGrid",{
             return that;
         },
         */
+        /*
+         *  context menu plugin
+        */
+        contextMenu:function(menu){
+            var that = this;
+
+            that.plugin("contextMenu",Std.extend({
+                handle:that[2]
+            },menu));
+
+            return that;
+        },
         /*
          * repaint
         */
