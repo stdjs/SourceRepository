@@ -10,7 +10,8 @@ Std.ui.module("SpinBox",{
         max:"infinite",
         minWidth:32,
         minHeight:12,
-        defaultClass:"StdUI_SpinBox"
+        defaultClass:"StdUI_SpinBox",
+        validator:"Number"
     },
     /*[#module option:extend]*/
     extend:{

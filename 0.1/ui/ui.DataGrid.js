@@ -1020,20 +1020,7 @@ Std.ui.module("DataGrid",{
             }
             return -1;
         },
-        /*
-         * get row index
-        */
-        rowIndex:function(pos){
-            if(isString(pos)){
-                var length = (pos = pos.split(':')).length;
-                if(length == 1){
-                    pos = ~~pos[0];
-                }else if(length == 2){
-                    pos = ~~pos[0] * 10 + ~~pos[1];
-                }
-            }
-            return pos;
-        },
+
         /*
          * columnResizable
         */
@@ -1096,6 +1083,20 @@ Std.ui.module("DataGrid",{
             return that.opt("rowNumbers",state,function(){
                 that.renderState && that.updateStyle();
             });
+        },
+        /*
+         * get row index
+        */
+        rowIndex:function(pos){
+            if(isString(pos)){
+                var length = (pos = pos.split(':')).length;
+                if(length == 1){
+                    pos = ~~pos[0];
+                }else if(length == 2){
+                    pos = ~~pos[0] * 10 + ~~pos[1];
+                }
+            }
+            return pos;
         },
         /*
          * row checkable
