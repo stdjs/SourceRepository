@@ -1319,7 +1319,7 @@ Std.ui.module("DataGrid",{
 
             if(selectionMode == "row"){
                 for(var name in selectedRow){
-                    return selectedRow[name];
+                    return name;
                 }
             }else if(selectionMode == "rows"){
                 var list = [];
