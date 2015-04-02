@@ -1628,8 +1628,5 @@ Std.ui.module("DataGrid",{
             that._rows.mergeArray(opts.items);
             that._rowCount += opts.items.length;
         }
-        if(opts.dataSource !== null){
-            that.initDataSource();
-        }
     }
 });

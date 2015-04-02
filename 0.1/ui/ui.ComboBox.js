@@ -319,18 +319,6 @@ Std.ui.module("ComboBox",{
             return this.opt("valueMode",valueMode);
         },
         /*
-         * value valid
-        */
-        valid:function(){
-            var that      = this;
-            var validator = that.opts.validator;
-
-            if(isEmpty(validator)){
-                return true;
-            }
-            return Std.is(validator,that.value());
-        },
-        /*
          * data source
          */
         dataSource:function(dataSource){
