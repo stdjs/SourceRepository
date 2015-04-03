@@ -51,6 +51,7 @@
 .StdUI_List > .StdUI_TemplateItem{
     clear: both;
     cursor: pointer;
+    transition: background 0.12s,border-color 0.12s;
 }
 .StdUI_List > .StdUI_TemplateItem.hover{
     background: #D6EBF6;
