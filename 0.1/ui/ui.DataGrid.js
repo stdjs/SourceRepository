@@ -590,7 +590,7 @@ Std.ui.module("DataGrid",{
         */
         paintCell:function(element,data){
             if(isString(data) || isNumber(data)){
-                element.innerHTML = data;
+                element.innerHTML = data + "";
             }else if(isObject(data)){
                 if(isWidget(data) || data.ui){
                     Std.dom(element).widget(data);
