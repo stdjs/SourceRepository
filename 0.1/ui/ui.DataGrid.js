@@ -1534,18 +1534,14 @@ Std.ui.module("DataGrid",{
         removeRow:function(row){
             var that = this;
 
-            if(row === "select"){
+            if(isNumber(row) || isArray(row)){
+                that._rows.remove(row);
+            }else if(row === "select"){
                 var indexs = [];
                 Std.each(that._selectedRow,function(index){
                     indexs.push(~~index);
                 });
                 that._rows.remove(indexs);
-            }else if(isArray(row)){
-                Std.each(row,function(i,index){
-                    that._rows.remove(index);
-                });
-            }else if(isNumber(row)){
-                that._rows.remove(row);
             }
             that._rowCount = that._rows.length;
 
