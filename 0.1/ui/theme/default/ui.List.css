@@ -31,7 +31,6 @@
     border:1px solid #B1B3B0;
     background: white;
     overflow: auto;
-    border-radius: 2px;
     transition: background 0.12s,border-color 0.2s;
     outline:none;
 }
