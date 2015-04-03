@@ -1538,13 +1538,17 @@ Std.ui.module("DataGrid",{
                 var indexs = [];
                 Std.each(that._selectedRow,function(index){
                     indexs.push(~~index);
-                    that._rowCount--;
                 });
                 that._rows.remove(indexs);
+            }else if(isArray(row)){
+                Std.each(row,function(i,index){
+                    that._rows.remove(index);
+                });
             }else if(isNumber(row)){
                 that._rows.remove(row);
-                that._rowCount = that._rows.length;
             }
+            that._rowCount = that._rows.length;
+
             return that.refresh().emit("removeRow",row);
         },
         /*
