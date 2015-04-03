@@ -329,6 +329,20 @@ Std.ui.module("ComboBox",{
             });
         },
         /*
+         * text
+        */
+        text:function(text){
+            var that = this;
+            var doms = that.D;
+
+            if(text === undefined){
+                return doms.content.text();
+            }
+            doms.content.text(text);
+
+            return that;
+        },
+        /*
          * select
         */
         select:function(item){
@@ -443,7 +457,7 @@ Std.ui.module("ComboBox",{
                 doms.input && doms.input.value(data);
             }else if(inputMode === "none"){
                 if(value === undefined){
-                    return doms.content.text();
+                    return that.text();
                 }
                 if(isWidget(value)){
                     data = value.ui === "TemplateItem" ? value.text() : value[0].clone().className(value.opts.defaultClass)
