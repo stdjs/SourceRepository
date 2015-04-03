@@ -52,7 +52,7 @@ Std.ui.module("Accordion",{
         render:function(){
             var that = this;
 
-            if(that._current = that.items[0]){
+            if(that.items.length > 0 && (that._current = that.items[0])){
                 that.repaint();
                 that._current.client.main.show();
             }
@@ -63,7 +63,7 @@ Std.ui.module("Accordion",{
         height:function(){
             var that = this;
 
-            if(that._current !== null){
+            if(that._current != null){
                 that.repaint();
             }
         },
@@ -273,7 +273,7 @@ Std.ui.module("Accordion",{
             var that    = this;
             var current = that._current;
 
-            if(current !== null){
+            if(current != null){
                 var height = that.computeClientHeight();
 
                 current.client.main.height(height);
@@ -327,7 +327,7 @@ Std.ui.module("Accordion",{
             var height  = that.computeClientHeight();
             var current = that._current;
 
-            if(current !== null){
+            if(current != null){
                 current[0].removeClass("selected");
                 current.client.main.css("overflow","hidden").animate({
                     100:{height:0}
