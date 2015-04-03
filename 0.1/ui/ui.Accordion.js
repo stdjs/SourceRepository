@@ -16,7 +16,8 @@ Std.ui.module("Accordion",{
         template:null,
         titleHeight:30,
         collapsible:false,
-        clientPadding:5
+        clientPadding:5,
+        activeItem:0
     },
     /*#module option:protected]*/
     protected:{
@@ -50,9 +51,11 @@ Std.ui.module("Accordion",{
          * render
         */
         render:function(){
-            var that = this;
+            var that  = this;
+            var opts  = that.opts;
+            var items = that.items;
 
-            if(that.items.length > 0 && (that._current = that.items[0])){
+            if(items.length > 0 && (that._current = items[opts.activeItem])){
                 that.repaint();
                 that._current.client.main.show();
             }
@@ -248,6 +251,17 @@ Std.ui.module("Accordion",{
          * length
         */
         length:0,
+        /*
+         * active item
+        */
+        activeItem:function(index){
+            var that = this;
+
+            if(index === undefined){
+                return that.items.indexOf(that._current);
+            }
+            return that.select(index);
+        },
         /*
          * template
         */

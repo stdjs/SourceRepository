@@ -61,7 +61,7 @@ Std.ui.module("TabPanel",{
         maxTabButtonWidth:"50%",
         contentPadding:5,
         deferRender:true,
-        activeTab:0,
+        activeItem:0,
         items:null,
         tabAlign:"left",
         tabPosition:"top"
@@ -71,9 +71,9 @@ Std.ui.module("TabPanel",{
     /*[#module option:protected]*/
     protected:{
         /*
-         * active tab
+         * active item
         */
-        activeTab:null,
+        activeItem:null,
         /*
          * tab bar overflowed
         */
@@ -112,7 +112,7 @@ Std.ui.module("TabPanel",{
             });
             that.initEvents();
             that.initKeyboard();
-            that.select(opts.activeTab);
+            that.select(opts.activeItem);
             that.tabBarOverflowCheck();
         },
         /*
@@ -330,16 +330,12 @@ Std.ui.module("TabPanel",{
                 }
             });
 
-
-            doms.prevBtn.css({
+            var styles = {
                 height:25,
                 width:tabBarWidth
-            });
-            doms.nextButton.css({
-                height:25,
-                width:tabBarWidth
-            });
-
+            };
+            doms.prevBtn.css(styles);
+            doms.nextButton.css(styles);
             doms.buttons.css("margin-top",tabButtonSpacing);
 
             return that.updateTabsHeight();
@@ -665,30 +661,30 @@ Std.ui.module("TabPanel",{
                 index = that.convertIndex(index,reference);
             }
             if(index !== -1 && index < that.items.length){
-                that.activeTab(index);
+                that.activeItem(index);
                 that.emit("tabSelect",index);
             }
             return that;
         },
         /*
-         * active tab
+         * active Item
         */
-        activeTab:function(index){
+        activeItem:function(index){
             var that = this;
 
             if(index === undefined){
-                return that.items.indexOf(that._activeTab);
+                return that.items.indexOf(that._activeItem);
             }
-            var item      = that.items[index];
-            var activeTab = that._activeTab;
+            var item       = that.items[index];
+            var activeItem = that._activeItem;
 
-            if(activeTab){
-                activeTab.button.select(false);
-                activeTab.content.removeClass("_visible");
+            if(activeItem){
+                activeItem.button.select(false);
+                activeItem.content.removeClass("_visible");
             }
             item.button.select(true);
-            that.items[that.opts.activeTab = index].content.addClass("_visible");
-            that._activeTab = item;
+            that.items[that.opts.activeItem = index].content.addClass("_visible");
+            that._activeItem = item;
             that.updateLayout();
 
             if(!item.content.renderState){
@@ -752,13 +748,13 @@ Std.ui.module("TabPanel",{
         removeTab:function(index){
             var that      = this;
             var items     = that.items;
-            var activeTab = that.activeTab();
+            var activeItem = that.activeItem();
 
             items[index].button.remove();
             items[index].content.remove();
             that.items.remove(index);
 
-            if(index === activeTab){
+            if(index === activeItem){
                 that.select("beside",index);
             }
             return that.tabBarOverflowCheck().emit("tabRemove",index);
@@ -774,7 +770,7 @@ Std.ui.module("TabPanel",{
                 item.content.remove();
             });
             that.items.clear();
-            that._activeTab = null;
+            that._activeItem = null;
             return that;
         }
     },
