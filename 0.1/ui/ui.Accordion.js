@@ -143,9 +143,9 @@ Std.ui.module("Accordion",{
          * create item
         */
         createItem:function(data){
-            var that    = this;
-            var header  = that.createItemHeader(data.text,data.icon,data.iconClass);
-            var client  = that.createItemClient(data.content);
+            var that   = this;
+            var header = that.createItemHeader(data.text,data.icon,data.iconClass);
+            var client = that.createItemClient(data.content);
 
             return {
                 0:newDiv("_item").append([
@@ -196,13 +196,13 @@ Std.ui.module("Accordion",{
                     tabIndex:null
                 });
             }else if(isObject(data)){
-                if(opts.template !== null){
+                if(isWidget(data)){
+                    widget = client;
+                }else if(opts.template !== null){
                     widget = Std.ui("TemplateItem",{
                         data:data,
                         template:opts.template
                     });
-                }else if(isWidget(data)){
-                    widget = client;
                 }else{
                     widget = Std.ui(data.ui || "widget",Std.extend({
                         tabIndex:null
