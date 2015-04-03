@@ -394,9 +394,10 @@ Std.ui.module("ComboBox",{
                     data:read.data,
                     type:read.type
                 }).on("success",function(responseJSON){
+                    that.clear();
                     that.emit("dataSourceLoad",responseJSON);
                     that.append(Std.mold.dataPath(responseJSON,read.dataPath));
-                    that.call_opts({value:null},true);
+                    that.call_opts("value",true);
                 });
             }
         },
@@ -606,9 +607,9 @@ Std.ui.module("ComboBox",{
          * append item
         */
         append:Std.func(function(data){
-            var that  = this;
-            var opts  = that.opts;
-            var item  = null;
+            var that = this;
+            var opts = that.opts;
+            var item = null;
 
             if(isString(data)){
                 item = Std.ui("ComboBoxItem",{text:data});
@@ -635,13 +636,24 @@ Std.ui.module("ComboBox",{
             }
         },{
             each:[isArray]
-        })
+        }),
+        /*
+         * clear items
+        */
+        clear:function(){
+            var items = this.items;
+
+            Std.each(items,function(i,item){
+                item.remove();
+            });
+            items.clear();
+        }
     },
     /*[#module option:main]*/
     main:function(that,opts,dom){
         that.D     = {};
         that.items = [];
-        
+
         that.inputMode(opts.inputMode);
         that.initEvents();
         that.initHandle();

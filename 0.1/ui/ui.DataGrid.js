@@ -108,6 +108,10 @@ Std.ui.module("DataGrid",{
             }
             that[1].height(opts.headerHeight);
             that[2].height(height - boxSize.height - opts.headerHeight - 1);
+
+            if(that.renderState){
+                that.refresh();
+            }
         },
         /*
          * remove
@@ -1487,20 +1491,18 @@ Std.ui.module("DataGrid",{
             var read       = dataSource.read;
 
             if(dataSource && dataSource.type === "ajax" && isObject(read)){
-                that.clear();
                 Std.ajax.json({
                     url:read.url,
                     data:read.data,
                     type:read.type || "get",
                     success:function(responseJSON){
+                        that.clear();
                         that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
                         that.emit("dataSourceLoad",responseJSON);
                     }
                 });
             }
-            if(that.renderState){
-                that.refresh();
-            }
+
             return that;
         },
         /*
