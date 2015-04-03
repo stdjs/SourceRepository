@@ -197,7 +197,7 @@ Std.ui.module("Accordion",{
                 });
             }else if(isObject(data)){
                 if(isWidget(data)){
-                    widget = client;
+                    widget = data;
                 }else if(opts.template !== null){
                     widget = Std.ui("TemplateItem",{
                         data:data,
@@ -210,7 +210,6 @@ Std.ui.module("Accordion",{
                 }
             }
 
-            console.log(widget)
             if(widget !== null){
                 widget[0].padding(widget.opts.padding = opts.clientPadding);
                 widget.appendTo(client);
