@@ -210,6 +210,7 @@ Std.ui.module("Accordion",{
                 }
             }
 
+            console.log(widget)
             if(widget !== null){
                 widget[0].padding(widget.opts.padding = opts.clientPadding);
                 widget.appendTo(client);
