@@ -140,7 +140,7 @@ Std.ui.module("Accordion",{
                 if(!widget.renderState){
                     widget.render();
                 }
-                widget[0].animate("stop");
+                client.main.animate("stop");
                 widget.height(height);
             }
         },
