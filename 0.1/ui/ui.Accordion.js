@@ -67,6 +67,7 @@ Std.ui.module("Accordion",{
             var that = this;
 
             if(that._current != null){
+
                 that.repaint();
             }
         },
@@ -139,6 +140,7 @@ Std.ui.module("Accordion",{
                 if(!widget.renderState){
                     widget.render();
                 }
+                widget[0].animate("stop");
                 widget.height(height);
             }
         },

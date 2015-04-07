@@ -428,6 +428,7 @@ Std.ui.module("DataGrid",{
                             });
                         }
                         that.emit("cellDblClick",cellPosition);
+                        e.preventDefault();
                     },
                     down:function(e){
                         var startIndex      = cell.index();
@@ -478,7 +479,7 @@ Std.ui.module("DataGrid",{
                     click:function(){
                         that.emit("rowClick",rowPosition);
                     },
-                    dblclick:function(){
+                    dblclick:function(e){
                         that.emit("rowDblClick",rowPosition);
                     },
                     down:function(e){
