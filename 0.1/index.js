@@ -10,6 +10,7 @@ Std.source.response("StdJS",function(){
     }
     return {
         "ui.Canvas":JSFile_UI("ui.Canvas"),
+        "ui.SVG":JSFile_UI("ui.SVG"),
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),
@@ -22,7 +23,7 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.RadioBox"),
             JSFile_UI("ui.RadioBox")
         ],
-	"ui.SpinBox":[
+	    "ui.SpinBox":[
             CSSFile_UI("ui.SpinBox"),
             JSFile_UI("ui.SpinBox")
         ],
@@ -34,23 +35,20 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.Edit"),
             JSFile_UI("ui.Edit")
         ],
-	"ui.TextEdit":[
+	    "ui.TextEdit":[
             CSSFile_UI("ui.Edit"),
             JSFile_UI("ui.Edit")
         ],
-	"ui.DateTimeEdit":{
-	    basics:["ui.LineEdit","ui.DatePicker"],
-	    files:[
-		CSSFile_UI("ui.DateTimeEdit"),
-		JSFile_UI("ui.DateTimeEdit")
-	    ]
-	},
+        "ui.DateTimeEdit":{
+            basics:["ui.LineEdit","ui.DatePicker"],
+            files:[
+                CSSFile_UI("ui.DateTimeEdit"),
+                JSFile_UI("ui.DateTimeEdit")
+            ]
+        },
         "ui.Button":[
             CSSFile_UI("ui.Button"),
             JSFile_UI("ui.Button")
-        ],
-        "ui.Canvas":[
-            JSFile_UI("ui.Canvas")
         ],
         "ui.ColorPicker":[
             CSSFile_UI("ui.ColorPicker"),
@@ -182,7 +180,7 @@ Std.source.response("StdJS",function(){
         "crypto.sha256":cryptoJS("sha256"),
         "crypto.base64":cryptoJS("base64"),
         "crypto.md5":cryptoJS("md5"),
-	"crypto.md6":cryptoJS("md6"),
+	    "crypto.md6":cryptoJS("md6"),
         "crypto.aes":{
             basics:[
                 "crypto.base64"
