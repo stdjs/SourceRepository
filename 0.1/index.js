@@ -175,6 +175,12 @@ Std.source.response("StdJS",function(){
             ]
         },
 	
+	"ui.KindEditor":{
+	    files:[
+	       "ui/kindeditor/themes/default/default.css","ui/kindeditor/kindeditor-all-min.js","ui/kindeditor/kindeditor.js"
+	    ]
+	},
+	
 	
         "crypto.sha1":cryptoJS("sha1"),
         "crypto.sha256":cryptoJS("sha256"),
