@@ -73,14 +73,13 @@ Std.ui.module("Window",{
         */
         titleButtonClick:function(name){
             var that = this;
-            var opts = that.opts;
 
             switch(name){
                 case "min":
                     that.minimize(true);
                     break;
                 case "max":
-                    that.maximize(!opts.maximize);
+                    that.maximize(!that.opts.maximize);
                     break;
                 case "close":
                     that.close();
@@ -145,8 +144,6 @@ Std.ui.module("Window",{
                 min:"_min",
                 max:"_max",
                 close:"_close"
-            }).on("titleButtonClick",function(name){
-                that.titleButtonClick(name);
             });
 
             that.D.TitleBar.on({

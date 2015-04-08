@@ -134,8 +134,6 @@ Std.ui.module("Image",{
     /*[#module option:main]*/
     main:function(that){
         that.D = {};
-        that.call_opts({
-            value:""
-        });
+        that.call_opts("value",true);
     }
 });

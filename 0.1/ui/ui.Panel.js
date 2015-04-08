@@ -56,9 +56,7 @@ Std.ui.module("Panel",{
             }
             that._central.render();
             that.initEvents();
-            that.call_opts({
-                collapsed:false
-            },true);
+            that.call_opts("collapsed",true);
         },
         /*
          * extend height
@@ -102,7 +100,7 @@ Std.ui.module("Panel",{
             if(name === "collapse"){
                 that.collapsed(!opts.collapsed,true);
             }
-            return that;
+            return that.emit("titleButtonClick",[name,that],true);
         },
         /*
          * init events
@@ -148,7 +146,7 @@ Std.ui.module("Panel",{
                         var titleButtons = that._titleButtons;
                         for(var name in titleButtons){
                             if(titleButtons[name].contains(this)){
-                                that.emit("titleButtonClick",[name,this],true);
+                                that.titleButtonClick(name);
                             }
                         }
                     }
