@@ -158,6 +158,11 @@ Std.ui.module("TabPanel",{
             var items = that.items;
 
             if(data === undefined){
+                items.each(function(i,item){
+                    item.button.remove();
+                    item.content.remove();
+                });
+                items.clear();
                 return;
             }
             if(isObject(data)){
