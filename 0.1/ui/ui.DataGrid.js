@@ -1255,6 +1255,9 @@ Std.ui.module("DataGrid",{
             }
             that._columnCount++;
 
+            if(that.renderState){
+                that.updateStyle();
+            }
             return that;
         },
         /*
@@ -1469,7 +1472,10 @@ Std.ui.module("DataGrid",{
                 that._rows.push(row);
                 that._rowCount++;
             }
-            return that.refresh();
+            if(that.renderState){
+                that.refresh();
+            }
+            return that;
         },
         /*
          * refresh
