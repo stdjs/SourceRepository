@@ -18,6 +18,7 @@
 .StdUI_MenuItem.disabled{
     color: #989593;
     background: transparent;
+    cursor: not-allowed;
 }
 .StdUI_MenuItem > ._icon{
     float: left;

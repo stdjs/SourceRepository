@@ -18,6 +18,7 @@
 }
 .StdUI_CheckBox.disabled{
     color: #989593;
+    cursor: not-allowed;
 }
 
 /************* Checkbox Icon*************/

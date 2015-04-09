@@ -4,6 +4,9 @@
     outline: none;
     overflow: hidden;
 }
+.StdUI_ToolBar.disabled{
+    cursor: not-allowed;
+}
 .StdUI_ToolBar > ._buttons{
     overflow: hidden;
 }

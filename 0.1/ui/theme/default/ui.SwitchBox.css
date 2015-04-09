@@ -12,6 +12,9 @@
     outline: none;
     box-shadow: 0 0 2px #AFAFAF;
 }
+.StdUI_SwitchBox.disabled{
+    cursor: not-allowed;
+}
 .StdUI_SwitchBox > ._sep{
     float: left;
     height: 100%;

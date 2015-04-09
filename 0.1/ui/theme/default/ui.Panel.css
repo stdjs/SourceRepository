@@ -14,7 +14,9 @@
     border-color: #94B7C3;
     box-shadow: 0 0 3px #3AAAE2,0 0 1px #E1DEDB inset;
 }
-
+.StdUI_Panel.disabled{
+    cursor: not-allowed;
+}
 
 /************* Title Bar *************/
 .StdUI_Panel > ._title{

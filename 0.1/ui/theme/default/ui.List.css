@@ -17,6 +17,10 @@
     background: #43ACE8;
     color: white;
 }
+.StdUI_ListItem.disabled{
+    cursor: not-allowed;
+}
+
 .StdUI_ListItem > ._icon{
     float: left;
 }

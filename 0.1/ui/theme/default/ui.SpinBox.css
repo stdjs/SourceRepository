@@ -23,6 +23,7 @@
     color: #ACA9A8;
     border-color: #C0BDBB;
     background: #EEEEEE;
+    cursor: not-allowed;
 }
 
 .StdUI_SpinBox > input{

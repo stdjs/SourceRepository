@@ -6,6 +6,9 @@
     outline: none;
     cursor: default;
 }
+.StdUI_Slider.disabled{
+    cursor: not-allowed;
+}
 .StdUI_Slider > ._client{
     position: relative;
     overflow: hidden;

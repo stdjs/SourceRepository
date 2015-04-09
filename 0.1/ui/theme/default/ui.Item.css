@@ -6,6 +6,7 @@
 }
 .StdUI_Item.disabled{
     color: #7F7F7F;
+    cursor: not-allowed;
 }
 
 .StdUI_Item > ._icon{

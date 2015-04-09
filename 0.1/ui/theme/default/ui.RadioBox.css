@@ -18,6 +18,7 @@
 }
 .StdUI_RadioBox.disabled{
     color: #989593;
+    cursor: not-allowed;
 }
 
 /************* RadioBox Icon *************/

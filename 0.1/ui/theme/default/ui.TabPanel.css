@@ -25,6 +25,9 @@
     border-color: #B2AFAC;
     z-index: 4;
 }
+.StdUI_TabButton.disabled{
+    cursor: not-allowed;
+}
 
 /********* buttonBox **********/
 .StdUI_TabButton > ._buttonBox{
@@ -78,6 +81,9 @@
     outline: none;
     overflow: hidden;
     clear: both;
+}
+.StdUI_Tabs.disabled{
+    cursor: not-allowed;
 }
 .StdUI_Tabs > ._tabBar{
     position: relative;

@@ -44,6 +44,7 @@
 .StdUI_Button.disabled,
 .StdUI_Button.disabled.checked,
 .StdUI_Button.disabled.focus{
+    cursor: not-allowed;
     color: #989593;
     background: #D4D0CC;
     background: linear-gradient(to bottom,#D7D3CF 0%,#D0CCC8 100%);
