@@ -376,7 +376,6 @@ Std.ui.module("Pagination",{
     }
 });
 
-
 /**
  * data source pagination plugin
 */
@@ -391,19 +390,20 @@ Std.plugin.module("dataSourcePagination",{
          * init DataGrid
         */
         initDataGrid:function(){
-            var that   = this;
-            var opts   = that.opts;
-            var widget = that.widget;
+            var that       = this;
+            var opts       = that.opts;
+            var widget     = that.widget;
+            var pagination = that._pagination;
 
-            widget.renderTo(widget);
+            pagination.renderTo(widget);
             widget.on("resize",function(){
-                widget[2].height(widget[2].height() - that._pagination.height());
+                widget[2].height(widget[2].height() - pagination.height());
             });
             widget.on("dataSourceLoad",function(responseJSON){
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 
                 Std.each("total pageSize pageCount pageRows page",function(i,type){
-                    that._pagination[type](data[type]);
+                    pagination[type](data[type]);
                 });
             });
             return that;
@@ -421,8 +421,7 @@ Std.plugin.module("dataSourcePagination",{
     /*[#module option:main]*/
     main:function(that,opts,widget){
         that._pagination = Std.ui("Pagination",opts);
-
-        console.log(widget.ui)
+        
         switch(widget.ui){
             case "DataGrid":
                 that.initDataGrid();
