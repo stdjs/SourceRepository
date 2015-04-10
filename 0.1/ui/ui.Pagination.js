@@ -179,6 +179,12 @@ Std.ui.module("Pagination",{
             });
         },
         /*
+         * page rows
+        */
+        pageRows:function(number){
+            return this.opt("pageRows",number);
+        },
+        /*
          * page
         */
         page:function(page){
@@ -421,7 +427,7 @@ Std.plugin.module("dataSourcePagination",{
     /*[#module option:main]*/
     main:function(that,opts,widget){
         that._pagination = Std.ui("Pagination",opts);
-        
+
         switch(widget.ui){
             case "DataGrid":
                 that.initDataGrid();
