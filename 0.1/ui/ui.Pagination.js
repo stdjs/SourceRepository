@@ -18,7 +18,7 @@ Std.ui.module("Pagination",{
         text:"<b><?=page?></b> / <b><?=pageCount?></b><b style='margin-left: 10px'>total:</b><?=total?>",
         href:"#<?=page?>",
         defaultClass:"StdUI_Pagination",
-        height:30,
+        height:34,
         first:"First",
         last:"Last",
         prev:"Prev",
@@ -401,10 +401,12 @@ Std.plugin.module("dataSourcePagination",{
             var widget     = that.widget;
             var pagination = that._pagination;
 
-            pagination.renderTo(widget);
-            widget.on("resize",function(){
+            widget.on("render resize",function(){
                 widget[2].height(widget[2].height() - pagination.height());
             });
+            pagination.renderTo(widget);
+            pagination[0].css("borderTopColor",widget[0].css("borderTopColor"));
+
             widget.on("dataSourceLoad",function(responseJSON){
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 

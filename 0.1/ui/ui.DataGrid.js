@@ -1490,7 +1490,7 @@ Std.ui.module("DataGrid",{
         /*
          * reload
         */
-        reload:function(){
+        reload:function(data){
             var that       = this;
             var opts       = that.opts;
             var dataSource = opts.dataSource;
@@ -1499,7 +1499,7 @@ Std.ui.module("DataGrid",{
             if(dataSource && dataSource.type === "ajax" && isObject(read)){
                 Std.ajax.json({
                     url:read.url,
-                    data:read.data,
+                    data:Std.extend(read.data,data),
                     type:read.type || "get",
                     success:function(responseJSON){
                         that.clear();

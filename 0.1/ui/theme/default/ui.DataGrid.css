@@ -7,6 +7,7 @@
     border:1px solid #B2AFAC;
     outline: none;
     transition: border-color 0.2s;
+    background: #E5DFDD;
 }
 .StdUI_DataGrid.hover{
     border-color: #6FD6FE;
@@ -177,3 +178,4 @@
 .StdUI_DataGrid_ColumnPosition._bottom{
     background-position: -30px -394px;
 }
+
