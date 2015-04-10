@@ -20,9 +20,10 @@ Std.ui.module("ComboBox",{
     option:{
         level:3,
         defaultClass:"StdUI_ComboBox",
-        minWidth:60,
+        minWidth:40,
         minHeight:26,
         maxHeight:26,
+        listMaxHeight:300,
         width:400,
         height:26,
         items:null,
@@ -106,7 +107,7 @@ Std.ui.module("ComboBox",{
 
             height = that.height() - that.boxSize.height;
 
-            doms.input   && doms.input.css({
+            doms.input && doms.input.css({
                 height:height,
                 lineHeight:height
             });
@@ -124,7 +125,7 @@ Std.ui.module("ComboBox",{
 
             width = that.width() - that.boxSize.width;
 
-            doms.input   && doms.input.css({
+            doms.input && doms.input.css({
                 width:width - 24
             });
             doms.content && doms.content.css({
@@ -163,7 +164,7 @@ Std.ui.module("ComboBox",{
                 classStatus:false,
                 enter:function(){
                     that._selectedItem && that._selectedItem.removeClass("selected");
-                    that._selectedItem =  currentItem.addClass("selected");
+                    that._selectedItem = currentItem.addClass("selected");
                 },
                 click:function(){
                     that.value(currentItem);
@@ -285,13 +286,11 @@ Std.ui.module("ComboBox",{
             if(doms.list !== undefined){
                 return that;
             }
-
             doms.list = newDiv("StdUI StdUI_ComboBoxList").appendTo("body").on("mousedown",function(e){
                 e.preventDefault();
             }).delegate("mouseenter",".StdUI_ComboBoxItem,.StdUI_TemplateItem",function(e){
                 that.itemMouseEnter(this,e);
             });
-
             that.items.each(function(i,item){
                 item.renderTo(doms.list);
             });
@@ -354,7 +353,7 @@ Std.ui.module("ComboBox",{
             if(isWidget(item) && that._currentItem !== item){
                 that._currentItem && that._currentItem.removeClass("selected");
                 that._currentItem =  that._selectedItem = item.addClass("selected");
-                that.emit("select",item);
+                that.emit("select change",item);
             }
             return that;
         },
@@ -429,7 +428,6 @@ Std.ui.module("ComboBox",{
                 if(that._currentMode !== ""){
                     that.removeClass("_"+that._currentMode);
                 }
-
                 if(mode === "input"){
                     doms.input   = newDom("input","_input").appendTo(that[0]);
                 }else if(mode === "none"){
@@ -497,7 +495,6 @@ Std.ui.module("ComboBox",{
                     item.ui === "TemplateItem" ? item.text(): item[0].clone().className(item.opts.defaultClass)
                 );
             }
-
             return that.select(index);
         },
         /*
@@ -546,6 +543,7 @@ Std.ui.module("ComboBox",{
         */
         open:function(){
             var that   = this;
+            var opts   = that.opts;
             var doms   = that.D;
             var offset = that[0].offset();
             var height = 0;
@@ -556,15 +554,19 @@ Std.ui.module("ComboBox",{
             if(!doms.list){
                 that.initList();
             }
-
+            doms.list.show();
             doms.handle.addClass("_open");
-            doms.list.show().css({
+
+            if((height = doms.list.height()) > opts.listMaxHeight){
+                height = opts.listMaxHeight;
+            }
+            doms.list.css({
                 left     : offset.x,
                 top      : offset.y + that.height(),
                 width    : that[0].width() - 2,
-                height   : (height = doms.list.height()) ? 0 : 0,
+                height   : 0,
                 opacity  : 0,
-                overflow :"hidden"
+                overflow : "hidden"
             }).animate({
                 100:{
                     height:height,
@@ -655,12 +657,15 @@ Std.ui.module("ComboBox",{
          * clear items
         */
         clear:function(){
-            var items = this.items;
+            var that  = this;
+            var items = that.items;
 
             Std.each(items,function(i,item){
                 item.remove();
             });
             items.clear();
+
+            return that;
         }
     },
     /*[#module option:main]*/

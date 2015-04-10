@@ -16,6 +16,7 @@
     background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
     box-shadow: 1px 1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
     transition: background 0.2s,box-shadow 0.2s,border 0.2s;
+    cursor: default;
 }
 .StdUI_Button.hover{
     border-color: #3AA7DD;
@@ -92,7 +93,6 @@
 }
 .StdUI_Button > ._buttonBox > tbody > tr > ._text{
     text-align: center;
-    cursor: default;
 }
 .StdUI_Button > ._buttonBox._textBesideIcon > tbody > tr > td:first-child{
     padding-right: 5px;

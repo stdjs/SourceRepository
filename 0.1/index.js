@@ -23,10 +23,13 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.RadioBox"),
             JSFile_UI("ui.RadioBox")
         ],
-	    "ui.SpinBox":[
-            CSSFile_UI("ui.SpinBox"),
-            JSFile_UI("ui.SpinBox")
-        ],
+	    "ui.SpinBox":{
+            basics:"ui.LineEdit",
+            files:[
+                CSSFile_UI("ui.SpinBox"),
+                JSFile_UI("ui.SpinBox")
+            ]
+        },
         "ui.SwitchBox":[
             CSSFile_UI("ui.SwitchBox"),
             JSFile_UI("ui.SwitchBox")
@@ -59,18 +62,14 @@ Std.source.response("StdJS",function(){
             JSFile_UI("ui.DatePicker")
         ],
         "ui.List":{
-            basics:[
-                "ui.Item"
-            ],
+            basics:"ui.Item",
             files:[
                 CSSFile_UI("ui.List"),
                 JSFile_UI("ui.List")
             ]
         },
         "ui.Menu":{
-            basics:[
-                "ui.Item"
-            ],
+            basics:"ui.Item",
             files:[
                 CSSFile_UI("ui.Menu"),
                 JSFile_UI("ui.Menu")
@@ -81,9 +80,7 @@ Std.source.response("StdJS",function(){
             JSFile_UI("ui.MenuBar")
         ],
         "ui.ComboBox":{
-            basics:[
-                "ui.Item"
-            ],
+            basics:"ui.Item",
             files:[
                 CSSFile_UI("ui.ComboBox"),
                 JSFile_UI("ui.ComboBox")
@@ -120,10 +117,13 @@ Std.source.response("StdJS",function(){
             CSSFile_UI("ui.MessageBox"),
             JSFile_UI("ui.MessageBox")
         ],
-        "ui.Pagination":[
-            CSSFile_UI("ui.Pagination"),
-            JSFile_UI("ui.Pagination")
-        ],
+        "ui.Pagination":{
+            basics:"ui.ComboBox",
+            files:[
+                CSSFile_UI("ui.Pagination"),
+                JSFile_UI("ui.Pagination")
+            ]
+        },
         "ui.Progress":[
             CSSFile_UI("ui.Progress"),
             JSFile_UI("ui.Progress")
