@@ -402,7 +402,9 @@ Std.plugin.module("dataSourcePagination",{
             var pagination = that._pagination;
 
             widget.on("render resize",function(){
-                widget[2].height(widget[2].height() - pagination.height());
+                setTimeout(function(){
+                    widget[2].height(widget[2].height() - pagination.height());
+                },1);
             });
             pagination.renderTo(widget);
             pagination[0].css("borderTopColor",widget[0].css("borderTopColor"));
