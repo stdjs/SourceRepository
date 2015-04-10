@@ -102,7 +102,7 @@ Std.ui.module("DataGrid",{
             var that    = this;
             var opts    = that.opts;
             var boxSize = that.boxSize;
-
+            
             if(!isNumber(height)){
                 height = that.height();
             }

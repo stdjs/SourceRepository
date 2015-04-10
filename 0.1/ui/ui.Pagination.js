@@ -400,15 +400,13 @@ Std.plugin.module("dataSourcePagination",{
             var opts       = that.opts;
             var widget     = that.widget;
             var pagination = that._pagination;
-
-            widget.on("render resize",function(){
-                setTimeout(function(){
-                    widget[2].height(widget[2].height() - pagination.height());
-                },1);
-            });
+            var updateSize = function(){
+                widget[2].height(widget.height() - widget.opts.headerHeight - widget.boxSize.height - 1 - pagination.height());
+            };
             pagination.renderTo(widget);
             pagination[0].css("borderTopColor",widget[0].css("borderTopColor"));
 
+            widget.on("resize",updateSize);
             widget.on("dataSourceLoad",function(responseJSON){
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 
@@ -416,6 +414,9 @@ Std.plugin.module("dataSourcePagination",{
                     pagination[type](data[type]);
                 });
             });
+            if(widget.renderState){
+                updateSize();
+            }
             return that;
         }
     },
