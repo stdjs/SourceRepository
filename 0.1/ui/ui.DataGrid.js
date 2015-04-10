@@ -988,6 +988,46 @@ Std.ui.module("DataGrid",{
             });
         },
         /*
+         * row
+        */
+        row:function(pos){
+            return this._rows[this.rowIndex(pos)];
+        },
+        /*
+         * cell
+        */
+        cell:function(rowPos,cellPos){
+            var that = this;
+
+            if(isString(rowPos)){
+                var data = rowPos.split(":");
+                rowPos  = ~~data[0];
+                cellPos = ~~data[1];
+            }
+            var cells = this._rows[rowPos].cells;
+            if(!isArray(cellPos) && isObject(cells)){
+                cellPos = that._columns[cellPos].name;
+            }
+            return cells[cellPos];
+        },
+        /*
+         * column
+        */
+        column:function(pos){
+            var that = this;
+
+            if(isNumber(pos)){
+                return that._columns[pos];
+            }else if(isString(pos)){
+                for(var i=0;i<that._columnCount;i++){
+                    if(pos === that._columns[i].name){
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        },
+        /*
          * columnResizable
         */
         columnResizable:function(state){
@@ -1105,7 +1145,6 @@ Std.ui.module("DataGrid",{
 
             return that;
         },
-
         /*
          * repaint
         */

@@ -422,6 +422,7 @@ Std.plugin("dataSourcePagination",{
     main:function(that,opts,widget){
         that._pagination = Std.ui("Pagination",opts);
 
+        console.log(widget.ui)
         switch(widget.ui){
             case "DataGrid":
                 that.initDataGrid();
