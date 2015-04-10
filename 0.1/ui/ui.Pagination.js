@@ -380,7 +380,7 @@ Std.ui.module("Pagination",{
 /**
  * data source pagination plugin
 */
-Std.plugin("dataSourcePagination",{
+Std.plugin.module("dataSourcePagination",{
     /*[#module option:option]*/
     option:{
         dataPath:""
