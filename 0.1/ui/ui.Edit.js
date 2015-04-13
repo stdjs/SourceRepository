@@ -217,6 +217,9 @@ Std.model("ui.Edit",{
             if(value === undefined){
                 return doms.input.value();
             }
+            if(value == null){
+                value = "";
+            }
             that.placeHolderState(value === "");
             doms.input.value(value);
 

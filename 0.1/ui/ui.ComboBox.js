@@ -408,9 +408,9 @@ Std.ui.module("ComboBox",{
                     type:read.type
                 }).on("success",function(responseJSON){
                     that.clear();
-                    that.emit("dataSourceLoad",responseJSON);
                     that.append(Std.mold.dataPath(responseJSON,read.dataPath));
                     that.call_opts("value",true);
+                    that.emit("dataSourceLoad",responseJSON);
                 });
             }
         },
