@@ -312,7 +312,8 @@ Std.ui.module("Pagination",{
                     pages.push(i+"");
                 }
                 return pages;
-            }());
+            }()).value(that.page());
+            
             return that;
         },
         /*
