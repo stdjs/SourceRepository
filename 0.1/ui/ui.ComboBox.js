@@ -542,11 +542,10 @@ Std.ui.module("ComboBox",{
          * open list
         */
         open:function(){
-            var that   = this;
-            var opts   = that.opts;
-            var doms   = that.D;
-            var offset = that[0].offset();
-            var height = 0;
+            var that       = this;
+            var doms       = that.D;
+            var offset     = that[0].offset();
+            var listHeight = 0;
 
             if(that._listVisible){
                 return that;
@@ -557,21 +556,27 @@ Std.ui.module("ComboBox",{
             doms.list.show();
             doms.handle.addClass("_open");
 
-            if((height = doms.list.height()) > opts.listMaxHeight){
-                height = opts.listMaxHeight;
+            if((listHeight = doms.list.offsetHeight()) > that.opts.listMaxHeight){
+                listHeight = that.opts.listMaxHeight;
+            }
+            var top      = offset.y + that.height();
+            var animates = {
+                height:listHeight - doms.list.boxSize().height,
+                opacity:1
+            };
+            if(offset.y + that.height() + listHeight > that[0].offsetParent().height()){
+                doms.list.addClass("_top");
+                animates.top = (top = offset.y) - listHeight;
             }
             doms.list.css({
                 left     : offset.x,
-                top      : offset.y + that.height(),
+                top      : top,
                 width    : that[0].width() - 2,
                 height   : 0,
                 opacity  : 0,
                 overflow : "hidden"
             }).animate({
-                100:{
-                    height:height,
-                    opacity:1
-                }
+                100:animates
             },{
                 duration:150,
                 timingFunction:"ease-in"
@@ -592,21 +597,24 @@ Std.ui.module("ComboBox",{
          * close list
         */
         close:function(){
-            var that  = this;
-            var doms  = that.D;
-
+            var that     = this;
+            var doms     = that.D;
+            var offset   = that[0].offset();
+            var animates = {
+                height:0,
+                opacity:0
+            };
             if(!that._listVisible){
                 return that;
             }
-
+            if(offset.y > doms.list.css("top")){
+                animates.top = offset.y;
+            }
             doms.handle.removeClass("_open");
             doms.list && doms.list.css("overflow","hidden").animate({
-                100:{
-                    height:0,
-                    opacity:0
-                }
+                100:animates
             },140,function(){
-                doms.list.hide().removeStyle("overflow height");
+                doms.list.hide().removeStyle("overflow height").removeClass("_top");
                 if(that._selectedItem !== null){
                     that._selectedItem.removeClass("selected");
                 }

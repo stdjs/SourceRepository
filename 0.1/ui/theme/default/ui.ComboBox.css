@@ -79,7 +79,11 @@
     padding: 1px;
     box-shadow: 1px 1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
 }
-
+.StdUI_ComboBoxList._top{
+    border-bottom: 0;
+    border-top: 1px solid #B2AFAC;
+    box-shadow: -1px -1px 1px rgba(184,181,179,0.7),0 0 1px #E1DEDB inset;
+}
 .StdUI_ComboBoxList > .StdUI_TemplateItem{
     clear: both;
 }
