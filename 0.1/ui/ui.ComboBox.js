@@ -564,7 +564,7 @@ Std.ui.module("ComboBox",{
                 height:listHeight - doms.list.boxSize().height,
                 opacity:1
             };
-            if(offset.y + that.height() + listHeight > that[0].offsetParent().height()){
+            if(offset.y + that.height() + listHeight > Std.dom(window).height()){
                 doms.list.addClass("_top");
                 animates.top = (top = offset.y) - listHeight;
             }
