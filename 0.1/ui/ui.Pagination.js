@@ -377,7 +377,7 @@ Std.ui.module("Pagination",{
         }
     },
     /*[#module option:main]*/
-    main:function(that,opts,dom){
+    main:function(that,opts){
         if(opts.change){
             that.on("change",opts.change);
         }
@@ -408,16 +408,18 @@ Std.plugin.module("dataSourcePagination",{
             var updateSize = function(){
                 widget[2].height(widget.height() - widget.opts.headerHeight - widget.boxSize.height - 1 - pagination.height());
             };
-            pagination.renderTo(widget)[0].css("borderTopColor",widget[0].css("borderTopColor"));
 
             widget.on("resize",updateSize);
             widget.on("dataSourceLoad",function(responseJSON){
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 
                 Std.each("total pageSize pageCount pageRows page",function(i,type){
-                    pagination[type](data[type]);
+                    pagination.opts[type](data[type]);
                 });
+                pagination.refreshPages().refreshText().refreshList();
             });
+            pagination.renderTo(widget)[0].css("borderTopColor",widget[0].css("borderTopColor"));
+
             if(widget.renderState){
                 updateSize();
             }
