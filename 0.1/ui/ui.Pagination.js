@@ -414,7 +414,7 @@ Std.plugin.module("dataSourcePagination",{
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 
                 Std.each("total pageSize pageCount pageRows page",function(i,type){
-                    pagination.opts[type](data[type]);
+                    pagination.opts[type] = data[type];
                 });
                 pagination.refreshPages().refreshText().refreshList();
             });
