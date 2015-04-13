@@ -313,7 +313,7 @@ Std.ui.module("Pagination",{
                 }
                 return pages;
             }()).value(that.page());
-            
+
             return that;
         },
         /*

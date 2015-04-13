@@ -1499,7 +1499,7 @@ Std.ui.module("DataGrid",{
             if(dataSource && dataSource.type === "ajax" && isObject(read)){
                 Std.ajax.json({
                     url:read.url,
-                    data:Std.extend(read.data,data),
+                    data:Std.extend(read.data || {},data),
                     type:read.type || "get",
                     success:function(responseJSON){
                         that.clear();
