@@ -188,16 +188,21 @@ Std.ui.module("Pagination",{
          * page
         */
         page:function(page){
-            var that = this;
+            var that     = this;
+            var opts     = that.opts;
+            var pageList = that._pageList;
 
-            return this.opt("page",page,function(){
-                var pageList = that._pageList;
-
+            if(page === undefined){
+                return opts.page;
+            }
+            if(page !== opts.page){
+                opts.page = page;
                 if(pageList && pageList.value() != page){
                     pageList.value(page);
                 }
-                this.refreshPages().refreshText().emit("change",page);
-            });
+                that.refreshPages().refreshText().emit("change",page);
+            }
+            return that;
         },
         /*
          * page index
@@ -403,8 +408,7 @@ Std.plugin.module("dataSourcePagination",{
             var updateSize = function(){
                 widget[2].height(widget.height() - widget.opts.headerHeight - widget.boxSize.height - 1 - pagination.height());
             };
-            pagination.renderTo(widget);
-            pagination[0].css("borderTopColor",widget[0].css("borderTopColor"));
+            pagination.renderTo(widget)[0].css("borderTopColor",widget[0].css("borderTopColor"));
 
             widget.on("resize",updateSize);
             widget.on("dataSourceLoad",function(responseJSON){
