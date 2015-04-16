@@ -1095,6 +1095,12 @@ Std.ui.module("DataGrid",function(){
                 return null;
             },
             /*
+             * query row by index
+            */
+            row:function(index){
+                return this.queryRowByIndex(index);
+            },
+            /*
              * query cell by column name
             */
             queryCellByColumnName:function(row,columnName){
@@ -1143,6 +1149,12 @@ Std.ui.module("DataGrid",function(){
                     }
                 }
                 return null;
+            },
+            /*
+             * query cell by index
+            */
+            cell:function(row,index){
+                return this.queryCellByIndex(row,index);
             },
             /*
              * query column by index
