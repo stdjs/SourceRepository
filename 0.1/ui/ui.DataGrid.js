@@ -669,7 +669,8 @@ Std.ui.module("DataGrid",function(){
                     var columnsArray = [];
 
                     for(var name in rowCells){
-                        var columnIndex = that.column(name);
+                        var columnIndex = that.queryColumnIndexByName(name);
+
                         if(columnIndex !== -1){
                             cellsArray[columnIndex]   = rowCells[name];
                             columnsArray[columnIndex] = columns[columnIndex];
@@ -677,7 +678,9 @@ Std.ui.module("DataGrid",function(){
                     }
                     columns  = columnsArray;
                     rowCells = cellsArray;
+
                 }
+
                 for(var y=0,children=rowElement.childNodes,cellCount=children.length;y<cellCount;y++){
                     if(!rowData || rowCells[y] == undefined){
                         continue;
