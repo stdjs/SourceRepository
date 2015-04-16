@@ -24,7 +24,6 @@ Std.ui.module("ComboBox",{
         minHeight:26,
         maxHeight:26,
         listMaxHeight:300,
-        width:400,
         height:26,
         items:null,
         value:null,
