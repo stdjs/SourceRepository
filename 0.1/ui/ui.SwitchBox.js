@@ -11,10 +11,9 @@ Std.ui.module("SwitchBox",{
         level:2,
         defaultClass:"StdUI_SwitchBox",
         height:26,
-        value:"off",
-        items:"off on",
-        styleType:"default",
-        color:"blue"
+        value:null,
+        items:null,
+        styleType:"default"
     },
     /*#module option:action]*/
     action:{
@@ -23,13 +22,9 @@ Std.ui.module("SwitchBox",{
     /*#module option:protected]*/
     protected:{
         /*
-         * state
+         * selected
         */
-        state:null,
-        /*
-         * current
-        */
-        current:0
+        selected:null
     },
     /*#module option:extend]*/
     extend:{
@@ -39,7 +34,7 @@ Std.ui.module("SwitchBox",{
         render:function(){
             var that = this;
 
-            //that.refreshCurrent();
+            that.call_opts(["styleType","value"]);
             that.repaint();
         },
         /*
@@ -51,53 +46,24 @@ Std.ui.module("SwitchBox",{
             if(!isNumber(height)){
                 height = that.height();
             }
-            that.D.state.height(height);
-            that[0].lineHeight(height - that.boxSize.height);
+            that[0].lineHeight(height -= that.boxSize.height);
+            that[1] && that[1].height(height - 2).lineHeight(height - 2);
         }
     },
     /*#module option:private]*/
     private:{
         /*
-         * create icon
-        */
-        createIcon:function(icon){
-            var iconElement = newDiv("_icon");
-
-            if(icon.charAt(0) !== '.'){
-                iconElement.append(newDom("img").attr("src",icon));
-            }else{
-                iconElement.className("_icon" + icon.replace(/\./g,' '));
-            }
-            return iconElement;
-        },
-        /*
-         * refreshCurrentIndex
-        */
-        refreshCurrent:function(){
+         * init handle
+         */
+        initHandle:function(){
             var that = this;
 
-            for(var i=0;i<that.length;i++){
-                if(that.items[i].name === that.value()){
-                    that._current = i;
-                    break;
-                }
-            }
-            return that;
-        },
-        /*
-         * refresh state
-        */
-        refreshState:function(){
-            var that    = this;
-            var width   = that.opts.width;
-            var state   = that.D.state;
-            var current = that.items[that._current];
+            if(that[1] == undefined){
+                var height = that.height() - that.boxSize.height - 2;
 
-            state.dom.innerHTML = current.dom.html();
-            state.css({
-                left  : current.dom.offsetLeft(),
-                width : width !== "auto" ? width / that.length - that.boxSize.width  : that.items[that._current].dom.outerWidth()
-            });
+                that[1] = newDiv("_handle").appendTo(that[0]);
+                that[1].height(height).lineHeight(height);
+            }
             return that;
         },
         /*
@@ -107,16 +73,19 @@ Std.ui.module("SwitchBox",{
             var that = this;
 
             that[0].unselect(true).delegate("click","._item",function(e){
+                if(!that.enable()){
+                    return;
+                }
                 var index = this.index("._item");
                 var item  = that.items[index];
 
-                if(index !== that._current){
-                    that._current = index;
-                    that.emit("change",that.opts.value = item.name);
+                if(item !== that._selected){
+                    that._selected = item;
+                    that.emit("change",that.opts.value = item.value);
                 }
-                that.D.state.html(item.dom.html()).animate({
+                that.initHandle()[1].html(item.dom.html()).animate({
                     to:{
-                        width:item.dom.width(),
+                        width:item.dom.width() - 2,
                         left:item.dom.offsetLeft()
                     }
                 },100);
@@ -131,28 +100,38 @@ Std.ui.module("SwitchBox",{
         */
         length:0,
         /*
-         * value
-        */
-        value:function(value){
-            var that = this;
-
-            return that.opt("value",value,function(){
-                that.refreshCurrent();
-                that.renderState && that.refreshState();
-                that.emit("change",value);
-            });
-        },
-        /*
          * style type
         */
         styleType:function(styleType){
-            var that = this;
-
-            return that.opt("styleType",styleType,function(){
-                if(styleType === "default"){
-
-                }
+            return this.opt("styleType",styleType,function(){
+                this.addClass("_" + styleType);
             });
+        },
+        /*
+         * refresh
+        */
+        refresh:function(){
+            var that     = this;
+            var width    = that.opts.width;
+            var selected = that._selected;
+
+            if(selected === null){
+                return that;
+            }
+            if(!that[1]){
+                that.initHandle();
+            }
+            if(width === "auto"){
+                width = selected.dom.outerWidth();
+            }else{
+                width = width / that.length - that.boxSize.width;
+            }
+            that[1].dom.innerHTML = selected.dom.html();
+            that[1].css({
+                left  : selected.dom.offsetLeft(),
+                width : width - 2
+            });
+            return that;
         },
         /*
          * repaint
@@ -167,37 +146,52 @@ Std.ui.module("SwitchBox",{
                 var itemWidth = 0;
 
                 if(width === "auto"){
-                    itemWidth = items[i].dom.outerWidth() + 16;
+                    itemWidth = items[i].dom.outerWidth() + 18;
                 }else{
                     itemWidth = width / that.length - boxWidth;
                 }
                 items[i].dom.width(i !== 0 ? itemWidth + 1 : itemWidth);
             }
+            return that.refresh();
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
 
-            return that.refreshState();
+            return that.opt("value",value,function(){
+                for(var i=0;i<that.length;i++){
+                    if(that.items[i].value === value){
+                        that._selected = that.items[i];
+                        break;
+                    }
+                }
+                that.renderState && that.refresh();
+                that.emit("change",value);
+            });
         },
         /*
          * append
         */
-        append:Std.func(function(name,icon){
+        append:Std.func(function(text,value){
             var that = this;
             var item = newDiv("_item");
 
-            if(isObject(name)){
-                name = name.name;
-                icon = name.icon;
+            if(isObject(text)){
+                value = text.value;
+                text  = text.name;
             }
-            if(isString(name)){
-                item.append(newDiv("_name").html(name));
-            }
-            if(isString(icon)){
-                item.append(that.createIcon(icon));
+
+            if(isString(text)){
+                item.append(newDiv("_name").html(text));
             }
             if(that.length++ > 0){
                 that[0].append(newDiv("_sep"));
             }
             that.items.push({
-                name:name,
+                text:text,
+                value:value,
                 dom:item
             });
             that[0].append(item);
@@ -207,9 +201,6 @@ Std.ui.module("SwitchBox",{
     },
     /*#module option:main]*/
     main:function(that,opts,dom){
-        that.D     = {
-            state:newDiv("_state").appendTo(dom)
-        };
         that.items = [];
         that.initEvents();
 
