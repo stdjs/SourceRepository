@@ -627,6 +627,8 @@ Std.ui.module("DataGrid",function(){
              * update Cell
             */
             paintCell:function(column,element,data,rowData,cellIndex){
+                var that = this;
+
                 switch(column.type){
                     case "template":
                         element.innerHTML = !isObject(data) ? data : column.template.render(data);
@@ -653,10 +655,10 @@ Std.ui.module("DataGrid",function(){
 
                             widget.on("change",function(){
                                 if(widget.renderState){
-                                    rowData.cells[cellIndex] = widget.value();
+                                    that.updateCellByIndex(rowData,cellIndex,widget.value());
                                 }
                             });
-                            this._cellWidgets.push(
+                            that._cellWidgets.push(
                                 element.ui = widget.appendTo(element)
                             );
                         }
@@ -1159,7 +1161,7 @@ Std.ui.module("DataGrid",function(){
                     return cells[index];
                 }else if(isObject(cells)){
                     var column   = this.queryColumnByIndex(index);
-                    if(column && column.name && cells[column.name]){
+                    if(column && column.name && cells[column.name] !== undefined){
                         return cells[column.name];
                     }
                 }
@@ -1422,7 +1424,7 @@ Std.ui.module("DataGrid",function(){
                     cells[index] = data;
                 }else if(isObject(cells)){
                     var column   = this.queryColumnByIndex(index);
-                    if(column && column.name && cells[column.name]){
+                    if(column && column.name && cells[column.name] !== undefined){
                         cells[column.name] = data;
                     }
                 }
