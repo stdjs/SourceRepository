@@ -1077,6 +1077,12 @@ Std.ui.module("DataGrid",function(){
             /*
              * query row by index
             */
+            row:function(index){
+                return this.queryRowByIndex(index);
+            },
+            /*
+             * query row by index
+            */
             queryRowByIndex:function(index){
                 return this._rows[this.rowIndex(index)] || null;
             },
@@ -1095,10 +1101,10 @@ Std.ui.module("DataGrid",function(){
                 return null;
             },
             /*
-             * query row by index
+             * query cell by index
             */
-            row:function(index){
-                return this.queryRowByIndex(index);
+            cell:function(row,index){
+                return this.queryCellByIndex(row,index);
             },
             /*
              * query cell by column name
@@ -1151,10 +1157,17 @@ Std.ui.module("DataGrid",function(){
                 return null;
             },
             /*
-             * query cell by index
+             * column
             */
-            cell:function(row,index){
-                return this.queryCellByIndex(row,index);
+            column:function(pos){
+                var that = this;
+
+                if(isNumber(pos)){
+                    return that.queryColumnByIndex(pos);
+                }else if(isString(pos)){
+                    return that.queryColumnByName(pos);
+                }
+                return null;
             },
             /*
              * query column by index
@@ -1180,19 +1193,6 @@ Std.ui.module("DataGrid",function(){
                 var index = this.queryColumnIndexByName(name);
 
                 return index !== -1 ? this._columns[index] : null
-            },
-            /*
-             * column
-            */
-            column:function(pos){
-                var that = this;
-
-                if(isNumber(pos)){
-                    return that.queryColumnByIndex(pos);
-                }else if(isString(pos)){
-                    return that.queryColumnByName(pos);
-                }
-                return null;
             },
             /*
              * get row index
