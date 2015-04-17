@@ -82,7 +82,9 @@ Std.ui.module("CheckBox",{
                 if(type == "bool"){
                     return that.checked();
                 }
-                return ~~that.checked();
+                if(type == "int"){
+                    return Number(that.checked());
+                }
             }
             if(type == "any"){
                 that.opts.value = value;
