@@ -1472,7 +1472,7 @@ Std.ui.module("DataGrid",function(){
                 if(value !== undefined){
                     return that;
                 }
-                for(var result,i=0;i<that._rowCount;i++){
+                for(var result=null,i=0;i<that._rowCount;i++){
                     var row = that._rows[i];
                     if(!result){
                         if(valueFormat == "auto"){
