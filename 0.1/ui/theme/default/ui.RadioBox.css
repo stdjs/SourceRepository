@@ -16,7 +16,8 @@
     line-height: 18px;
     text-indent: 5px;
 }
-.StdUI_RadioBox.disabled{
+.StdUI_RadioBox.disabled,
+.StdUI_RadioBox.disabled *{
     color: #989593;
     cursor: not-allowed;
 }

@@ -180,7 +180,7 @@ Std.ui.module("SwitchBox",{
 
             if(isObject(text)){
                 value = text.value;
-                text  = text.name;
+                text  = text.text;
             }
 
             if(isString(text)){

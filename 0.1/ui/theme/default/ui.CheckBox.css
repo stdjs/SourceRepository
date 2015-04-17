@@ -16,7 +16,8 @@
     text-indent: 5px;
     color: #484848;
 }
-.StdUI_CheckBox.disabled{
+.StdUI_CheckBox.disabled,
+.StdUI_CheckBox.disabled *{
     color: #989593;
     cursor: not-allowed;
 }

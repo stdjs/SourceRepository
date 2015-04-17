@@ -397,6 +397,9 @@ Std.ui.module("DataGrid",function(){
                     },e);
                 };
                 that.D.columns.on("mouseenter","._column",mouseenter).delegate("mouseenter","._column > ._resizeHandle",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
                     opts.columnResizable && this.mouse({
                         auto:false,
                         unselect:true,
@@ -423,6 +426,9 @@ Std.ui.module("DataGrid",function(){
                     }
                 };
                 that[2].delegate("mouseenter","._block > ._row > ._cell",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
                     var startCellIndex  = -1;
                     var startRowIndex   = -1;
                     var startBlockIndex = -1;
@@ -485,6 +491,9 @@ Std.ui.module("DataGrid",function(){
                 };
 
                 that[2].delegate("mouseenter","._block > ._row",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
                     var startIndex,startBlockIndex,rowPosition;
                     var selectionMode = opts.selectionMode;
                     var row           = this.mouse({

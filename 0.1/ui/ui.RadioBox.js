@@ -5,18 +5,22 @@ Std.ui.module("RadioBox",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"change checked",
+    events:"change",
     /*[#module option:option]*/
     option:{
         level:1,
         defaultClass:"StdUI_RadioBox",
         text:"RadioBox",
-        checked:false,
-        value:null
+        value:false,
+        valueType:"bool" //bool,int,any
     },
     /*[#module option:action]*/
     action:{
         content:"text"
+    },
+    /*[#module option:protected]*/
+    protected:{
+        checked:false
     },
     /*[#module option:static]*/
     static:{
@@ -108,6 +112,12 @@ Std.ui.module("RadioBox",{
     /*[#module option:public]*/
     public:{
         /*
+         * value type
+        */
+        valueType:function(type){
+            return this.opt("valueType",type);
+        },
+        /*
          * text
         */
         text:function(text){
@@ -119,13 +129,39 @@ Std.ui.module("RadioBox",{
          * checked
         */
         checked:function(state){
-            return this.opt("checked",state,function(){
-                this.toggleClass("checked",state).emit("change",state);
+            var that = this;
 
-                if(state === true){
-                    this.emit("checked");
+            if(state === undefined){
+                return that._checked;
+            }
+            if(that._checked !== state){
+                that.toggleClass("checked",that._checked = state);
+                that.renderState && that.emit("change",state);
+            }
+            return that;
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+            var type = that.valueType();
+
+            if(value === undefined){
+                if(type == "any"){
+                    return that.opts.value;
                 }
-            });
+                if(type == "bool"){
+                    return that.checked();
+                }
+                return ~~that.checked();
+            }
+            if(type == "any"){
+                that.opts.value = value;
+            }else{
+                that.checked(Boolean(value));
+            }
+            return that;
         }
     },
     /*[#module option:main]*/
@@ -135,11 +171,7 @@ Std.ui.module("RadioBox",{
             that[2] = newDom("label","_text")
         ]);
 
-        that.call_opts({
-            text:"",
-            checked:false
-        },true);
-
+        that.call_opts(["text","value"]);
         that.initEvents();
     }
 });
