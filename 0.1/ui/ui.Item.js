@@ -35,8 +35,8 @@ Std.ui.module("Item",{
             },true);
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init icon
         */

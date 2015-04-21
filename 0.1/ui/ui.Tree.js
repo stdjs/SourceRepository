@@ -26,8 +26,8 @@ Std.ui.module("TreeItem",{
         data:null,
         tabIndex:null
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * data url
         */
@@ -105,8 +105,8 @@ Std.ui.module("TreeItem",{
             each:[isArray]
         })
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * refresh icon
         */
@@ -506,8 +506,8 @@ Std.ui.module("Tree",{
     },
     /*[#module option:events]*/
     events:"selectionModeChange clear itemClick itemDblClick itemRename itemCheck contextmenu",
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * data url
         */
@@ -559,8 +559,12 @@ Std.ui.module("Tree",{
             each:[isArray]
         })
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * items length
+        */
+        length:0,
         /*
          * init events
         */
@@ -635,10 +639,6 @@ Std.ui.module("Tree",{
     },
     /*[#module option:public]*/
     public:{
-        /*
-         * items length
-         */
-        length:0,
         /*
          * editable
         */

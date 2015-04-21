@@ -34,8 +34,8 @@ Std.ui.module("Panel",{
          */
         children:"append"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         titleBar:null,
         menuBar:null,
         toolBar:null,
@@ -88,8 +88,8 @@ Std.ui.module("Panel",{
             that._toolBar && that._toolBar.remove();
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * title button click
          */

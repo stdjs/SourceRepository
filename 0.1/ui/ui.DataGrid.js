@@ -42,8 +42,8 @@ Std.ui.module("DataGrid",function(){
             valueFormat:"auto",   //auto,array,object
             defaultClass:"StdUI_DataGrid"
         },
-        /*[#module option:protected]*/
-        protected:{
+        /*[#module option:private]*/
+        private:{
             /*
              * row count
              */
@@ -131,8 +131,8 @@ Std.ui.module("DataGrid",function(){
                 that.clear();
             }
         },
-        /*[#module option:private]*/
-        private:{
+        /*[#module option:protected]*/
+        protected:{
             /*
              * init header
             */

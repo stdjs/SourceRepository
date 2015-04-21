@@ -11,8 +11,8 @@ Std.ui.module("DateTimeEdit",{
         defaultClass:"StdUI_DateTimeEdit",
         format:"yyyy-MM-dd h:m:s"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * date time picker
         */
@@ -44,8 +44,8 @@ Std.ui.module("DateTimeEdit",{
             that.removeDocumentEvents();
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init handle
         */

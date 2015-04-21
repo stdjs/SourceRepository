@@ -12,8 +12,8 @@ Std.ui.module("TabButton",{
         styleType:"text",    //text,icon,textBesideIcon
         defaultClass:"StdUI_TabButton"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * selected states
         */
@@ -68,8 +68,8 @@ Std.ui.module("TabPanel",{
     },
     /*[#module option:events]*/
     events:"tabSelect tabRemove",
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * active item
         */
@@ -173,8 +173,8 @@ Std.ui.module("TabPanel",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init keyboard
         */

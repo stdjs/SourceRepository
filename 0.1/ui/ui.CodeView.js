@@ -16,8 +16,8 @@ Std.ui.module("CodeView",{
         defaultClass:"StdUI_CodeView",
         value:""
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         initEvents:function(){
 
         }

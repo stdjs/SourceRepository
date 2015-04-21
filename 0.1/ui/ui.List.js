@@ -12,8 +12,8 @@ Std.ui.module("ListItem",{
         height:24,
         value:null
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * selected
         */
@@ -64,8 +64,8 @@ Std.ui.module("List",{
         iconHeight:16,
         selectionMode:"single" //single,multi,none
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * selected items
         */
@@ -105,8 +105,8 @@ Std.ui.module("List",{
             each:[isArray]
         })
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init events
         */

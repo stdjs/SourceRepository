@@ -15,8 +15,8 @@ Std.ui.module("MenuItem",{
         text:"menu item",
         items:null
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         childVisible:false
     },
     /*[#module option:extend]*/
@@ -172,8 +172,8 @@ Std.ui.module("Menu",{
         height:"auto",
         items:null
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         currentItem:null
     },
     /*[#module option:extend]*/
@@ -226,8 +226,8 @@ Std.ui.module("Menu",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * key event
         */

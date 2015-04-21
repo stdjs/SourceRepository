@@ -34,8 +34,8 @@ Std.ui.module("DatePicker",{
             that.initEvents();
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * date count
         */

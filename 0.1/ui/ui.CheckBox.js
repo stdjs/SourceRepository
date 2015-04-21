@@ -18,12 +18,12 @@ Std.ui.module("CheckBox",{
     action:{
         content:"text"
     },
-    /*[#module option:protected]*/
-    protected:{
-        checked:false
-    },
     /*[#module option:private]*/
     private:{
+        checked:false
+    },
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init events
         */

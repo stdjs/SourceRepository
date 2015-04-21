@@ -23,8 +23,8 @@ Std.ui.module("ColorPicker",{
         paletteSize:150,
         value:"#000"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         rollY:0,
         paletteX:0,
         paletteY:0
@@ -46,8 +46,8 @@ Std.ui.module("ColorPicker",{
             that.initColors();
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init inputs
         */

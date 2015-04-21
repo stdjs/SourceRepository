@@ -48,8 +48,8 @@ Std.model("ui.Slider",{
             that.initEvents();
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * update progress
         */
@@ -288,8 +288,8 @@ Std.ui.module("HSlider",{
         level:3,
         height:22
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * direction
         */
@@ -330,7 +330,7 @@ Std.ui.module("VSlider",{
         height:200
     },
     /*[#module option:private]*/
-    protected:{
+    private:{
         /*
          * direction
         */

@@ -40,8 +40,8 @@ Std.ui.module("GridView",{
         value:null,
         defaultClass:"StdUI_GridView"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * row count
         */
@@ -80,8 +80,8 @@ Std.ui.module("GridView",{
 
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init header
         */

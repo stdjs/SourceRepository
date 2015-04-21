@@ -19,8 +19,8 @@ Std.ui.module("SwitchBox",{
     action:{
         content:"value"
     },
-    /*#module option:protected]*/
-    protected:{
+    /*#module option:private]*/
+    private:{
         /*
          * selected
         */
@@ -50,11 +50,15 @@ Std.ui.module("SwitchBox",{
             that[1] && that[1].height(height - 2).lineHeight(height - 2);
         }
     },
-    /*#module option:private]*/
-    private:{
+    /*#module option:protected]*/
+    protected:{
+        /*
+         * length
+        */
+        length:0,
         /*
          * init handle
-         */
+        */
         initHandle:function(){
             var that = this;
 
@@ -95,10 +99,6 @@ Std.ui.module("SwitchBox",{
     },
     /*#module option:public]*/
     public:{
-        /*
-         * length
-        */
-        length:0,
         /*
          * style type
         */
@@ -207,6 +207,5 @@ Std.ui.module("SwitchBox",{
         if(opts.items){
             that.append(opts.items);
         }
-
     }
 });

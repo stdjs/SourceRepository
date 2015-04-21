@@ -31,7 +31,7 @@
             tools:{}
         },
         /*[#module option:protected]*/
-        protected:{
+        private:{
             selection:null,
             range:null
         },
@@ -102,8 +102,8 @@
                 }
             }
         },
-        /*[#module option:private]*/
-        private:{
+        /*[#module option:protected]*/
+        protected:{
             /*
              * create window
             */

@@ -19,13 +19,6 @@ Std.ui.module("Accordion",{
         clientPadding:5,
         activeItem:0
     },
-    /*#module option:protected]*/
-    protected:{
-        /*
-         * current
-        */
-        current:null
-    },
     /*#module option:action]*/
     action:{
         /*
@@ -44,6 +37,13 @@ Std.ui.module("Accordion",{
                 };
             },true));
         }
+    },
+    /*#module option:private]*/
+    private:{
+        /*
+         * current
+         */
+        current:null
     },
     /*#module option:extend]*/
     extend:{
@@ -91,8 +91,8 @@ Std.ui.module("Accordion",{
             }
         }
     },
-    /*#module option:private]*/
-    private:{
+    /*#module option:protected]*/
+    protected:{
         /*
          * compute client height
         */

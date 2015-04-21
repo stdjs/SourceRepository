@@ -60,8 +60,8 @@ Std.ui.module("ToolBar",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * create tool
         */

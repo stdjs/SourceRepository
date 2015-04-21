@@ -17,8 +17,11 @@ Std.ui.module("CodeEdit",{
         defaultClass:"StdUI_CodeEdit",
         value:""
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init events
+        */
         initEvents:function(){
             var that = this;
 
@@ -32,6 +35,9 @@ Std.ui.module("CodeEdit",{
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * value
+        */
         value:function(value){
             var that = this;
 

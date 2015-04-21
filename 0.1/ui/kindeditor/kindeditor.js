@@ -5,7 +5,7 @@ Std.ui.module("KindEditor",{
         height:200,
         value:""
     },
-    protected:{
+    private:{
         timer:null
     },
     extend:{
@@ -48,7 +48,7 @@ Std.ui.module("KindEditor",{
             that.updateEditorSize();
         }
     },
-    private:{
+    protected:{
         updateEditorSize:function(){
             var that = this;
             var data = "";

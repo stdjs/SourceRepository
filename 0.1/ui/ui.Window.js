@@ -30,8 +30,8 @@ Std.ui.module("Window",{
         closeMethod:"hide",
         renderTo:"body"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * locker
         */
@@ -106,8 +106,8 @@ Std.ui.module("Window",{
             that._windowResize && Std.dom(window).off("resize",that._windowResize);
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init locker
         */

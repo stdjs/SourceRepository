@@ -59,8 +59,8 @@ Std.ui.module("SpinBox",{
             });
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init handle
         */

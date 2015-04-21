@@ -50,8 +50,8 @@ Std.ui.module("Pagination",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init keyboard
         */
@@ -396,8 +396,8 @@ Std.plugin.module("dataSourcePagination",{
     option:{
         dataPath:""
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init DataGrid
         */

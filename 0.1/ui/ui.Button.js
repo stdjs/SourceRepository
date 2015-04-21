@@ -5,6 +5,8 @@ Std.ui.module("Button",{
     nodeName:"a",
     /*[#module option:parent]*/
     parent:"widget",
+    /*[#module option:events]*/
+    events:"checked mousedown mouseup click press longpress focus blur",
     /*#module option:action]*/
     action:{
         content:"text"
@@ -26,8 +28,6 @@ Std.ui.module("Button",{
         iconWidth:18,
         iconHeight:18
     },
-    /*[#module option:events]*/
-    events:"checked mousedown mouseup click press longpress focus blur",
     /*[#module option:extend]*/
     extend:{
         /*
@@ -57,11 +57,11 @@ Std.ui.module("Button",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * button press
-         */
+        */
         press:function(){
             var that = this;
             var opts = that.opts;

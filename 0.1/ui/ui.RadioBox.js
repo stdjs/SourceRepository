@@ -18,8 +18,8 @@ Std.ui.module("RadioBox",{
     action:{
         content:"text"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         checked:false
     },
     /*[#module option:static]*/
@@ -92,8 +92,8 @@ Std.ui.module("RadioBox",{
             }
         })
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init events
         */

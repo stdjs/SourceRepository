@@ -36,13 +36,6 @@ Std.ui.module("ComboBox",{
     },
     /*[#module option:events]*/
     events:"open close select change focus blur dataSourceLoad",
-    /*[#module option:protected]*/
-    protected:{
-        listVisible:false,
-        currentMode:"",
-        currentItem:null,
-        selectedItem:null
-    },
     /*[#module option:action]*/
     action:{
         /*
@@ -75,6 +68,13 @@ Std.ui.module("ComboBox",{
 
             this.append(items);
         }
+    },
+    /*[#module option:private]*/
+    private:{
+        listVisible:false,
+        currentMode:"",
+        currentItem:null,
+        selectedItem:null
     },
     /*[#module option:extend]*/
     extend:{
@@ -132,8 +132,8 @@ Std.ui.module("ComboBox",{
             });
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * toggle list
         */

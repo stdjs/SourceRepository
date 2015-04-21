@@ -20,8 +20,8 @@ Std.model("ui.Edit",{
     },
     /*[#module option:events]*/
     events:"focus blur change",
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * input node name
         */
@@ -48,8 +48,8 @@ Std.model("ui.Edit",{
             }
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * init events
         */
@@ -324,8 +324,8 @@ Std.ui.module("LineEdit",{
         minHeight:12,
         defaultClass:"StdUI_LineEdit"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         inputNodeName:"input"
     },
     /*[#module option:extend]*/

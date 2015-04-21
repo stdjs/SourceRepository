@@ -20,6 +20,8 @@ Std.ui.module("Label",{
     parent:"widget",
     /*[#module option:nodeName]*/
     nodeName:"a",
+    /*[#module option:events]*/
+    events:"change",
     /*[#module option:action]*/
     action:{
         content:"value"
@@ -43,8 +45,6 @@ Std.ui.module("Label",{
         background:"",
         textFormat:"html"    //html,text
     },
-    /*[#module option:events]*/
-    events:"change",
     /*[#module option:public]*/
     public:{
         /*

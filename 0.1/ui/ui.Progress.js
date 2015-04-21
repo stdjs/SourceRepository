@@ -4,6 +4,8 @@
 Std.model("ui.Progress",{
     /*[#module option:parent]*/
     parent:"widget",
+    /*[#module option:events]*/
+    events:"finished change",
     /*[#module option:action]*/
     action:{
         content:"value"
@@ -18,8 +20,6 @@ Std.model("ui.Progress",{
         text:"%.2f%%",
         color:"blue"  //blue,red,black,green,gray
     },
-    /*[#module option:events]*/
-    events:"finished change",
     /*[#module option:extend]*/
     extend:{
         /*
@@ -50,8 +50,8 @@ Std.model("ui.Progress",{
             doms.texts.css({height:height,lineHeight:height});
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
         /*
          * update progress
          */
@@ -201,8 +201,8 @@ Std.ui.module("HProgress",{
         minWidth:35,
         minHeight:15
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         /*
          * direction
         */
@@ -223,7 +223,7 @@ Std.ui.module("VProgress",{
         minWidth:15
     },
     /*[#module option:private]*/
-    protected:{
+    private:{
         /*
          * direction
         */

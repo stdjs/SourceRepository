@@ -28,8 +28,8 @@ Std.ui.module("MessageBox",{
         defaultButton:"ok",
         informativeText:null
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         hasIcon:false,
         hasDetail:false,
         hasInformativeText:false
@@ -70,8 +70,12 @@ Std.ui.module("MessageBox",{
             Std.dom(window).off("keyup",that._keyupHandle);
         }
     },
-    /*[#module option:private]*/
-    private:{
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * input
+         */
+        input:null,
         /*
          * init keyboard
         */
@@ -155,10 +159,6 @@ Std.ui.module("MessageBox",{
     },
     /*[#module option:public]*/
     public:{
-        /*
-         * input
-        */
-        input:null,
         /*
          * message box title
         */
