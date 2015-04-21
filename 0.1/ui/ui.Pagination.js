@@ -404,14 +404,14 @@ Std.plugin.module("dataSourcePagination",{
         initDataGrid:function(){
             var that       = this;
             var opts       = that.opts;
-            var widget     = that.widget;
+            var owner      = that.owner;
             var pagination = that._pagination;
             var updateSize = function(){
-                widget[2].height(widget.height() - widget.opts.headerHeight - widget.boxSize.height - 1 - pagination.height());
+                owner[2].height(owner.height() - owner.opts.headerHeight - owner.boxSize.height - 1 - pagination.height());
             };
 
-            widget.on("resize",updateSize);
-            widget.on("dataSourceLoad",function(responseJSON){
+            owner.on("resize",updateSize);
+            owner.on("dataSourceLoad",function(responseJSON){
                 var data = Std.mold.dataPath(responseJSON,opts.dataPath);
 
                 Std.each("total pageSize pageCount pageRows page",function(i,type){
@@ -419,9 +419,9 @@ Std.plugin.module("dataSourcePagination",{
                 });
                 pagination.refreshPages().refreshText().refreshList();
             });
-            pagination.renderTo(widget)[0].css("borderTopColor",widget[0].css("borderTopColor"));
+            pagination.renderTo(owner)[0].css("borderTopColor",owner[0].css("borderTopColor"));
 
-            if(widget.renderState){
+            if(owner.renderState){
                 updateSize();
             }
             return that;
@@ -437,10 +437,10 @@ Std.plugin.module("dataSourcePagination",{
         }
     },
     /*[#module option:main]*/
-    main:function(that,opts,widget){
+    main:function(that,opts,owner){
         that._pagination = Std.ui("Pagination",opts);
 
-        switch(widget.ui){
+        switch(owner.ui){
             case "DataGrid":
                 that.initDataGrid();
                 break;

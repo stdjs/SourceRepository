@@ -1235,7 +1235,7 @@ Std.ui.module("DataGrid",function(){
             contextMenu:function(menu){
                 var that = this;
 
-                that.plugin("contextMenu",Std.extend({
+                that.plugin("ui.ContextMenu",Std.extend({
                     handle:that[2]
                 },menu));
 
