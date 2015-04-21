@@ -375,8 +375,8 @@ Std.ui.module("TextEdit",{
         minHeight:20,
         defaultClass:"StdUI_TextEdit"
     },
-    /*[#module option:protected]*/
-    protected:{
+    /*[#module option:private]*/
+    private:{
         inputNodeName:"textarea"
     },
     /*[#module option:extend]*/
