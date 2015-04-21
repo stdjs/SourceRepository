@@ -6,7 +6,7 @@ Std.source.response("StdJS",function(){
         return "ui/" + name + ".js";
     }
     function cryptoJS(name){
-        return "crypto/Std.crypto."+name+".js";
+        return "crypto/"+name+".js";
     }
     return {
         "ui.Canvas":JSFile_UI("ui.Canvas"),
@@ -174,7 +174,6 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.ImageCutter")
             ]
         },
-	
 	"ui.KindEditor":{
 	    files:[
 	       "ui/kindeditor/themes/default/default.css","ui/kindeditor/kindeditor-all-min.js","ui/kindeditor/kindeditor.js"
@@ -186,7 +185,7 @@ Std.source.response("StdJS",function(){
         "crypto.sha256":cryptoJS("sha256"),
         "crypto.base64":cryptoJS("base64"),
         "crypto.md5":cryptoJS("md5"),
-	    "crypto.md6":cryptoJS("md6"),
+	"crypto.md6":cryptoJS("md6"),
         "crypto.aes":{
             basics:[
                 "crypto.base64"
@@ -194,6 +193,8 @@ Std.source.response("StdJS",function(){
             files:[
                 cryptoJS("aes")
             ]
-        }
+        },
+	
+	"plugin.upload":"plugin/upload.js"
     };
 });
