@@ -135,6 +135,34 @@ Std.ui.module("ComboBox",{
     /*[#module option:protected]*/
     protected:{
         /*
+         * create item
+        */
+        createItem:function(data){
+            var that = this;
+            var opts = that.opts;
+            var item = null;
+
+            if(isString(data)){
+                item = Std.ui("ComboBoxItem",{
+                    text:data
+                });
+            }else if(isWidget(data)){
+                item = data;
+            }else if(isObject(data)){
+                if(!that.opts.template){
+                    item = Std.ui(data.ui || "ComboBoxItem",data);
+                }else{
+                    item = Std.ui("TemplateItem",{
+                        template:that.template(),
+                        data:data,
+                        textField:opts.textField,
+                        valueField:opts.valueField
+                    });
+                }
+            }
+            return item;
+        },
+        /*
          * toggle list
         */
         toggleList:function(){
@@ -627,29 +655,29 @@ Std.ui.module("ComboBox",{
             return that.emit("close");
         },
         /*
+         * insert item
+        */
+        insert:function(data,index){
+            var that = this;
+            var item = that.createItem(data);
+
+            if(isWidget(item)){
+                var items = that.items;
+
+                if(that.D.list){
+                    that.D.list.insertBefore(item,items[index]);
+                    item.render();
+                }
+                items.insert(item.parent(that),index);
+            }
+            return that;
+        },
+        /*
          * append item
         */
         append:Std.func(function(data){
             var that = this;
-            var opts = that.opts;
-            var item = null;
-
-            if(isString(data)){
-                item = Std.ui("ComboBoxItem",{text:data});
-            }else if(isWidget(data)){
-                item = data;
-            }else if(isObject(data)){
-                if(!that.opts.template){
-                    item = Std.ui(data.ui || "ComboBoxItem",data);
-                }else{
-                    item = Std.ui("TemplateItem",{
-                        template:that.template(),
-                        data:data,
-                        textField:opts.textField,
-                        valueField:opts.valueField
-                    });
-                }
-            }
+            var item = that.createItem(data);
 
             if(isWidget(item)){
                 if(that.D.list){
