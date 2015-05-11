@@ -63,12 +63,11 @@ Std.ui.module("Image",{
         */
         toBase64:function(gray){
             var that      = this;
-            var canvas    = document.createElement("canvas");
+            var canvas    = newDom("canvas").dom;
             var context   = canvas.getContext("2d");
 
             canvas.width  = that._image.width;
             canvas.height = that._image.height;
-
             context.drawImage(that._image,0,0);
 
             var imgPixels = context.getImageData(0,0,canvas.width,canvas.height);

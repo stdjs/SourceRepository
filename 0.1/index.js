@@ -10,7 +10,6 @@ Std.source.response("StdJS",function(){
     }
     return {
         "ui.Canvas":JSFile_UI("ui.Canvas"),
-        "ui.SVG":JSFile_UI("ui.SVG"),
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),

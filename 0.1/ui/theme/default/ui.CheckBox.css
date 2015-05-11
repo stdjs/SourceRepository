@@ -25,36 +25,31 @@
 /************* Checkbox Icon*************/
 .StdUI_CheckBox_Icon{
     float: left;
-    width:18px;
-    height: 18px;
-    box-shadow: 0 0 1px white inset;
-    background: url("images/StdUI_Global.png") -9px -248px no-repeat;
+    width:16px;
+    height: 16px;
+    background: url("images/StdUI_Global.png") -11px -249px no-repeat;
 }
 .StdUI_CheckBox.focus > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.focus{
-    background-position: -94px -248px;
+    background-position: -95px -249px;
 }
 .StdUI_CheckBox.hover > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.hover{
-    background-position: -179px -248px;
-}
-.StdUI_CheckBox.press > .StdUI_CheckBox_Icon,
-.StdUI_CheckBox_Icon.press{
-    box-shadow: none;
+    background-position: -180px -249px;
 }
 .StdUI_CheckBox.checked > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.checked{
-    background-position: -269px -247px;
+    background-position: -270px -248px;
 }
 .StdUI_CheckBox.checked.hover > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.checked.hover{
-    background-position: -361px -247px;
+    background-position: -362px -248px;
 }
 .StdUI_CheckBox.disabled > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.disabled{
-    background-position: -543px -247px;
+    background-position: -544px -249px;
 }
 .StdUI_CheckBox.disabled.checked > .StdUI_CheckBox_Icon,
 .StdUI_CheckBox_Icon.disabled.checked{
-    background-position: -452px -247px;
+    background-position: -453px -249px;
 }

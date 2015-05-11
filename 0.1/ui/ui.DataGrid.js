@@ -2,6 +2,11 @@
  * data grid widget module
 */
 Std.ui.module("DataGrid",function(){
+    var $rowNumbers   = "rowNumbers";
+    var $rowCheckable = "rowCheckable";
+    var $mouseenter   = "mouseenter";
+    var $selected     = "selected";
+
     return {
         /*[#module option:parent]*/
         parent:"widget",
@@ -25,6 +30,7 @@ Std.ui.module("DataGrid",function(){
             rowEditable:false,
             rowNumbers:false,
             rowCheckable:false,
+            rowCheckboxWidth:40,
             rowCollapsible:false,
             cellPadding:3,
             cellEditable:false,
@@ -53,6 +59,10 @@ Std.ui.module("DataGrid",function(){
              */
             columnCount:0,
             /*
+             * row numbers width
+            */
+            rowNumbersWidth:0,
+            /*
              * selected column
              */
             selectedColumn:null,
@@ -73,8 +83,8 @@ Std.ui.module("DataGrid",function(){
              */
             columnPositions:null,
             /*
-             * lastRowBlock
-             */
+             * last row block
+            */
             lastRowBlock:null,
             /*
              * sort handle
@@ -83,7 +93,15 @@ Std.ui.module("DataGrid",function(){
             /*
              * widgets
              */
-            cellWidgets:null
+            cellWidgets:null,
+            /*
+             * startAt
+            */
+            startAt:0,
+            /*
+             * checkbox init
+            */
+            checkboxInit:false
         },
         /*[#module option:extend]*/
         extend:{
@@ -92,7 +110,6 @@ Std.ui.module("DataGrid",function(){
              */
             render:function(){
                 var that = this;
-                var opts = that.opts;
 
                 that.updateRowBlocks();
                 that.repaint();
@@ -172,9 +189,11 @@ Std.ui.module("DataGrid",function(){
                 that._columnPositions = [];
 
                 for(var i=0,length=that._columns.length,lastColumnEndPos=0;i<length;i++){
+                    var column = that._columns[i];
+
                     that._columnPositions.push({
                         begin:lastColumnEndPos,
-                        end  :lastColumnEndPos = (isNumber(that._columns[i].width) ? lastColumnEndPos+that._columns[i].width : lastColumnEndPos+opts.columnWidth)
+                        end  :lastColumnEndPos = (isNumber(column.width) ? lastColumnEndPos + column.width : lastColumnEndPos+opts.columnWidth)
                     });
                 }
                 return that._columnPositions;
@@ -216,7 +235,7 @@ Std.ui.module("DataGrid",function(){
                 };
                 Std.dom(document).on("mousemove",mousemove).once("mouseup",function(e){
                     var width = resizer.outerWidth();
-                    var index = column.index();
+                    var index = column.index() - that._startAt;
 
                     this.off("mousemove",mousemove);
 
@@ -252,14 +271,14 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * init column drop event
-             */
+            */
             initColumnDropEvent:function(columnElement){
                 var that        = this;
                 var opts        = that.opts;
                 var startX      = 0;
                 var startY      = 0;
                 var columnWidth = 0;
-                var columnIndex = columnElement.index();
+                var columnIndex = columnElement.index() - that._startAt;
                 var offset      = columnElement.offset();
                 var movestart   = false;
                 var moveHandle  = null;
@@ -274,6 +293,8 @@ Std.ui.module("DataGrid",function(){
                     startY      = offset.y - e.pageY - 1;
                     headOffset  = that[1].offset();
                     columnWidth = columnElement.outerWidth();
+
+                    headOffset.x += Std.dom(that._columns[0].element).position().x;
                     that.emit("columnDropStart",[e.pageX,e.pageY],true);
                 };
                 var inRange    = function(e){
@@ -350,13 +371,52 @@ Std.ui.module("DataGrid",function(){
                 });
             },
             /*
+             * init checkbox
+            */
+            initCheckbox:function(){
+                var that = this;
+
+                that.D.columns.on($mouseenter,"._defColumn._rowCheckbox>._checkbox",function(e){
+                    var checkbox = this.mouse({auto:false, click:function(){
+                        var checked = !checkbox.hasClass("checked");
+                        for(var i=0,length=that._rows.length;i<length;i++){
+                            that._rows[i].checked = checked;
+                        }
+                        checkbox.toggleClass("checked",checked);
+                        that.refresh();
+                    }},e);
+                });
+
+                that[2].on($mouseenter,"._block>._row>._defCell._rowCheckbox>._checkbox",function(e){
+                    var checkbox   = this;
+                    var cell       = checkbox.parent();
+                    var rowElement = cell.parent();
+                    var rowIndex   = that.computeRowIndexByCell(cell);
+                    var rowData    = that._rows[rowIndex];
+
+                    checkbox.mouse({auto:false, click:function(){
+                        checkbox.toggleClass("checked", rowData.checked = !rowData.checked);
+                        if(that.selectionMode() === "checkedRows"){
+                            if(rowData.checked){
+                                that.selectRow(rowIndex,cell.parent());
+                            }else{
+                                rowElement.removeClass($selected);
+                                delete that._selectedRow[rowIndex];
+                            }
+                        }
+                    }},e);
+                });
+                that._checkboxInit = true;
+                return that;
+            },
+            /*
              * init header events
-             */
+            */
             initHeaderEvents:function(){
                 var that       = this;
                 var opts       = that.opts;
                 var mouseenter = function(e){
-                    var columnIndex = this.index();
+                    var columnIndex = this.index() - that._startAt;
                     this.mouse({
                         auto:false,
                         dblclick:function(){
@@ -373,12 +433,14 @@ Std.ui.module("DataGrid",function(){
                             }
                             if(selectionMode === "column"){
                                 that.clearSelected(selectionMode);
-                                that.selectColumn(this.index());
+                                that.selectColumn(columnIndex);
                             }
                         },
                         click:function(){
+                            if(columnIndex < 0){
+                                return;
+                            }
                             var sortType = that._columns[columnIndex].sortType;
-
                             switch(sortType){
                                 case "asc":
                                     sortType = "desc";
@@ -396,7 +458,7 @@ Std.ui.module("DataGrid",function(){
                         }
                     },e);
                 };
-                that.D.columns.on("mouseenter","._column",mouseenter).delegate("mouseenter","._column > ._resizeHandle",function(e){
+                that.D.columns.on($mouseenter,"._column",mouseenter).delegate($mouseenter,"._column > ._resizeHandle",function(e){
                     if(!that.enable()){
                         return;
                     }
@@ -413,22 +475,23 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * init cell events
-             */
+            */
             initCellEvents:function(){
                 var that        = this;
                 var opts        = that.opts;
                 var selectCells = function(cellPosition){
-                    if(!this.hasClass("selected")){
+                    if(!this.hasClass($selected)){
                         that.selectCell(cellPosition,this);
                     }else if(cellPosition in that._selectedCell){
-                        this.removeClass("selected");
+                        this.removeClass($selected);
                         delete that._selectedCell[cellPosition];
                     }
                 };
-                that[2].delegate("mouseenter","._block > ._row > ._cell",function(e){
+                that[2].delegate($mouseenter,"._block > ._row > ._cell",function(e){
                     if(!that.enable()){
                         return;
                     }
+                    var row             = null;
                     var startCellIndex  = -1;
                     var startRowIndex   = -1;
                     var startBlockIndex = -1;
@@ -441,9 +504,11 @@ Std.ui.module("DataGrid",function(){
                             that.emit("cellClick",cellPosition);
                         },
                         dblclick:function(e){
-                            if(opts.cellEditable && that.column(this.index()).type !== "widget"){
-                                that.editCell(this,function(text){
-                                    that.updateCellByIndex(that.queryRowByIndex(startRowIndex),startCellIndex,text);
+                            var columnType = that.column(startCellIndex).type;
+                            if(startCellIndex >= 0 && opts.cellEditable && that.column(startCellIndex).type !== "widget"){
+                                var rowData = that.queryRowByIndex(startBlockIndex * 10 + startRowIndex);
+                                that.editCell(this,columnType,that.queryCellByIndex(rowData,startCellIndex),function(text){
+                                    that.updateCellByIndex(rowData,startCellIndex,text);
                                     that.emit("cellChange",[cellPosition,text],true);
                                     that.refresh();
                                 });
@@ -452,9 +517,10 @@ Std.ui.module("DataGrid",function(){
                             e.preventDefault();
                         },
                         down:function(e){
-                            startCellIndex  = cell.index();
-                            startRowIndex   = cell.parent().index();
-                            startBlockIndex = cell.parent("._block").index();
+                            row             = cell.parent();
+                            startCellIndex  = cell.index() - that._startAt;
+                            startRowIndex   = row.index();
+                            startBlockIndex = row.parent().index();
                             cellPosition    = sprintf("%d:%d",startBlockIndex * 10 + startRowIndex,startCellIndex);
 
                             if(selectionMode === "cells" && e.ctrlKey){
@@ -479,18 +545,18 @@ Std.ui.module("DataGrid",function(){
                 var that       = this;
                 var opts       = that.opts;
                 var selectRows = function(rowPosition){
-                    if(!this.hasClass("selected")){
+                    if(!this.hasClass($selected)){
                         that.selectRow(rowPosition,this);
                     }else{
                         var index = that.rowIndex(rowPosition);
                         if(that._selectedRow[index]){
-                            this.removeClass("selected");
+                            this.removeClass($selected);
                             delete that._selectedRow[index];
                         }
                     }
                 };
 
-                that[2].delegate("mouseenter","._block > ._row",function(e){
+                that[2].delegate($mouseenter,"._block > ._row",function(e){
                     if(!that.enable()){
                         return;
                     }
@@ -579,6 +645,8 @@ Std.ui.module("DataGrid",function(){
                 var offsetLeft = headOffset.x - 6 + index + (index === that._columns.length ? that._columnPositions[index - 1].end : that._columnPositions[index].begin);
                 var zIndex     = Std.ui.status.zIndex + 1;
 
+                offsetLeft += that._columns[0].element.position().x;
+
                 that.hideColumnDropPosition();
                 that.D.columnPos1 = newDiv("StdUI_DataGrid_ColumnPosition _top").appendTo("body").css({
                     top:headOffset.y - 12,
@@ -608,13 +676,20 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * create row html
-             */
+            */
             createRowHtml:function(row,cell){
+                var opts         = this.opts;
                 var html         = "";
                 var rowHtml      = "";
                 var rowClass     = "_row";
-                var rowClass_odd = rowClass + (this.opts.stripeRows ? " _odd" : "");
+                var rowClass_odd = rowClass + (opts.stripeRows ? " _odd" : "");
 
+                if(opts.rowNumbers){
+                    rowHtml += "<div class='_defCell _rowNumber'></div>";
+                }
+                if(opts.rowCheckable){
+                    rowHtml += "<div class='_defCell _rowCheckbox'></div>";
+                }
                 for(var i=0;i<cell;i++){
                     rowHtml += "<div class='_cell _cell"+i+"'></div>";
                 }
@@ -628,10 +703,13 @@ Std.ui.module("DataGrid",function(){
             */
             paintCell:function(column,element,data,rowData,cellIndex){
                 var that = this;
+                var opts = that.opts;
 
                 switch(column.type){
                     case "template":
-                        element.innerHTML = !isObject(data) ? data : column.template.render(data);
+                        element.innerHTML =  column.template.render(
+                            !isObject(data) ? {value:data} : data
+                        );
                         break;
                     case null:
                     case "text":
@@ -648,8 +726,8 @@ Std.ui.module("DataGrid",function(){
                     case "widget":
                         if(Std.ui.exist(column.ui)){
                             var widget = Std.ui(column.ui,Std.extend({
-                                width:(column.width || this.opts.columnWidth) - this.opts.cellPadding * 2,
-                                height:this.opts.rowHeight - this.opts.cellPadding * 2,
+                                width:(column.width || opts.columnWidth) - opts.cellPadding * 2,
+                                height:opts.rowHeight - opts.cellPadding * 2,
                                 value:data
                             },column.option));
 
@@ -671,6 +749,7 @@ Std.ui.module("DataGrid",function(){
             */
             paintRow:function(rowIndex,blockID,rowElement,rowData){
                 var that     = this;
+                var opts     = that.opts;
                 var cells    = [];
                 var columns  = that._columns;
                 var rowCells = rowData.cells;
@@ -689,24 +768,44 @@ Std.ui.module("DataGrid",function(){
                     }
                     columns  = columnsArray;
                     rowCells = cellsArray;
-
                 }
+                var children = rowElement.childNodes;
 
-                for(var y=0,children=rowElement.childNodes,cellCount=children.length;y<cellCount;y++){
+                if(opts.rowNumbers){
+                    children[0].innerHTML = rowIndex + 1;
+                }
+                if(opts.rowCheckable){
+                    children[1].appendChild(
+                        newDiv("_checkbox" + (rowData.checked ? " checked" : "")).dom
+                    );
+                    if(rowData.checked && that.selectionMode() === "checkedRows"){
+                        that.selectRow(rowIndex,Std.dom(rowElement));
+                    }
+                }
+                for(var y=0,cellCount=children.length;y<cellCount;y++){
                     if(!rowData || rowCells[y] == undefined){
                         continue;
                     }
-                    cells[y] = that.paintCell(columns[y],children[y],rowCells[y],rowData,y);
+                    cells[y] = that.paintCell(columns[y],children[that._startAt + y],rowCells[y],rowData,y);
                 }
                 return {row:rowElement,cells:cells,blockID:blockID};
             },
             /*
              * edit cell
             */
-            editCell:function(cell,callback){
+            editCell:function(cell,columnType,cellData,callback){
                 var that     = this;
                 var position = cell.position();
-                var input    = newDom("input","_input").value(cell.text()).on({
+                var text     = cell.text();
+
+                if(columnType === "template"){
+                    if(isString(cellData) || isNumber(cellData)){
+                        text = cellData;
+                    }else if(isObject(cellData) && "value" in cellData){
+                        text = cellData.value;
+                    }
+                }
+                var input    = newDom("input","_input").value(text).on({
                     blur:function(){
                         var value = this.value();
                         input.remove();
@@ -723,7 +822,6 @@ Std.ui.module("DataGrid",function(){
                     outerWidth  : cell.outerWidth(),
                     outerHeight : cell.outerHeight()
                 });
-
                 setTimeout(input.focus.bind(
                     input.lineHeight(input.height())
                 ),10);
@@ -778,13 +876,12 @@ Std.ui.module("DataGrid",function(){
                 var that         = this;
                 var rowSelector  = "._block > ._row";
                 var selectedRows = {};
-
-                var mouseenter = function(e){
+                var mouseenter   = function(e){
                     Std.each(selectedRows,function(i,row){
                         if(i in that._selectedRow){
                             delete that._selectedRow[i];
                         }
-                        row.removeClass("selected");
+                        row.removeClass($selected);
                         delete selectedRows[i];
                     });
 
@@ -822,9 +919,8 @@ Std.ui.module("DataGrid",function(){
                             selectedRows[i*10 + y] = rows[y];
                         }
                     }
-
                     Std.each(selectedRows,function(i,row){
-                        row.addClass("selected");
+                        row.addClass($selected);
                     });
                 };
 
@@ -832,10 +928,9 @@ Std.ui.module("DataGrid",function(){
                     Std.each(selectedRows,function(i,row){
                         that.selectRow(~~i,row);
                     });
-                    that[2].off("mouseenter",rowSelector,mouseenter);
+                    that[2].off($mouseenter,rowSelector,mouseenter);
                 });
-
-                that[2].delegate("mouseenter",rowSelector,mouseenter);
+                that[2].delegate($mouseenter,rowSelector,mouseenter);
 
                 return that;
             },
@@ -852,7 +947,7 @@ Std.ui.module("DataGrid",function(){
                         if(i in that._selectedCell){
                             delete that._selectedCell[i];
                         }
-                        cell.removeClass("selected");
+                        cell.removeClass($selected);
                         delete selectedCells[i];
                     });
 
@@ -904,7 +999,7 @@ Std.ui.module("DataGrid",function(){
                         }
                     }
                     Std.each(selectedCells,function(i,cell){
-                        cell.addClass("selected");
+                        cell.addClass($selected);
                     });
                 };
 
@@ -912,9 +1007,9 @@ Std.ui.module("DataGrid",function(){
                     Std.each(selectedCells,function(i,row){
                         that.selectCell(i,row);
                     });
-                    that[2].off("mouseenter",cellSelector,mouseenter);
+                    that[2].off($mouseenter,cellSelector,mouseenter);
                 });
-                that[2].delegate("mouseenter",cellSelector,mouseenter);
+                that[2].delegate($mouseenter,cellSelector,mouseenter);
 
                 return that;
             },
@@ -953,27 +1048,33 @@ Std.ui.module("DataGrid",function(){
              * update style
             */
             updateStyle:function(){
-                var that        = this;
-                var opts        = that.opts;
-                var CSSData     = {};
-                var bodyWidth   = 0;
-                var gridWidth   = that.width() - that.boxSize.width;
-                var rowHeight   = opts.rowHeight - 1;
-                var blockHeight = (rowHeight + 1) * 10 + "px";
-                var cellHeight  = rowHeight - opts.cellPadding * 2;
-                var columnData  = {
+                var that            = this;
+                var opts            = that.opts;
+                var CSSData         = {};
+                var bodyWidth       = 0;
+                var gridWidth       = that.width() - that.boxSize.width;
+                var rowHeight       = opts.rowHeight - 1;
+                var blockHeight     = (rowHeight + 1) * 10 + "px";
+                var cellHeight      = rowHeight - opts.cellPadding * 2;
+                var columnWidth     = opts.columnWidth;
+                var headerHeight    = opts.headerHeight;
+                var rowNumbersWidth = that._rowNumbersWidth;
+                var columnData      = {
+                    "._defColumn":{
+                        height:headerHeight - 1 + "px"
+                    },
                     "._column":{
                         textAlign:opts.columnTextAlign,
-                        height:opts.headerHeight - 1 + "px",
-                        lineHeight:opts.headerHeight - 1 + "px",
+                        height:headerHeight - 1 + "px",
+                        lineHeight:headerHeight - 1 + "px",
                         '>':{
                             "._sortType":{
-                                marginTop:(opts.headerHeight - 7) / 2 + "px"
+                                marginTop:(headerHeight - 7) / 2 + "px"
                             }
                         }
                     }
                 };
-                var cellData    = {
+                var cellData        = {
                     "._cell":{
                         padding:opts.cellPadding + "px",
                         height:cellHeight + "px",
@@ -981,21 +1082,42 @@ Std.ui.module("DataGrid",function(){
                         textAlign:opts.cellTextAlign
                     }
                 };
+                if(opts.rowNumbers){
+                    cellData["._defCell._rowNumber"] = {
+                        height:opts.rowHeight + "px",
+                        width:rowNumbersWidth + 1 + "px"
+                    };
+                    columnData["._defColumn._rowNumbers"] = {
+                        height:headerHeight + "px",
+                        width:rowNumbersWidth + "px"
+                    };
+                    bodyWidth += rowNumbersWidth + 2;
+                }
+                if(opts.rowCheckable){
+                    cellData["._defCell._rowCheckbox"] = {
+                        height:opts.rowHeight + "px",
+                        width:opts.rowCheckboxWidth + 1 + "px"
+                    };
+                    columnData["._defColumn._rowCheckbox"] = {
+                        width:opts.rowCheckboxWidth + "px"
+                    };
+                    bodyWidth += opts.rowCheckboxWidth + 2;
+                }
 
                 for(var i=0,length=that._columnCount;i<length;i++){
                     var column = that._columns[i];
-                    var width  = (column.width || opts.columnWidth) - 1 + "px";
+                    var width  = (column.width || columnWidth) - 1 + "px";
 
                     columnData["._column" + i] = {
                         width:width
                     };
                     cellData["._cell" + i] = {
-                        width:(column.width || opts.columnWidth) - opts.cellPadding * 2 + "px"
+                        width:(column.width || columnWidth) - opts.cellPadding * 2 + "px"
                     };
-                    bodyWidth += (column.width || opts.columnWidth) + 1;
+                    bodyWidth += (column.width || columnWidth) + 1;
                 }
 
-                if(bodyWidth < gridWidth){
+                if(bodyWidth <= gridWidth){
                     bodyWidth = "100%";
                 }else{
                     bodyWidth += "px";
@@ -1220,6 +1342,14 @@ Std.ui.module("DataGrid",function(){
                 return pos;
             },
             /*
+             * computeRowIndexByCell
+            */
+            computeRowIndexByCell:function(cellElement){
+                var row = cellElement.parent();
+
+                return row.parent().index() * 10 + row.index();
+            },
+            /*
              * header visible
             */
             headerVisible:function(state){
@@ -1242,14 +1372,6 @@ Std.ui.module("DataGrid",function(){
                 return that;
             },
             /*
-             * row checkable
-            */
-            rowCheckable:function(){
-                var that = this;
-
-                return that;
-            },
-            /*
              * stripe rows
              */
             stripeRows:function(state){
@@ -1258,19 +1380,62 @@ Std.ui.module("DataGrid",function(){
                 });
             },
             /*
-             * row numbers
-             */
-            rowNumbers:function(state){
-                var that = this;
-                var doms = that.D;
+             * row checkable
+            */
+            rowCheckable:function(state){
+                var that       = this;
+                var defColumns = that._defColumns;
 
-                return that.opt("rowNumbers",state,function(){
-                    that.renderState && that.updateStyle();
+                return that.opt($rowCheckable,state,function(){
+                    if(state == true && !defColumns[$rowCheckable]){
+                        var checkboxColumn = defColumns[$rowCheckable] = newDiv("_defColumn _rowCheckbox").append(
+                            newDiv("_checkbox")
+                        );
+                        if(!that._checkboxInit){
+                            that.initCheckbox();
+                        }
+                        if(that.rowNumbers()){
+                            that.D.columns.insertAfter(checkboxColumn,defColumns[$rowNumbers]);
+                        }else{
+                            that.D.columns.prepend(checkboxColumn);
+                        }
+                        that._startAt++;
+                    }else if(state == false && $rowCheckable in defColumns){
+                        if(defColumns[$rowCheckable]){
+                            defColumns[$rowCheckable].remove();
+                        }
+                        delete defColumns[$rowCheckable];
+                        that._startAt--;
+                    }
+                    that.renderState && that.refresh();
+                });
+            },
+            /*
+             * row numbers
+            */
+            rowNumbers:function(state){
+                var that       = this;
+                var defColumns = that._defColumns;
+
+                return that.opt($rowNumbers,state,function(){
+                    if(state == true && !defColumns[$rowNumbers]){
+                        that.D.columns.prepend(
+                            defColumns[$rowNumbers] = newDiv("_defColumn _rowNumbers")
+                        );
+                        that._startAt++;
+                    }else if(state == false && $rowNumbers in defColumns){
+                        if(defColumns[$rowNumbers]){
+                            defColumns[$rowNumbers].remove();
+                        }
+                        that._startAt--;
+                        delete defColumns[$rowNumbers];
+                    }
+                    that.renderState && that.refresh();
                 });
             },
             /*
              * select row
-             */
+            */
             selectRow:function(pos,row){
                 var that        = this;
                 var rowIndex    = -1;
@@ -1293,7 +1458,7 @@ Std.ui.module("DataGrid",function(){
                     row = that._rowBlocks[Math.floor(rowIndex / 10)].children(rowIndex % 10);
                 }
                 if(row && !(rowIndex in selectedRow)){
-                    selectedRow[rowIndex] = row.addClass("selected");
+                    selectedRow[rowIndex] = row.addClass($selected);
                 }
                 return that;
             },
@@ -1342,7 +1507,7 @@ Std.ui.module("DataGrid",function(){
                     cell = row.children(cellIndex[1]);
                 }
                 if(cell && !(index in selectedCell)){
-                    selectedCell[index] = cell.addClass("selected");
+                    selectedCell[index] = cell.addClass($selected);
                 }
                 return that;
             },
@@ -1369,7 +1534,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * select column
-             */
+            */
             selectColumn:function(index){
                 var that           = this;
                 var columns        = that._columns;
@@ -1377,7 +1542,7 @@ Std.ui.module("DataGrid",function(){
 
                 if(!(index in selectedColumn)){
                     selectedColumn[index] = columns[index];
-                    selectedColumn[index].element.addClass("selected");
+                    selectedColumn[index].element.addClass($selected);
                 }
                 return that;
             },
@@ -1558,11 +1723,11 @@ Std.ui.module("DataGrid",function(){
              * insert column
             */
             insertColumn:function(column,index){
-                var that     = this;
-                var text     = "";
-                var name     = "";
-                var element  = newDiv("_column _column" + that._columnCount);
-                var columns  = that._columns;
+                var that    = this;
+                var text    = "";
+                var name    = "";
+                var element = newDiv("_column _column" + that._columnCount);
+                var columns = that._columns;
 
                 if(isString(column)){
                     text = column;
@@ -1660,7 +1825,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * refresh column class
-             */
+            */
             resetColumnClass:function(startIndex){
                 var that    = this;
                 var columns = that._columns;
@@ -1672,7 +1837,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * reload
-             */
+            */
             reload:function(data){
                 var that       = this;
                 var opts       = that.opts;
@@ -1695,7 +1860,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * repaint
-             */
+            */
             repaint:function(){
                 var that        = this;
                 var opts        = that.opts;
@@ -1703,6 +1868,7 @@ Std.ui.module("DataGrid",function(){
                 var blockHeight = opts.rowHeight * 10;
                 var beginBlock  = Math.floor(scrollTop / blockHeight);
                 var blockNumber = Math.ceil((that.height() - that.boxSize.height - opts.headerHeight - 1) / blockHeight  + (scrollTop / blockHeight % 1));
+                var lastRowNum  = 0;
 
                 for(var i=0;i<blockNumber;i++){
                     var blockID = beginBlock + i;
@@ -1711,15 +1877,22 @@ Std.ui.module("DataGrid",function(){
                     if(!block || block.childNodes.length !== 0){
                         continue;
                     }
-
                     var rowCount  = block === that._lastRowBlock ? that._rowCount - blockID * 10 : 10;
                     var blockHtml = that.createRowHtml(rowCount,that._columnCount);
                     var fragment  = Std.dom.fragment(blockHtml);
 
                     for(var y=0,rows=fragment.childNodes,length=rows.length;y<length;y++){
-                        that.paintRow(blockID * 10 + y,blockID,rows[y],that._rows[blockID * 10 + y]);
+                        that.paintRow(blockID * 10 + y,blockID,rows[y],that._rows[lastRowNum = blockID * 10 + y]);
                     }
                     block.appendChild(fragment);
+                }
+
+                if(opts.rowNumbers){
+                    var tester = newDom("span","_tester").html(that._rowCount).appendTo(that);
+                    if((that._rowNumbersWidth = tester.width() + 10) < 30){
+                        that._rowNumbersWidth = 30;
+                    }
+                    tester.remove();
                 }
                 return that.initCellWidgets();
             },
@@ -1747,19 +1920,19 @@ Std.ui.module("DataGrid",function(){
                         break;
                     case "column":
                         Std.each(that._selectedColumn,function(i,column){
-                            column.element.removeClass("selected");
+                            column.element.removeClass($selected);
                             delete that._selectedColumn[i];
                         });
                         break;
                     case "row":
                         Std.each(that._selectedRow,function(i,row){
-                            row.removeClass("selected");
+                            row.removeClass($selected);
                             delete that._selectedRow[i];
                         });
                         break;
                     case "cell":
                         Std.each(that._selectedCell,function(i,cell){
-                            cell.removeClass("selected");
+                            cell.removeClass($selected);
                             delete that._selectedCell[i];
                         });
                         break;
@@ -1846,8 +2019,8 @@ Std.ui.module("DataGrid",function(){
             clearRowBlocks:function(){
                 var that = this;
 
-                that._rowBlocks.clear();
                 that._lastRowBlock = null;
+                that._rowBlocks.clear();
                 that.clearSelected();
                 that[2].clear();
 
@@ -1858,7 +2031,7 @@ Std.ui.module("DataGrid",function(){
         main:function(that,opts,dom){
             that.addClass("StdUI_" + that.objectName);
             that.D               = {};
-            that._CSSStyle        = new Std.css;
+            that._CSSStyle       = new Std.css;
             that._rows           = [];
             that._columns        = [];
             that._rowBlocks      = [];
@@ -1866,12 +2039,14 @@ Std.ui.module("DataGrid",function(){
             that._selectedRow    = {};
             that._selectedCell   = {};
             that._cellWidgets    = [];
+            that._defColumns     = {};
 
             that.initHeader();
             that.initBody();
             that.initEvents();
             that.call_opts({
                 rowNumbers:false,
+                rowCheckable:false,
                 dataSource:null
             },true);
 

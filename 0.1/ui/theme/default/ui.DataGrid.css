@@ -42,7 +42,8 @@
 }
 
 /******* header > columns > column********/
-.StdUI_DataGrid > ._header > ._columns > ._column{
+.StdUI_DataGrid > ._header > ._columns > ._column,
+.StdUI_DataGrid > ._header > ._columns > ._defColumn{
     float: left;
     position: relative;
     overflow: hidden;
@@ -134,7 +135,8 @@
 }
 
 /******* body > row > cells > cell ********/
-.StdUI_DataGrid > ._body > ._block > ._row > ._cell{
+.StdUI_DataGrid > ._body > ._block > ._row > ._cell,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell{
     float: left;
     cursor: default;
     position: relative;
@@ -150,6 +152,17 @@
 .StdUI_DataGrid > ._body > ._block > ._row > ._cell.selected{
     color: white;
     background-color: #43ace8;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowNumber,
+.StdUI_DataGrid > ._tester{
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    border-right-color: #C8C8C8;
+    background-color: #DDDDDD;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox{
+
 }
 
 /******* body > header,body > input********/
@@ -179,3 +192,37 @@
     background-position: -30px -394px;
 }
 
+/******* grid checkbox *******/
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox{
+    width: 16px;
+    height: 16px;
+    margin: 7px auto;
+    box-shadow: 0 0 1px white inset;
+    background: url("images/StdUI_Global.png") -11px -249px no-repeat;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.hover,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.hover{
+    background-position: -180px -249px;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.press,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.press{
+    box-shadow: none;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.checked,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.checked{
+    background-position: -270px -248px;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.checked.hover,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.checked.hover{
+    background-position: -362px -248px;
+}
+
+.StdUI_DataGrid > ._body > ._block > ._row.selected > ._defCell._rowCheckbox > ._checkbox{
+    background-color: white;
+    background-position: -544px -249px;
+}
+.StdUI_DataGrid > ._body > ._block > ._row.selected > ._defCell._rowCheckbox > ._checkbox.checked{
+    background-color: white;
+    background-position: -453px -249px;
+}
