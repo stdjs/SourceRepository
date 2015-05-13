@@ -60,10 +60,10 @@
 }
 
 .StdUI_Button.checked,
-.StdUI_Button.focus.checked
-{
+.StdUI_Button.focus.checked{
     background: #2183B0;
     color: #F3F3F3;
+    border-color: #2699CE;
 }
 .StdUI_Button.checked.hover{
 
@@ -72,8 +72,7 @@
     background: #1D769F;
 }
 
-
-/*********  buttonBox **********/
+/********* buttonBox **********/
 .StdUI_Button > ._buttonBox{
     overflow: hidden;
     word-break: keep-all;

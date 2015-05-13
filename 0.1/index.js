@@ -13,7 +13,10 @@ Std.source.response("StdJS",function(){
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),
-        "ui.ToolTip":JSFile_UI("ui.ToolTip"),	    
+        "ui.ToolTip":[
+            CSSFile_UI("ui.ToolTip"),
+            JSFile_UI("ui.ToolTip")
+        ],
         "ui.CheckBox":[
             CSSFile_UI("ui.CheckBox"),
             JSFile_UI("ui.CheckBox")

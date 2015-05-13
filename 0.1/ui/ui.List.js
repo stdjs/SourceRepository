@@ -56,10 +56,12 @@ Std.ui.module("List",{
     option:{
         defaultClass:"StdUI_List",
         level:4,
+        type:"default",         //default,block
         value:null,
         items:null,
         template:null,
         itemHeight:24,
+        itemWidth:80,
         iconWidth:16,
         iconHeight:16,
         selectionMode:"single" //single,multi,none
@@ -100,7 +102,6 @@ Std.ui.module("List",{
                     items.remove(index);
                 }
             }
-            return that;
         },{
             each:[isArray]
         })
@@ -125,39 +126,104 @@ Std.ui.module("List",{
          * init List Item events
         */
         initItemEvents:function(){
-            var that = this;
-
-            //-------- select
-            var selectItem = function(item,index){
-                var selectionMode = that.opts.selectionMode;
-
-                if(selectionMode === "single"){
-                    that.select(index);
-                }else if(selectionMode === "multi"){
-                    item._selected ? that.clearSelect(item) : that.select(item);
+            var that   = this;
+            var select = function(index,item){
+                switch(that.opts.selectionMode){
+                    case "single":
+                        that.select(index);
+                        break;
+                    case "multi":
+                        item._selected ? that.clearSelect(item) : that.select(item);
+                        break;
                 }
             };
-
-            //-------- mouse enter
             that[0].delegate("mouseenter",".StdUI_ListItem,.StdUI_TemplateItem",function(e){
                 var index = this.index();
                 var item  = that.items[index];
 
                 item[0].mouse({
                     auto:false,
-                    down:function(e){
-                        selectItem(item,index);
-                    },
                     click:function(){
                         that.emit("itemClick",item);
+                    },
+                    down:function(){
+                        select(index,item);
                     }
                 },e);
             });
             return that;
+        },
+        /*
+         * create item
+        */
+        createItem:function(data){
+            var that   = this;
+            var opts   = that.opts;
+            var UIName = "ListItem";
+            var option = {
+                height:opts.itemHeight,
+                iconWidth:opts.iconWidth,
+                iconHeight:opts.iconHeight
+            };
+
+            if(isWidget(data)){
+                return data;
+            }
+            if(opts.template){
+                UIName = "TemplateItem";
+                Std.extend(option,{
+                    data:data,
+                    template:that.template(),
+                    textField:opts.textField,
+                    valueField:opts.valueField
+                });
+            }else if(isString(data)){
+                option.text = data;
+            }else if(isObject(data)){
+                if(isString(data.ui)){
+                    UIName = data.ui;
+                }
+                option = Std.extend(option,data);
+            }
+            if(option !== null){
+                if(opts.type == "block"){
+                    option.width = opts.itemWidth;
+                }
+                return Std.ui(UIName,option);
+            }
+            return null;
         }
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * type
+        */
+        type:function(type){
+            return this.opt("type",type,function(){
+                this[0].toggleClass("_block",type === "block");
+            });
+        },
+        /*
+         * item width
+        */
+        itemWidth:function(width){
+            return this.opt("itemWidth",width,function(){
+                Std.each(this.items,function(i,item){
+                    item.width(width);
+                });
+            });
+        },
+        /*
+         * item height
+        */
+        itemHeight:function(height){
+            return this.opt("itemHeight",height,function(){
+                Std.each(this.items,function(i,item){
+                    item.height(height);
+                });
+            });
+        },
         /*
          * template
         */
@@ -188,12 +254,9 @@ Std.ui.module("List",{
             if(selectionMode === "none"){
                 return;
             }
-            //----- if data is widget
             if(isWidget(index)){
                 that.select(items.indexOf(index));
-            }
-            //----- if data is number
-            else if(isNumber(index)){
+            }else if(isNumber(index) && index !== -1){
                 var selectItem = items[index];
 
                 if(!selectItem || selectItem._selected){
@@ -202,7 +265,8 @@ Std.ui.module("List",{
                     that.clearSelect();
                 }
 
-                selectItem.addClass("selected")._selected = true;
+                selectItem.addClass("selected");
+                selectItem._selected = true;
 
                 that.selectedItems.push(selectItem);
                 that.emit("select",[index,selectItem],true);
@@ -214,49 +278,41 @@ Std.ui.module("List",{
          * append item
         */
         append:Std.func(function(data){
-            var that  = this;
-            var opts  = that.opts;
-            var item  = null;
-            var addon = {
-                iconWidth:opts.iconWidth,
-                iconHeight:opts.iconHeight
-            };
-            if(opts.itemHeight){
-                addon.height = opts.itemHeight;
-            }
+            var that = this;
+            var item = that.createItem(data);
 
-            if(isString(data)){
-                item = Std.ui("ListItem",{
-                    text:data,
-                    height:opts.itemHeight,
-                    iconWidth:opts.iconWidth,
-                    iconHeight:opts.iconHeight
-                });
-            }else if(isWidget(data)){
-                item = data;
-            }else if(isObject(data)){
-                if(!that.opts.template){
-                    data.height     = opts.itemHeight;
-                    data.iconWidth  = opts.iconWidth;
-                    data.iconHeight = opts.iconHeight;
-                    item = Std.ui(data.ui || "ListItem",data);
-                }else{
-                    item = Std.ui("TemplateItem",{
-                        template:that.template(),
-                        data:data,
-                        textField:opts.textField,
-                        valueField:opts.valueField
-                    });
-                }
-            }
-
-            if(isWidget(item) && item !== null){
+            if(item !== null && isWidget(item)){
                 that.items.push(item);
                 that.renderState && item.renderTo(that[0]);
             }
         },{
             each:[isArray]
         }),
+        /*
+         * clear select
+        */
+        clearSelect:function(data){
+            var that          = this;
+            var selectedItems = that.selectedItems;
+
+            if(data === undefined){
+                for(var i=0,length=selectedItems.length;i<length;i++){
+                    selectedItems[i].removeClass("selected");
+                    selectedItems[i]._selected = false;
+                }
+                selectedItems.clear();
+            }else if(isNumber(data) && data !== -1){
+                var selectedItem = selectedItems[data];
+                if(selectedItem && selectedItem._selected){
+                    selectedItem.removeClass("selected");
+                    selectedItem._selected = false;
+                    selectedItems.remove(data);
+                }
+            }else if(isWidget(data)){
+                that.clearSelect(selectedItems.indexOf(data));
+            }
+            return that;
+        },
         /*
          * clear items
         */
@@ -271,39 +327,18 @@ Std.ui.module("List",{
             that.selectedItems.clear();
 
             return that;
-        },
-        /*
-         * clear select
-        */
-        clearSelect:function(data){
-            var that          = this;
-            var selectedItems = that.selectedItems;
-
-            if(data === undefined){
-                for(var i=0,length=selectedItems.length;i<length;i++){
-                    selectedItems[i].removeClass("selected")._selected = false;
-                }
-                selectedItems.clear();
-            }else if(isNumber(data)){
-                var selectedItem = selectedItems[data];
-                if(selectedItem && selectedItem._selected){
-                    selectedItem.removeClass("selected")._selected = false;
-                    selectedItems.remove(data);
-                }
-            }else if(isWidget(data)){
-                that.clearSelect(selectedItems.indexOf(data));
-            }
-            return that;
         }
     },
     /*[#module option:main]*/
-    main:function(that,opts,dom){
+    main:function(that,opts){
         that.items         = [];
         that.selectedItems = [];
 
-        if(opts.template !== null){
-            that.template(opts.template);
-        }
+        that.call_opts({
+            type:"default",
+            template:null
+        },true);
+
         if(opts.items){
             that.append(opts.items);
         }

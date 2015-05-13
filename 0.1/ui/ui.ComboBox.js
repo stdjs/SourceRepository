@@ -32,7 +32,8 @@ Std.ui.module("ComboBox",{
         valueMode : "text",  //text,index,item
         textField : "text",
         valueField: "value",
-        dataSource:null
+        dataSource: null,
+        suggest: false
     },
     /*[#module option:events]*/
     events:"open close select change focus blur dataSourceLoad",
@@ -149,7 +150,7 @@ Std.ui.module("ComboBox",{
             }else if(isWidget(data)){
                 item = data;
             }else if(isObject(data)){
-                if(!that.opts.template){
+                if(!opts.template){
                     item = Std.ui(data.ui || "ComboBoxItem",data);
                 }else{
                     item = Std.ui("TemplateItem",{
@@ -268,6 +269,11 @@ Std.ui.module("ComboBox",{
                 }else if(keyCode === 40){
                     that.value(++index >= items.length ? items[0] : items[index]);
                     that.focus();
+                }
+                if(e.target.nodeName === "INPUT"){
+                    if(that.opts.suggest){
+
+                    }
                 }
             });
             return that;

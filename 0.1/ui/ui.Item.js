@@ -23,11 +23,11 @@ Std.ui.module("Item",{
     },
     /*[#module option:extend]*/
     extend:{
+        /*
+         * before render
+        */
         beforeRender:function(){
-            var that = this;
-
-            //------init default option
-            that.call_opts({
+            this.call_opts({
                 icon:null,
                 iconClass:null,
                 text:"",
@@ -50,7 +50,6 @@ Std.ui.module("Item",{
             }else{
                 icon.appendTo(that[0]);
             }
-
             return that.call_opts({
                 iconWidth:null,
                 iconHeight:null
@@ -77,6 +76,20 @@ Std.ui.module("Item",{
 
             return that.opt("iconHeight",height,function(){
                 that.D.icon && that.D.icon.height(height);
+            });
+        },
+        /*
+         * icon class name
+        */
+        iconClass:function(className){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("iconClass",className,function(){
+                if(!doms.icon){
+                    that.initIcon();
+                }
+                doms.icon.className("_icon " + className);
             });
         },
         /*
@@ -108,32 +121,15 @@ Std.ui.module("Item",{
                 }
                 doms.iconImg.attr("src",icon);
             });
-        },
-        /*
-         * icon class name
-        */
-        iconClass:function(className){
-            var that = this;
-            var doms = that.D;
-
-            return that.opt("iconClass",className,function(){
-                if(!doms.icon){
-                    that.initIcon();
-                }
-                doms.icon.className("_icon " + className);
-            });
         }
     },
     /*[#module option:main]*/
     main:function(that,opts,dom){
         that.D = {};
 
-        //------
-        if(isFunction(opts.click)){
-            dom.on("click",function(){
-                that.enable() && opts.click.call(that);
-            })
-        }
+        isFunction(opts.click) && dom.on("click",function(){
+            that.enable() && opts.click.call(that);
+        });
     }
 });
 
@@ -201,16 +197,22 @@ Std.ui.module("TemplateItem",{
             var that = this;
             var opts = that.opts;
 
-            return that.opt("data",data,function(){
-                var template = that.template();
+            if(data === undefined){
+                return opts.data;
+            }
+            var template = that.template();
 
-                if(isObject(template)){
-                    template.renderTo(that,data);
-                    that.emit("templateRender");
-                }
-                that.text(data[opts.textField]);
-                that.value(data[opts.valueField]);
-            });
+            if(isString(data) || isNumber(data)){
+                data = {value:data};
+            }
+            if(isObject(template)){
+                template.renderTo(that,data);
+                that.emit("templateRender");
+            }
+            that.text(data[opts.textField]);
+            that.value(data[opts.valueField]);
+            opts.data = data;
+            return that;
         }
     },
     /*[#module option:main]*/
@@ -220,11 +222,8 @@ Std.ui.module("TemplateItem",{
         if(opts.template){
             that.template(opts.template);
         }
-        //------
-        if(isFunction(opts.click)){
-            dom.on("click",function(){
-                that.enable() && opts.click.call(that);
-            })
-        }
+        isFunction(opts.click) && dom.on("click",function(){
+            that.enable() && opts.click.call(that);
+        });
     }
 });

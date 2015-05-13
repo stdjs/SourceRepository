@@ -200,7 +200,7 @@ Std.ui.module("SwitchBox",{
         })
     },
     /*#module option:main]*/
-    main:function(that,opts,dom){
+    main:function(that,opts){
         that.items = [];
         that.initEvents();
 
