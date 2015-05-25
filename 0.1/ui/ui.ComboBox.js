@@ -85,6 +85,7 @@ Std.ui.module("ComboBox",{
         render:function(){
             var that = this;
 
+            that.initEvents();
             that.call_opts({
                 value:null
             },true);
@@ -715,7 +716,6 @@ Std.ui.module("ComboBox",{
         that.items = [];
 
         that.inputMode(opts.inputMode);
-        that.initEvents();
         that.initHandle();
         that.call_opts("dataSource",true);
 

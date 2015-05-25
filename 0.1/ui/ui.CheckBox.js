@@ -22,6 +22,15 @@ Std.ui.module("CheckBox",{
     private:{
         checked:false
     },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+         */
+        render:function(){
+            this.initEvents();
+        }
+    },
     /*[#module option:protected]*/
     protected:{
         /*
@@ -102,6 +111,5 @@ Std.ui.module("CheckBox",{
         ]);
 
         that.call_opts(["text","value"]);
-        that.initEvents();
     }
 });

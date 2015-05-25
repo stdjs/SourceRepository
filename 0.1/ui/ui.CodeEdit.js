@@ -17,6 +17,15 @@ Std.ui.module("CodeEdit",{
         defaultClass:"StdUI_CodeEdit",
         value:""
     },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            this.initEvents();
+        }
+    },
     /*[#module option:protected]*/
     protected:{
         /*
@@ -53,8 +62,6 @@ Std.ui.module("CodeEdit",{
         if(opts.value){
             that.value(opts.value);
         }
-
         dom.contentEditable(true);
-        that.initEvents();
     }
 });

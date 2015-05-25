@@ -1,1 +1,33 @@
- 
+
+/********** menu bar **********/
+.StdUI_MenuBar{
+    position: relative;
+    font-size: 13px;
+    overflow: hidden;
+    outline: none;
+}
+.StdUI_MenuBar > ._items{
+    width: 99999px;
+    height: 100%;
+}
+.StdUI_MenuBar > ._items > ._item{
+    float: left;
+    height: 100%;
+    padding: 0 10px 0 10px;
+    border: 1px solid transparent;
+    cursor: default;
+}
+.StdUI_MenuBar > ._items > ._item.hover{
+    background: #6ED6FF;
+}
+.StdUI_MenuBar > ._items > ._item.selected,
+.StdUI_MenuBar > ._items > ._item.press{
+    background: #43ace8;
+    color: white;
+}
+.StdUI_MenuBar > ._items > ._item > ._icon{
+    float: left;
+}
+.StdUI_MenuBar > ._items > ._item > ._text{
+    float: left;
+}

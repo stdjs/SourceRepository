@@ -97,8 +97,11 @@
 .StdUI_Panel > ._body{
     overflow: hidden;
 }
+.StdUI_Panel > ._body > .StdUI_MenuBar{
+    padding: 0 3px 0 3px;
+}
 .StdUI_Panel > ._body > .StdUI_ToolBar{
-    padding: 0 2px 0 2px;
+    padding: 0 3px 0 3px;
 }
 .StdUI_Panel > ._body > ._client{
     font-size: 12px;

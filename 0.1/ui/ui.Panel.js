@@ -51,6 +51,9 @@ Std.ui.module("Panel",{
         render:function(){
             var that = this;
 
+            if(that._menuBar){
+                that._menuBar.render();
+            }
             if(that._toolBar){
                 that._toolBar.render();
             }
@@ -85,6 +88,7 @@ Std.ui.module("Panel",{
             var that = this;
 
             that._central.remove();
+            that._menuBar && that._menuBar.remove();
             that._toolBar && that._toolBar.remove();
         }
     },
@@ -319,7 +323,19 @@ Std.ui.module("Panel",{
          * menu bar
          */
         menuBar:function(data){
+            var that = this;
 
+            if(data === undefined){
+                return that._menuBar || null;
+            }
+            if(isWidget(data)){
+                that._menuBar = data;
+            }else if(isObject(data)){
+                that._menuBar = Std.ui("MenuBar",data);
+            }
+            that.D.body.prepend(that._menuBar);
+
+            return that;
         },
         /*
          * tool bar
@@ -333,7 +349,7 @@ Std.ui.module("Panel",{
             if(isWidget(data)){
                 that._toolBar = data;
             }else if(isObject(data)){
-                that._toolBar = Std.ui.create("ToolBar",data);
+                that._toolBar = Std.ui("ToolBar",data);
             }
             that.D.body.insertBefore(that._toolBar,that.D.Client);
 

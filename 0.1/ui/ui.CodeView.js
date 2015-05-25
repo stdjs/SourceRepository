@@ -18,6 +18,9 @@ Std.ui.module("CodeView",{
     },
     /*[#module option:protected]*/
     protected:{
+        /*
+         * init events
+        */
         initEvents:function(){
 
         }

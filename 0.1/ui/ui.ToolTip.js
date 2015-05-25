@@ -10,6 +10,7 @@ Std.ui.module("ToolTip",{
         defaultClass:"StdUI_ToolTip",
         value:null,
         renderTo:"body",
+        align:"center",
         position:"top",  //top,right,bottom,left
         x:0,
         y:0,
@@ -19,7 +20,7 @@ Std.ui.module("ToolTip",{
         selector:null,
         target:null,
         tabIndex:null,
-        padding:10
+        padding:12
     },
     /*#module option:extend]*/
     extend:{
@@ -35,6 +36,7 @@ Std.ui.module("ToolTip",{
          * render
         */
         render:function(){
+            this.initEvents();
             this.call_opts({selector:null},true);
             this[0].css("zIndex",Std.ui.status.zIndex+1);
         }
@@ -146,6 +148,14 @@ Std.ui.module("ToolTip",{
             });
         },
         /*
+         * align
+        */
+        align:function(align){
+            return this.opt("align",align,function(){
+                this.renderState && this.relocate();
+            });
+        },
+        /*
          * position
         */
         position:function(position){
@@ -233,7 +243,6 @@ Std.ui.module("ToolTip",{
             that[1] = newDiv("_client"),
             that[2] = newDiv("_pointer")
         ]);
-        that.initEvents();
         that.call_opts(["x","y","padding","position"]);
     }
 });
@@ -244,15 +253,12 @@ Std.ui.module("ToolTip",{
 Std.plugin.module("ToolTip",{
     /*[#module option:option]*/
     option:{
+        triggerMode:"mouseenter",
         timeout:200,
-        iframe:null,
-        html:null,
-        url:null,
         delegate:null,
         width:"auto",
         height:"auto",
-        position:"top",  //top,right,bottom,left,auto
-        className:""
+        position:"top"  //top,right,bottom,left,auto
     },
     /*[#module option:protected]*/
     protected:{
@@ -260,21 +266,21 @@ Std.plugin.module("ToolTip",{
          * create widget
         */
         createWidget:function(){
-            var that = this;
-            var opts = that.opts;
-
-            that._tooltip = Std.ui("ToolTip",{
-                renderTo:"body",
-                className:opts.className,
-                position:opts.position,
-                width:opts.width,
-                height:opts.height,
+            var that   = this;
+            var opts   = that.opts;
+            var option = {
                 on:{
                     load:function(data){
                         that.emit("load",data);
                     }
                 }
+            };
+            Std.each("className position width height padding renderTo url html iframe selector",function(i,name){
+                if(name in opts){
+                    option[name] = opts[name];
+                }
             });
+            that._tooltip = Std.ui("ToolTip",option);
             return that;
         },
         /*
@@ -285,14 +291,7 @@ Std.plugin.module("ToolTip",{
             var opts = that.opts;
 
             if(!that._tooltip){
-                that.createWidget().call_opts({
-                    url:null,
-                    html:null,
-                    iframe:null,
-                    selector:null
-                },true);
-
-                that._tooltip[0].mouse({
+                that.createWidget()._tooltip[0].mouse({
                     enter:function(){
                         that.clearTimer();
                     },
@@ -416,9 +415,9 @@ Std.plugin.module("ToolTip",{
         };
 
         if(isString(opts.delegate)){
-            Std.dom(owner).on("mouseenter",opts.delegate,mouseevent);
+            Std.dom(owner).on(opts.triggerMode,opts.delegate,mouseevent);
         }else{
-            Std.dom(owner).on("mouseenter",mouseevent);
+            Std.dom(owner).on(opts.triggerMode,mouseevent);
         }
     }
 });

@@ -1,111 +1,128 @@
-
-
-/************* Tree *************/
+/********* Data Tree *********/
 .StdUI_Tree{
-    overflow: auto;
     font-size: 12px;
+    overflow: auto;
+    outline: none;
 }
-.StdUI_Tree > ._treeBody{
-    padding: 4px;
-    position: relative;
-    z-index: 0;
-}
-
-/************* Tree Item *************/
-.StdUI_TreeItem > ._itemNode{
-    cursor: default;
-    padding: 1px 0 1px 0;
-    white-space: nowrap;
-}
-.StdUI_TreeItem > ._itemNode._expanded > ._nodeExpander{
-    background-position: -21px -1px;
-}
-.StdUI_TreeItem > ._itemNode._expanded > ._nodeExpander.hover{
-    background-position: -77px 1px;
-}
-.StdUI_TreeItem > ._itemNode._expanded > ._itemFrame > ._nodeIcon._defaultIcon._folder{
-    background-position: -4px -65px;
-}
-.StdUI_TreeItem > ._itemNode > ._nodeExpander{
-    display: inline-block;
-    vertical-align:top;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    background-image: url("images/StdUI_Tree.png");
-    background-repeat: no-repeat;
-    background-position: 3px -1px;
-}
-.StdUI_TreeItem > ._itemNode > ._nodeExpander._none{
-    background-image: none;
-}
-.StdUI_TreeItem > ._itemNode > ._nodeExpander.hover{
-    background-position: -49px 1px;
-}
-.StdUI_TreeItem > ._itemNode > .StdUI_CheckIcon{
-    float: none;
+/*
+ * anchor
+*/
+.StdUI_Tree a._anchor{
+    display: inline-block;*display: inline;*zoom: 1;
     vertical-align: middle;
-    margin-right: 3px;
-    cursor: pointer;
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
-}
-.StdUI_TreeItem > ._itemNode > ._itemFrame{
+    color: #2B2B2B;
+    padding: 1px 3px 1px 3px;
     border: 1px solid transparent;
-    border-radius: 2px;
-    height: 16px;
-    padding: 2px 4px 2px 1px;
-    color: #222222;
-    text-decoration: none;
+    transition: border-color,background 0.3s;
 }
-.StdUI_TreeItem > ._itemNode.hover > ._itemFrame{
-    background-color: #EEEEEE;
-    border-color: #D9D9D9;
+.StdUI_Tree a._anchor.hover{
+    background: #B3D5E5;
+    border-color: #B3D5E5;
 }
-.StdUI_TreeItem > ._itemNode.selected > ._itemFrame{
-    background-color: #FCE9BB;
-    border-color: #FCC56F;
+.StdUI_Tree a._anchor.selected{
+    color: white;
+    background: #43ACE8;
+    border-color: #43ACE8;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeIcon{
+/*
+ * hand
+*/
+.StdUI_Tree i._hand{
+    display: inline-block;*display: inline;*zoom: 1;
+    vertical-align: middle;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    background: url("images/StdUI_Tree.png") 0 -2px no-repeat;
+}
+.StdUI_Tree i._loading{
+    background: url("images/loading_12.gif") no-repeat;
+}
+.StdUI_Tree i._hand._empty{
+    background: none;
+}
+.StdUI_Tree i._hand.hover{
+    background-position: -52px -2px;
+}
+.StdUI_Tree i._hand._expanded{
+    background-position: -24px -2px;
+}
+.StdUI_Tree i._hand._expanded.hover{
+    background-position: -80px -2px;
+}
+/*
+ * checkbox
+*/
+.StdUI_Tree i._checkbox{
+    display: inline-block;*display: inline;*zoom: 1;
+    vertical-align: middle;
     width:16px;
     height: 16px;
-    padding-right: 2px;
-    vertical-align: middle;
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
+    background: url("images/StdUI_Global.png") -11px -249px no-repeat;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeIcon._defaultIcon{
+.StdUI_Tree i._checkbox.hover{
+    background-position: -180px -249px;
+}
+.StdUI_Tree i._checkbox.checked{
+    background-position: -270px -248px;
+}
+.StdUI_Tree i._checkbox.checked.hover{
+    background-position: -362px -248px;
+}
+.StdUI_Tree a._anchor.selected > i._checkbox{
+    background-position: -544px -249px;
+}
+.StdUI_Tree a._anchor.selected > i._checkbox.checked{
+    background-position: -453px -249px;
+}
+/*
+ * icon
+*/
+.StdUI_Tree i._icon{
+    display: inline-block;*display: inline;*zoom: 1;
+    vertical-align: middle;
+    position: relative;
+    margin-right: 2px;
+}
+.StdUI_Tree i._icon._defaultIcon{
     background: url("images/StdUI_Tree.png") no-repeat;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeIcon._defaultIcon._folder{
-    background-position: -3px -31px;
+.StdUI_Tree i._icon._defaultIcon._folder{
+    background-position: -1px -29px;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeIcon._defaultIcon._file{
-    background-position: -78px -28px;
+.StdUI_Tree i._icon._defaultIcon._file{
+    background-position: -76px -26px;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeIcon > img{
+.StdUI_Tree i._icon > img{
     float: left;
-    width:16px;
-    height: 16px;
+    width: 100%;
+    height: 100%;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeText{
-    vertical-align: middle;
-    height: 16px;
-    line-height: 16px;
+/*
+ * text
+*/
+.StdUI_Tree a._anchor > span{
+    overflow: hidden;
 }
-.StdUI_TreeItem > ._itemNode > ._itemFrame  > ._nodeTextEdit{
-    border: 0;
+/*
+ * container
+*/
+.StdUI_Tree ul._container_ul{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.StdUI_Tree li._container_li{
+    margin: 0;
+    list-style: none;
+    word-break:keep-all;
+    white-space:nowrap;
+}
+/*
+ * input
+*/
+.StdUI_Tree input._input{
+    border: 1px solid transparent;
     margin: 0;
     padding: 0;
-    background: none;
-    vertical-align: middle;
-    height: 16px;
-    line-height: 16px;
-}
-.StdUI_TreeItem > ._childrenNode{
-    display: none;
-    clear: both;
-    margin-left: 16px;
 }

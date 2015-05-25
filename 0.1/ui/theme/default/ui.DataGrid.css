@@ -107,6 +107,7 @@
     color: #5E5E5E;
     overflow: hidden;
     border-bottom: 1px solid #DADADA;
+    transition: background 0.15s;
 }
 .StdUI_DataGrid > ._body > ._block >._row._odd{
     background-color: #F1F1F1;

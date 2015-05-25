@@ -27,7 +27,7 @@ Std.ui.module("Window",{
         minimize:false,
         maximize:false,
         title:"Window",
-        closeMethod:"hide",
+        closeAction:"remove",
         renderTo:"body"
     },
     /*[#module option:private]*/
@@ -294,7 +294,7 @@ Std.ui.module("Window",{
         */
         close:function(){
             var that   = this;
-            var method = that.opts.closeMethod;
+            var method = that.opts.closeAction;
 
             if(method in that){
                 that[method]();

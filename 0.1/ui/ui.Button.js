@@ -31,6 +31,13 @@ Std.ui.module("Button",{
     /*[#module option:extend]*/
     extend:{
         /*
+         * render
+        */
+        render:function(){
+            this.initEvents();
+            this.initMouse();
+        },
+        /*
          * extend width
         */
         width:function(n){
@@ -355,8 +362,6 @@ Std.ui.module("Button",{
         that.D = {};
 
         that.styleType(opts.styleType);
-        that.initEvents();
-        that.initMouse();
     }
 });
 

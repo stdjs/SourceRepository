@@ -35,7 +35,7 @@
     overflow: hidden;
     color: #5A5A5A;
     border: 1px solid transparent;
-    transition: background 0.12s,border-color 0.12s;
+    transition: background 0.15s,border-color 0.15s;
 }
 .StdUI_List > .StdUI_ListItem.hover{
     background: #D6EBF6;
@@ -60,7 +60,7 @@
 .StdUI_List > .StdUI_TemplateItem{
     clear: both;
     cursor: pointer;
-    transition: background 0.12s,border-color 0.12s;
+    transition: background 0.15s,border-color 0.15s;
 }
 .StdUI_List > .StdUI_TemplateItem.hover{
     background: #D6EBF6;

@@ -13,7 +13,8 @@ Std.ui.module("MenuItem",{
     option:{
         defaultClass:"StdUI_MenuItem",
         text:"menu item",
-        items:null
+        items:null,
+        root:null
     },
     /*[#module option:private]*/
     private:{
@@ -45,6 +46,19 @@ Std.ui.module("MenuItem",{
     /*[#module option:public]*/
     public:{
         /*
+         * root
+         */
+        root:function(root){
+            var that = this;
+            var opts = that.opts;
+
+            if(root === undefined){
+                return opts.root || that;
+            }
+            opts.root = root;
+            return that;
+        },
+        /*
          * append
         */
         append:function(data){
@@ -54,13 +68,14 @@ Std.ui.module("MenuItem",{
             if(that.menu){
                 that.menu.append(data);
             }else{
-                !that.items && (that.items = []);
+                if(!that.items){
+                    that.items = [];
+                }
                 that.items.push(data);
             }
             if(!doms.open){
                 doms.open = newDiv("_open").appendTo(that[0]);
             }
-
             return that;
         },
         /*
@@ -77,6 +92,7 @@ Std.ui.module("MenuItem",{
                 that.menu = Std.ui("Menu",{
                     parent:that,
                     items:that.items,
+                    root:that.root(),
                     renderTo:"body"
                 });
             }
@@ -90,30 +106,30 @@ Std.ui.module("MenuItem",{
                 top:offset.y,
                 opacity:0,
                 margin:0
-            }).animate({
-                to:{
-                    opacity:1
-                }
-            },100);
+            }).animate({to:{opacity:1}},100);
 
             return that;
         },
         /*
          * hide child menu
         */
-        hideChild:function(){
+        hideChild:function(useAnimate){
             var that = this;
 
             if(!that.menu){
                 return that;
             }
-            that.menu[0].animate({
-                to:{
-                    opacity:0
-                }
-            },100,function(){
-                that.menu.visible(that._childVisible = false)
-            });
+            if(useAnimate === false){
+                that.menu.visible(that._childVisible = false);
+            }else{
+                that.menu[0].animate({
+                    to:{
+                        opacity:0
+                    }
+                },100,function(){
+                    that.menu.visible(that._childVisible = false);
+                });
+            }
             return that;
         },
         /*
@@ -145,11 +161,9 @@ Std.ui.module("MenuItem",{
         if(opts.items){
             that.items = opts.items;
         }
-        //------
         if(!doms.icon){
             that.initIcon();
         }
-        //------
         if(!doms.text){
             dom.append(doms.text = newDiv("_text"));
         }
@@ -170,7 +184,8 @@ Std.ui.module("Menu",{
         level:1,
         width:"auto",
         height:"auto",
-        items:null
+        items:null,
+        root:null
     },
     /*[#module option:private]*/
     private:{
@@ -212,13 +227,9 @@ Std.ui.module("Menu",{
                 items.each(function(i,item){
                     item.remove();
                 });
-            }
-            //------data is number
-            else if(isNumber(data)){
+            }else if(isNumber(data)){
                 items[data] && items[data].remove() && items.remove(data);
-            }
-            //------data is widget
-            else if(isWidget(data)){
+            }else if(isWidget(data)){
                 var index = items.indexOf(data);
                 if(index !== -1){
                     items[index] && items[index].remove() && items.remove(index);
@@ -235,24 +246,32 @@ Std.ui.module("Menu",{
             var that   = this;
             var jump   = 0;
             var items  = that.items;
+            var parent = that.parent();
             var check  = function(item){
                 return !item.enable() || item.ui !== "MenuItem";
             };
 
             //-----enter key
             if(keyCode === 13){
-                that.emit("itemPress",currentItem.emit("press"));
+                that.root().emit("itemPress",currentItem.emit("press"));
             }
             //-----esc key
             else if(keyCode === 27){
-                //currentItem.hideChild();
+                if(isWidget(parent)){
+                    that.hide();
+                    if(parent.ui === "MenuItem"){
+                        parent.parent().focus();
+                    }else{
+                        parent.focus();
+                    }
+                }
             }
             //-----left key
             else if(keyCode === 37){
-                var parent = that.parent();
                 currentItem.hideChild();
                 if(parent && parent.ui === "MenuItem"){
                     parent.focus().hideChild();
+                    parent.parent().focus();
                 }
             }
             //-----up key
@@ -290,15 +309,16 @@ Std.ui.module("Menu",{
             var that = this;
 
             that[0].on({
+                contextmenu:Std.func(false),
                 keydown:function(e){
-                    var currentItem  = that._currentItem;
-                    var index        = that.items.indexOf(currentItem);
+                    var currentItem = that._currentItem;
+                    var index       = that.items.indexOf(currentItem);
+
                     if(index == -1){
                         return;
                     }
                     that.keyEvent(e.keyCode,currentItem,index);
-                },
-                contextmenu:Std.func(false)
+                }
             });
             return that;
         },
@@ -309,22 +329,22 @@ Std.ui.module("Menu",{
             var that  = this;
             var state = false;
 
-            that[0].delegate("mouseenter mouseleave click",".StdUI_MenuItem",function(e){
+            that[0].delegate("mouseenter mouseleave mousedown click",".StdUI_MenuItem",function(e){
                 var item      = that.items[this.index()];
                 var eventName = e.name;
 
-                //------- menu first mouse enter
                 if(state === false){
                     that[0].unselect(state = true);
                 }
-                //------- disabled or sep
                 if(!item.enable() || item.ui === "sep"){
                     return;
                 }
 
                 //-------events
                 if(eventName === "click"){
-                    that.emit("itemPress",item.emit("press"));
+                    that.root().emit("itemPress",item.emit("press"));
+                }else if(eventName === "mousedown"){
+                    e.stopPropagation();
                 }else if(eventName == "mouseenter"){
                     that.select(item);
                 }else if(eventName == "mouseleave" && !item.childVisible()){
@@ -338,33 +358,40 @@ Std.ui.module("Menu",{
     /*[#module option:public]*/
     public:{
         /*
+         * root
+        */
+        root:function(root){
+            var that = this;
+            var opts = that.opts;
+
+            if(root === undefined){
+                return opts.root || that;
+            }
+            opts.root = root;
+            return that;
+        },
+        /*
          * select
         */
         select:function(item){
             var that = this;
 
-            //------item is current item
             if(item === that._currentItem){
                 return that;
             }
-            //------if current item is not undefined
             if(that._currentItem){
-                that._currentItem.removeClass("selected").hideChild();
+                that._currentItem.removeClass("selected").hideChild(false);
                 that._currentItem = null;
             }
-            //------if item is false
             if(item === false){
                 return that;
             }
-            //------if item is number
             if(isNumber(item)){
                 item = that.items[item];
             }
-            //------if item is not widget,MenuItem,or disabled
             if(!isWidget(item) || item.ui !== "MenuItem" || !item.enable()){
                 return that;
             }
-            //------
             if((that._currentItem = item.addClass("selected")).D.open){
                 item.showChild();
             }
@@ -376,28 +403,30 @@ Std.ui.module("Menu",{
         append:Std.func(function(data){
             var that = this;
             var item = null;
+            var root = that.root();
 
             //------if data is string
             if(isString(data)){
-                item = Std.ui("MenuItem",{text:data});
-            }
-            //------if data is widget
-            else if(isWidget(data)){
+                item = Std.ui("MenuItem",{
+                    text:data,
+                    root:root
+                });
+            }else if(isWidget(data)){
                 item = data;
-            }
-            //------if data is object
-            else if(isObject(data)){
+            }else if(isObject(data)){
+                data.root = root;
                 item = Std.ui(data.ui || "MenuItem",data);
             }
-
-            //------menu has been render
+            if(!isWidget(item)){
+                return;
+            }
+            //------menu has been rendered
             if(that.renderState){
                 item.renderTo(that[0]);
             }else{
-                item.appendTo(that[0])
+                item.appendTo(that[0]);
             }
-
-            that.items.push(item);
+            that.items.push(item.parent(that));
         },{
             each:[isArray]
         })

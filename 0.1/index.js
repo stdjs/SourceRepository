@@ -13,6 +13,7 @@ Std.source.response("StdJS",function(){
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),
+        "ui.Splitter":JSFile_UI("ui.Splitter"),
         "ui.ToolTip":[
             CSSFile_UI("ui.ToolTip"),
             JSFile_UI("ui.ToolTip")
@@ -80,6 +81,10 @@ Std.source.response("StdJS",function(){
         "ui.MenuBar":[
             CSSFile_UI("ui.MenuBar"),
             JSFile_UI("ui.MenuBar")
+        ],
+        "ui.PathBar":[
+            CSSFile_UI("ui.PathBar"),
+            JSFile_UI("ui.PathBar")
         ],
         "ui.ComboBox":{
             basics:"ui.Item",
@@ -159,6 +164,10 @@ Std.source.response("StdJS",function(){
         "ui.DataGrid":[
             CSSFile_UI("ui.DataGrid"),
             JSFile_UI("ui.DataGrid")
+        ],
+        "ui.TreeGrid":[
+            CSSFile_UI("ui.TreeGrid"),
+            JSFile_UI("ui.TreeGrid")
         ],
         "ui.PropertyGird":[
             CSSFile_UI("ui.PropertyGrid"),

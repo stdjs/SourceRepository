@@ -114,6 +114,7 @@ Std.ui.module("DataGrid",function(){
                 that.updateRowBlocks();
                 that.repaint();
                 that.updateStyle();
+                that.initEvents();
                 that.call_opts({
                     contextMenu:null
                 },true);
@@ -2043,7 +2044,6 @@ Std.ui.module("DataGrid",function(){
 
             that.initHeader();
             that.initBody();
-            that.initEvents();
             that.call_opts({
                 rowNumbers:false,
                 rowCheckable:false,
