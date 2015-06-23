@@ -32,9 +32,10 @@ Std.ui.module("Image",{
         level:1,
         width:22,
         height:22,
-        gray:false,
+        type:"stretch", //stretch,repeat
         value:"",
-        zoom:true
+        zoom:true,
+        gray:false
     },
     /*[#module option:public]*/
     public:{
@@ -61,7 +62,7 @@ Std.ui.module("Image",{
         /*
          * to base64
         */
-        toBase64:function(gray){
+        toBase64:function(){
             var that      = this;
             var canvas    = newDom("canvas").dom;
             var context   = canvas.getContext("2d");
@@ -72,18 +73,6 @@ Std.ui.module("Image",{
 
             var imgPixels = context.getImageData(0,0,canvas.width,canvas.height);
 
-            if(gray === true){
-                for(var y=0;y<imgPixels.height;y++){
-                    for(var x=0;x<imgPixels.width;x++){
-                        var i   = (y * 4) * imgPixels.width + x * 4;
-                        var avg = (imgPixels.data[i] + imgPixels.data[i + 1] + imgPixels.data[i + 2]) / 3;
-
-                        imgPixels.data[i]     = avg;
-                        imgPixels.data[i + 1] = avg;
-                        imgPixels.data[i + 2] = avg;
-                    }
-                }
-            }
             context.putImageData(imgPixels,0,0,0,0,imgPixels.width,imgPixels.height);
 
             return canvas.toDataURL();
@@ -121,10 +110,14 @@ Std.ui.module("Image",{
 
                 if(isEmpty(imageSrc) || that._image === null){
                     return;
-                }else if(typeof(Worker) !== "function"){
+                }
+                if(state === false){
+                    return;
+                }
+                if(!Std.is.ie()){
                     that[0].css("filter",state ? "progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)" : "");
                 }else{
-                    that.D.img.attr("src",state ? that.toBase64(true) : imageSrc);
+                    that[0].css("filter","grayscale(100%)");
                 }
                 that.emit("gray",state);
             });

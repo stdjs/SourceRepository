@@ -27,8 +27,8 @@ Std.ui.module("Window",{
         minimize:false,
         maximize:false,
         title:"Window",
-        closeAction:"remove",
-        renderTo:"body"
+        renderTo:"body",
+        closeAction:"remove"
     },
     /*[#module option:private]*/
     private:{
@@ -124,11 +124,15 @@ Std.ui.module("Window",{
          * init window event
         */
         initWindowEvent:function(){
-            var that      = this;
-            var windowObj = Std.dom(window);
+            var that         = this;
+            var offsetParent = that[0].offsetParent();
 
-            windowObj.on("resize",that._windowResize = function(){
-                that.rect(0,0,windowObj.width(),windowObj.height());
+            if(offsetParent.contains("body")){
+                offsetParent = Std.dom(window);
+            }
+            Std.dom(window).on("resize",that._windowResize = function(){
+                that.move(0,0);
+                that.size(offsetParent.outerWidth(),offsetParent.outerHeight());
             });
 
             return that;
@@ -223,6 +227,19 @@ Std.ui.module("Window",{
                     }
                 }
             });
+        },
+        /*
+         * save rect
+        */
+        saveRect:function(){
+            var that = this;
+
+            return that._lastRect = {
+                top:that[0].css("top"),
+                left:that[0].css("left"),
+                width:that.width(),
+                height:that.height()
+            }
         }
     },
     /*[#module option:public]*/
@@ -297,7 +314,9 @@ Std.ui.module("Window",{
             var method = that.opts.closeAction;
 
             if(method in that){
-                that[method]();
+                that.animation("close",function(){
+                    that[method]();
+                },method);
             }
             return that.emit("close");
         },
@@ -308,12 +327,10 @@ Std.ui.module("Window",{
             var that = this;
 
             return that.opt("minimize",state,function(){
-                if(state === true){
-                    that.hide();
-                }else{
-                    that.show().restore();
-                }
                 that.emit("minimize",state);
+                that.animation("minimize",function(){
+                    that.visible(!state);
+                },state);
             });
         },
         /*
@@ -326,13 +343,14 @@ Std.ui.module("Window",{
                 if(state === false){
                     that.restore();
                 }else{
-                    that._lastRect = that.rect();
                     that.titleButtons("max").addClass("_restore");
 
                     if(!that._windowResize){
                         that.initWindowEvent();
                     }
-                    that._windowResize();
+                    that.animation("maximize",function(){
+                        that._windowResize();
+                    },that.saveRect());
                 }
                 that.emit("maximize",state);
             });
@@ -348,12 +366,14 @@ Std.ui.module("Window",{
             that.titleButtons("max").removeClass("_restore");
 
             if(lastRect !== null){
-                that.width(lastRect.width);
-                that.height(lastRect.height);
-                that[0].css({
-                    top  : lastRect.top,
-                    left : lastRect.left
-                });
+                that.animation("restore",function(){
+                    that.width(lastRect.width);
+                    that.height(lastRect.height);
+                    that[0].css({
+                        top  : lastRect.top,
+                        left : lastRect.left
+                    });
+                },lastRect);
             }
             if(that._windowResize){
                 Std.dom(window).off("resize",that._windowResize);
@@ -364,7 +384,7 @@ Std.ui.module("Window",{
     /*[#module option:main]*/
     main:function(that,opts,dom){
         dom.focussing(function(){
-            that[0].css("zIndex",++Std.ui.status.zIndex);
+            that.toForeground();
         },null,false);
 
         that.initTitleContextMenu();

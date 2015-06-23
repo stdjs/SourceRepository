@@ -14,12 +14,19 @@ Std.ui.module("Item",{
         defaultClass:"StdUI_Item",
         text:"",
         icon:null,
-        iconClass:null,
         value:null,
-        template:null,
         tabIndex:null,
+        iconClass:null,
         iconWidth:null,
-        iconHeight:null
+        iconHeight:null,
+        verticalAlign:"top"  //none,top,middle,bottom
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * text visible
+        */
+        textVisible:true
     },
     /*[#module option:extend]*/
     extend:{
@@ -28,11 +35,64 @@ Std.ui.module("Item",{
         */
         beforeRender:function(){
             this.call_opts({
-                icon:null,
-                iconClass:null,
                 text:"",
-                value:null
+                value:null,
+                icon:null,
+                iconClass:null
             },true);
+        },
+        /*
+         * width
+        */
+        width:function(){
+            var that  = this;
+            var opts  = that.opts;
+            var doms  = that.D;
+            var width = that.width();
+
+            if(isNumber(opts.iconWidth) && doms.icon && width - that.boxSize.width <= opts.iconWidth){
+                if(that._textVisible && doms.text){
+                    doms.text.hide();
+                    that._textVisible = false;
+                }
+            }else if(!that._textVisible && doms.text){
+                doms.text.show();
+                that._textVisible = true;
+            }
+        },
+        /*
+         * height
+        */
+        height:function(){
+            var that          = this;
+            var opts          = that.opts;
+            var verticalAlign = opts.verticalAlign;
+
+            if(verticalAlign === "top" || verticalAlign === "none"){
+                return;
+            }
+            var doms       = that.D;
+            var height     = that.height() - that.boxSize.height;
+            var top        = 0;
+            var lineHeight = 0;
+
+            if(verticalAlign === "middle"){
+                if(isNumber(opts.iconHeight)){
+                    top = (height - opts.iconHeight) / 2;
+                }
+                lineHeight = height;
+            }else if(verticalAlign === "bottom"){
+                if(isNumber(opts.iconHeight)){
+                    top = height - opts.iconHeight;
+                }
+                lineHeight = height * 2;
+            }
+            if(doms.icon && isNumber(opts.iconHeight)){
+                doms.icon.marginTop(top);
+            }
+            if(doms.text){
+                doms.text.lineHeight(lineHeight);
+            }
         }
     },
     /*[#module option:protected]*/
@@ -58,6 +118,12 @@ Std.ui.module("Item",{
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * verticalAlign
+        */
+        verticalAlign:function(align){
+            return this.opt("verticalAlign",align);
+        },
         /*
          * icon width
         */

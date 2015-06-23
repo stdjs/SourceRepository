@@ -1,8 +1,11 @@
 
 /************ Item **************/
 .StdUI_Item{
-    overflow: hidden;
     color: #303030;
+    overflow: hidden;
+    word-break:keep-all;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 .StdUI_Item.disabled{
     color: #7F7F7F;
@@ -18,8 +21,11 @@
     height: 100%;
 }
 .StdUI_Item > ._text{
-    float: left;
+    display: inline;
+    vertical-align: middle;
     font-size: 12px;
     text-indent: 2px;
+    overflow: hidden;
+    cursor: default;
 }
 

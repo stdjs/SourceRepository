@@ -17,6 +17,8 @@ Std.ui.module("MessageBox",{
         draggable:true,
         title:null,
         value:null,
+        icon:"auto",
+        iconClass:"auto",
         text:"null",
         timeout:0,
         buttons:"ok",
@@ -77,6 +79,16 @@ Std.ui.module("MessageBox",{
          */
         input:null,
         /*
+         * init icon
+        */
+        initIcon:function(){
+            var that = this;
+
+            that.D.BodyClient.prepend(that.D.BodyClientIcon = newDiv("_icon"));
+
+            return that;
+        },
+        /*
          * init keyboard
         */
         initKeyboard:function(){
@@ -113,7 +125,9 @@ Std.ui.module("MessageBox",{
             var that  = this;
             var state = false;
 
-            that[0].focussing(function(e){
+            that[0].on("mousedown",function(e){
+                e.stopPropagation();
+            }).focussing(function(e){
                 if(state === false){
                     state = true;
                     that.initKeyboard();
@@ -193,15 +207,16 @@ Std.ui.module("MessageBox",{
          * update layout
         */
         updateLayout:function(){
-            var that  = this;
-            var opts  = that.opts;
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
 
             if(opts.buttonsAlign != "left"){
-                var width = that.D.Buttons.offsetWidth() - that.D.ButtonGroup.offsetWidth() - 2;
+                var width = doms.Buttons.offsetWidth() - doms.ButtonGroup.offsetWidth() - 2;
                 if(opts.type == "warning" || opts.buttonsAlign == "center"){
                     width /= 2;
                 }
-                that.D.ButtonSpacing.width(width);
+                doms.ButtonSpacing.width(width);
             }
         },
         /*
@@ -211,9 +226,24 @@ Std.ui.module("MessageBox",{
             var that = this;
 
             return that.opt("icon",icon,function(){
-                if(!that._hasIcon){
-                    that._hasIcon = true;
-                    that.D.BodyClient.prepend(that.D.BodyClientIcon = newDiv("_icon"));
+                if(!that.D.BodyClientIcon){
+                    that.initIcon();
+                    that.D.BodyClientIcon.html(
+                        newDom("img").attr("src",icon)
+                    );
+                }
+            });
+        },
+        /*
+         * icon class
+        */
+        iconClass:function(className){
+            var that = this;
+
+            return that.opt("icon",className,function(){
+                if(!that.D.BodyClientIcon){
+                    that.initIcon();
+                    that.D.BodyClientIcon.className("_icon " + className);
                 }
             });
         },
@@ -412,7 +442,7 @@ Std.ui.module("MessageBox",{
 
         //--------
         if(opts.type !== "none"){
-            that.icon(opts.type);
+            that.iconClass(opts.type);
             dom.addClass("_" + opts.type);
         }
 
@@ -422,6 +452,8 @@ Std.ui.module("MessageBox",{
         }
 
         that.call_opts({
+            icon:"auto",
+            iconClass:"auto",
             text:"",
             buttons:"",
             timeout:0,

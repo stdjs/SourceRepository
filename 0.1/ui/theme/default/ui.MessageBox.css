@@ -61,6 +61,11 @@
     margin-right: 15px;
     background: url("images/StdUI_MessageBox.png") no-repeat;
 }
+.StdUI_MessageBox > ._body > ._client > ._icon > img{
+    float: left;
+    width: 100%;
+    height: 100%;
+}
 .StdUI_MessageBox > ._body > ._client > ._content{
     display: inline-block;*display: inline;*zoom: 1;
     max-width: 600px;
@@ -235,8 +240,6 @@
 .StdUI_MessageBox._warning > ._body > ._buttons > ._buttonGroup > ._button.press{
     background: #ED5812;
 }
-
-
 
 /*********** MessageBox error ***************/
 .StdUI_MessageBox._error{

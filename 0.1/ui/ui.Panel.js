@@ -9,14 +9,16 @@ Std.ui.module("Panel",{
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_Panel",
+        level:4,
         width:300,
         height:200,
         minWidth:70,
         minHeight:50,
-        level:4,
         title:"panel",
         menuBar:null,
         toolBar:null,
+        titleIcon:null,
+        titleIconClass:null,
         titleHeight:22,
         titleButtons:null,
 	    clientPadding:8,
@@ -65,20 +67,8 @@ Std.ui.module("Panel",{
          * extend height
         */
         height:function(height){
-            var that         = this;
-            var opts         = that.opts;
-            var clientHeight = (isNumber(height) ? height : that.height()) - that.boxSize.height - opts.titleHeight;
-
-            if(opts.clientPadding){
-                clientHeight -= opts.clientPadding * 2;
-            }
-            if(that._toolBar){
-                clientHeight -= that._toolBar.height();
-            }
-            if(that._menuBar){
-                clientHeight -= that._menuBar.height();
-            }
-            that.D.Client.height(clientHeight);
+            var that = this;
+            that.updateHeight(height);
             that._central.emit("resize");
         },
         /*
@@ -116,16 +106,16 @@ Std.ui.module("Panel",{
 
             that[0].on({
                 focusin:function(){
-                    that.addClass("focus");
+                    that.addClass("focused");
                 },
-                mousedown:function(){
+                focusout:function(){
+                    that.removeClass("focused");
+                },
+                mousedown:function(e){
                     that.focus();
                 },
                 mouseenter:function(){
                     if(state == false){
-                        that[0].on("focusout",function(){
-                            that.removeClass("focus");
-                        });
                         doms.TitleBar.unselect(state = true);
                         that._toolBar && that._toolBar[0].unselect(true);
                     }
@@ -208,6 +198,26 @@ Std.ui.module("Panel",{
             return that;
         },
         /*
+         * update height
+        */
+        updateHeight:function(height){
+            var that         = this;
+            var opts         = that.opts;
+            var clientHeight = (isNumber(height) ? height : that.height()) - that.boxSize.height - opts.titleHeight;
+
+            if(opts.clientPadding){
+                clientHeight -= opts.clientPadding * 2;
+            }
+            if(that._toolBar){
+                clientHeight -= that._toolBar.height();
+            }
+            if(that._menuBar){
+                clientHeight -= that._menuBar.height();
+            }
+            that.D.Client.height(clientHeight);
+            return that;
+        },
+        /*
          * create title button
         */
         createTitleButton:function(name,data){
@@ -268,16 +278,22 @@ Std.ui.module("Panel",{
             var that = this;
             var doms = that.D;
 
-            return that.opt("icon",icon,function(){
-                if(icon.charAt(0) !== '.'){
-                    if(!doms.TitleIconImg){
-                        doms.TitleIconImg = newDom("img").appendTo(doms.TitleIcon);
-                    }
-                    doms.TitleIconImg.attr("src",icon);
-                }else{
-                    doms.TitleIconImg && doms.TitleIconImg.remove();
-                    doms.TitleIcon.className("_icon" + icon.replace(/\./g,' '));
+            return that.opt("titleIcon",icon,function(){
+                if(!doms.TitleIconImg){
+                    doms.TitleIconImg = newDom("img").appendTo(doms.TitleIcon);
                 }
+                doms.TitleIconImg.attr("src",icon);
+            });
+        },
+        /*
+         * get or set title icon class
+         */
+        titleIconClass:function(className){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("titleIcon",className,function(){
+                doms.TitleIcon.className("_icon " + className);
             });
         },
         /*
@@ -335,6 +351,10 @@ Std.ui.module("Panel",{
             }
             that.D.body.prepend(that._menuBar);
 
+            if(that.renderState){
+                that._menuBar.render();
+                that.updateHeight();
+            }
             return that;
         },
         /*
@@ -352,6 +372,10 @@ Std.ui.module("Panel",{
                 that._toolBar = Std.ui("ToolBar",data);
             }
             that.D.body.insertBefore(that._toolBar,that.D.Client);
+            if(that.renderState){
+                that._toolBar.render();
+                that.updateHeight();
+            }
 
             return that;
         },
@@ -453,10 +477,11 @@ Std.ui.module("Panel",{
         that.initBody();
         that.initClient();
         that.initTitleEvents();
-
         that.call_opts({
             menuBar:null,
             toolBar:null,
+            titleIcon:null,
+            titleIconClass:null,
             titleButtons:null,
             collapsible:false
         },true);

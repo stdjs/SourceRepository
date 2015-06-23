@@ -10,7 +10,7 @@
     transition: background 0.2s,opacity 0.2s,border-color 0.2s,box-shadow 0.1s;
     box-shadow: 0 0 2px #B1AEAC,0 0 1px #EFEFEF inset;
 }
-.StdUI_Panel.focus{
+.StdUI_Panel.focused{
     border-color: #94B7C3;
     box-shadow: 0 0 3px #3AAAE2,0 0 1px #E1DEDB inset;
 }
@@ -31,8 +31,12 @@
     float: left;
     width:16px;
     height: 16px;
-    margin: 3px 5px 0 4px;
+    margin: 4px 5px 0 4px;
     background: url("images/StdUI_Global.png") -352px -2px no-repeat;
+}
+.StdUI_Panel > ._title > ._icon > img{
+    width: 100%;
+    height: 100%;
 }
 .StdUI_Panel > ._title > ._text{
     float: left;

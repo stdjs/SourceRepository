@@ -98,15 +98,13 @@ Std.ui.module("MenuItem",{
             }
 
             //------show menu and set style
-            that.menu.visible(that._childVisible = true);
+            that.menu.visible(that._childVisible = true).toForeground();
             that.menu[0].css({
                 position:"absolute",
-                zIndex:++Std.ui.status.zindex,
                 left:offset.x + that.width(),
                 top:offset.y,
-                opacity:0,
                 margin:0
-            }).animate({to:{opacity:1}},100);
+            });
 
             return that;
         },
@@ -213,6 +211,11 @@ Std.ui.module("Menu",{
                 that[0].css("zIndex",++Std.ui.status.zIndex);
             }else{
                 that.select(false);
+                that.items.each(function(i,item){
+                    if(item._childVisible){
+                        item.hideChild();
+                    }
+                });
             }
         },
         /*
@@ -351,12 +354,17 @@ Std.ui.module("Menu",{
                     that.select(false);
                 }
             });
-
             return that;
         }
     },
     /*[#module option:public]*/
     public:{
+        /*
+         * each
+        */
+        each:function(callback){
+            return Std.each(this.items,callback)
+        },
         /*
          * root
         */

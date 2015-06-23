@@ -380,6 +380,6 @@ Std.ui.module("ToolButton",{
         height:32,
         iconWidth:24,
         iconHeight:24,
-        text:"btn"
+        text:""
     }
 });

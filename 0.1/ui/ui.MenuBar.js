@@ -127,16 +127,12 @@ Std.ui.module("MenuBar",{
                 if(!parent || !(target.is(parent) || parent.contains(target)) || !that[0].visible()){
                     return;
                 }
-
                 if(e.keyCode === 18){
                     that.updateLabels(altDown = true);
                     e.preventDefault();
                 }else if(e.keyCode === 27){
                     that.clearStates();
-                }else{
-                    if(e.altKey){
-                        e.preventDefault();
-                    }
+                }else if(e.altKey){
                     Std.each(that.items,function(i,item){
                         if(item.text.toUpperCase().indexOf("&" + String.fromCharCode(e.keyCode)) !== -1){
                             if(i === that._selectedIndex){
@@ -148,6 +144,7 @@ Std.ui.module("MenuBar",{
                             return true;
                         }
                     });
+                    e.preventDefault();
                 }
             });
             that[0].on("keydown",function(e){
