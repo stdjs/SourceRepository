@@ -1,5 +1,6 @@
 /********* Data Tree *********/
 .StdUI_Tree{
+    position: relative;
     font-size: 12px;
     overflow: auto;
     outline: none;
@@ -23,6 +24,12 @@
     color: white;
     background: #43ACE8;
     border-color: #43ACE8;
+}
+.StdUI_Tree a._anchor._clone{
+    padding: 5px;
+    border-color: #BBBBBB;
+    background: #F4F4F4;
+    box-shadow: 0 0 4px #BBBBBB;
 }
 /*
  * hand
@@ -125,4 +132,14 @@
     border: 1px solid transparent;
     margin: 0;
     padding: 0;
+}
+/*
+ * input
+*/
+.StdUI_Tree ._position{
+    display: none;
+    position: absolute;
+    height: 0;
+    background: #43ACE8;
+    border: 1px solid #3E93E8;
 }
