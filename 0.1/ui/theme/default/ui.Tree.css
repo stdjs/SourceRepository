@@ -25,11 +25,39 @@
     background: #43ACE8;
     border-color: #43ACE8;
 }
-.StdUI_Tree a._anchor._clone{
-    padding: 5px;
+.StdUI_Tree_CloneAnchor{
+    padding: 5px 5px 5px 25px;
+    height: 25px;
     border-color: #BBBBBB;
-    background: #F4F4F4;
     box-shadow: 0 0 4px #BBBBBB;
+    background: #F4F4F4 url("images/StdUI_Tree.png") 2px -160px;
+    background-repeat: no-repeat;
+
+}
+.StdUI_Tree_CloneAnchor > i._icon{
+    float: left;
+    height: 16px;
+    width: 16px;
+    margin-top: 5px;
+}
+.StdUI_Tree_CloneAnchor > i._icon > img{
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+.StdUI_Tree_CloneAnchor > span{
+    font-size: 12px;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 5px;
+}
+.StdUI_Tree_CloneAnchor._before,
+.StdUI_Tree_CloneAnchor._after{
+    background-position: 2px -128px;
+}
+.StdUI_Tree_CloneAnchor._in{
+    background-image: url("images/StdUI_Tree.png");
+    background-position: 2px -95px;
 }
 /*
  * hand
@@ -140,6 +168,5 @@
     display: none;
     position: absolute;
     height: 0;
-    background: #43ACE8;
-    border: 1px solid #3E93E8;
+    border: 1px solid red;
 }

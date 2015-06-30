@@ -1837,6 +1837,18 @@ Std.ui.module("DataGrid",function(){
                 return that;
             },
             /*
+             * refresh
+            */
+            refresh:function(){
+                var that = this;
+
+                that.clearCellWidgets();
+                that.clearRowBlocks();
+                that.updateRowBlocks();
+
+                return that.repaint();
+            },
+            /*
              * reload
             */
             reload:function(data){
@@ -1898,20 +1910,8 @@ Std.ui.module("DataGrid",function(){
                 return that.initCellWidgets();
             },
             /*
-             * refresh
-             */
-            refresh:function(){
-                var that = this;
-
-                that.clearCellWidgets();
-                that.clearRowBlocks();
-                that.updateRowBlocks();
-
-                return that.repaint();
-            },
-            /*
              * clear selected
-             */
+            */
             clearSelected:Std.func(function(type){
                 var that = this;
 

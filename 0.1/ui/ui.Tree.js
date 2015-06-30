@@ -73,7 +73,6 @@ Std.ui.module("Tree",function(){
                 var childNode = new treeItemModule(tree,item);
                 childNode.parent(that);
 
-
                 return childNode;
             },
             /*
@@ -88,10 +87,10 @@ Std.ui.module("Tree",function(){
                 }else{
                     that._items.clear();
                 }
-                for(var i=0,length=items.length;i<length;i++){
-                    var childNode  = that._createChildNode(items[i]);
+                Std.each(items,function(i,item){
+                    var childNode  = that._createChildNode(item);
                     that._items[i] = childNode.insertTo(that.D.ul);
-                }
+                });
                 return that;
             },
             /*
@@ -124,8 +123,8 @@ Std.ui.module("Tree",function(){
                 var that   = this;
                 var opts   = that.opts;
                 var anchor = that.D.anchor = newDom("a","_anchor").appendTo(that.D.li.append(
-                    that.D.hand  = newDom("i","_hand _empty")
-                ));
+                    that.D.hand = newDom("i","_hand _empty")
+                )).on("dragstart",Std.func(false));
 
                 opts.checkable && that._createCheckBox();
                 that._createNodeIcon();
@@ -135,6 +134,24 @@ Std.ui.module("Tree",function(){
                 opts.target && anchor.attr("target",opts.target);
                 opts.text   && anchor.append(that.D.text = newDom("span").html(opts.text));
 
+                return that;
+            },
+            /*
+             * update checkbox
+            */
+            updateCheckBox:function(checked){
+                var that = this;
+                var opts = that.opts;
+
+                if(that._items){
+                    for(var i=0,length=that._items.length;i<length;i++){
+                        that._items[i].checked(checked);
+                    }
+                }else if(opts.items){
+                    for(var i=0,length=opts.items.length;i<length;i++){
+                        opts.items[i].checked = checked;
+                    }
+                }
                 return that;
             }
         },
@@ -187,6 +204,26 @@ Std.ui.module("Tree",function(){
                 });
             },
             /*
+             * insert before
+            */
+            insertBefore:function(source,target){
+                return this.insert(source,target,"before");
+            },
+            /*
+             * insert after
+            */
+            insertAfter:function(source,target){
+                return this.insert(source,target,"after");
+            },
+            /*
+             * append
+            */
+            append:Std.func(function(source){
+                this.insert(source);
+            },{
+                each:[isArray]
+            }),
+            /*
              * expandAll
             */
             expandAll:function(){
@@ -195,7 +232,6 @@ Std.ui.module("Tree",function(){
                 Std.each(that._items,function(i,item){
                     item.expandAll();
                 });
-
                 return that;
             },
             /*
@@ -207,7 +243,6 @@ Std.ui.module("Tree",function(){
                 Std.each(that._items,function(i,item){
                     item.collapseAll();
                 });
-
                 return that;
             },
             /*
@@ -230,14 +265,37 @@ Std.ui.module("Tree",function(){
                 return text.reverse().join("/");
             },
             /*
+             * update
+            */
+            update:function(){
+                var that      = this;
+                var opts      = that.opts;
+                var className = "_hand";
+
+                if(!isEmpty(opts.items) || !isEmpty(that._items)){
+                    if(opts.expanded){
+                        className += " _expanded";
+                        if(!that.D.ul){
+                            that._createChildNodes(opts.items);
+                        }
+                    }
+                }else{
+                    className += " _empty"
+                }
+                that.D.hand.className(className);
+                return that;
+            },
+            /*
              * selected
             */
             selected:function(selected,push){
                 var that = this;
+                var tree = that.tree();
 
                 return that.opt("selected",selected,function(){
                     if(push !== false){
-                        var selectedItems = that.tree()._selectedItems;
+                        var selectedItems = tree._selectedItems;
+
                         if(selected === true){
                             selectedItems.push(that);
                         }else{
@@ -252,13 +310,14 @@ Std.ui.module("Tree",function(){
             */
             checked:function(checked,push){
                 var that = this;
-                var opts = that.opts;
-                var tree = that.tree();
 
                 return that.opt("checked",checked,function(){
+                    var tree         = that.tree();
+                    var checkedItems = tree._checkedItems;
+
                     that.D.checkbox.toggleClass("checked",checked);
+
                     if(push !== false){
-                        var checkedItems = that.tree()._checkedItems;
                         if(checked === true){
                             checkedItems.push(that);
                         }else{
@@ -268,15 +327,7 @@ Std.ui.module("Tree",function(){
                     if(tree.selectionMode() === "checkedItems"){
                         that.selected(checked);
                     }
-                    if(that._items){
-                        for(var i=0,length=that._items.length;i<length;i++){
-                            that._items[i].checked(checked);
-                        }
-                    }else if(opts.items){
-                        for(var i=0,length=opts.items.length;i<length;i++){
-                            opts.items[i].checked = checked;
-                        }
-                    }
+                    that._updateCheckBox(checked);
                     tree.emit("itemChecked",checked);
                 });
             },
@@ -284,33 +335,26 @@ Std.ui.module("Tree",function(){
              * insert to
             */
             insertTo:function(target,index){
-                var that = this;
-                var opts = that.opts;
-                var li   = that.D.li = newDom("li","_container_li").data("node",that);
+                var that          = this;
+                var opts          = that.opts;
+                var tree          = that.tree();
+                var newNode       = that.D.li = newDom("li","_container_li").data("node",that);
+                var selectionMode = tree.selectionMode();
 
                 that._createNodeAnchor();
 
-                if(!isEmpty(opts.items)){
-                    var className = "_hand";
-
-                    if(opts.expanded){
-                        className += " _expanded";
-                        that._createChildNodes(opts.items);
-                    }
-                    that.D.hand.className(className);
-                }
-                if(opts.selected || (opts.checked && opts.tree.selectionMode() === "checkedItems")){
+                if(opts.selected || (opts.checked && selectionMode === "checkedItems")){
                     that.selected(true);
                 }
                 if(opts.id && opts.tree){
-                    opts.tree._IDMap[opts.id] = that;
+                    opts.tree.map(opts.id,that);
                 }
                 if(index === undefined){
-                    target.append(this.D.li);
+                    target.append(newNode);
                 }else if(isNumber(index)){
-                    target.insert(this.D.li,index);
+                    target.insert(newNode,index);
                 }
-                return that;
+                return that.update();
             },
             /*
              * expand
@@ -383,6 +427,7 @@ Std.ui.module("Tree",function(){
                 var that      = this;
                 var opts      = that.opts;
                 var doms      = that.D;
+                var parent    = that.parent();
                 var childNode = that._createChildNode(source);
 
                 if(!opts.items){
@@ -398,9 +443,9 @@ Std.ui.module("Tree",function(){
                             that._items.push(childNode.insertTo(doms.ul));
                         }
                     }else if(type == "before"){
-                        that.parent().insertBefore(source,that);
+                        parent.insertBefore(source,that);
                     }else if(type == "after"){
-                        that.parent().insertAfter(source,that);
+                        parent.insertAfter(source,that);
                     }
                 }else if(isNumber(target)){
                     opts.items.insert(source,target);
@@ -428,31 +473,12 @@ Std.ui.module("Tree",function(){
                 return that;
             },
             /*
-             * append
-            */
-            append:Std.func(function(source){
-                this.insert(source);
-            },{
-                each:[isArray]
-            }),
-            /*
-             * insert before
-            */
-            insertBefore:function(source,target){
-                return this.insert(source,target,"before");
-            },
-            /*
-             * insert after
-            */
-            insertAfter:function(source,target){
-                return this.insert(source,target,"after");
-            },
-            /*
              * remove
             */
             remove:function(item){
                 var that = this;
                 var opts = that.opts;
+                var tree = that.tree();
 
                 if(item === undefined){
                     var parentItems = opts.parent._items;
@@ -462,7 +488,7 @@ Std.ui.module("Tree",function(){
                         parentItems.remove(index);
                     }
                     if(opts.id){
-                        delete opts.tree._IDMap[opts.id];
+                        delete tree._IDMap[opts.id];
                     }
                     that.D.li.remove();
                 }
@@ -514,8 +540,8 @@ Std.ui.module("Tree",function(){
                 if(opts.droppable){
                     that.initDroppableEvents();
                 }
-
                 that.initEvents();
+                that.initKeyboardEvents();
                 that.updateStyle();
             },
             /*
@@ -529,7 +555,7 @@ Std.ui.module("Tree",function(){
                     var index = null;
 
                     if(isString(item) || isNumber(item)){
-                        item = that.queryNodeByID(item);
+                        item = that.map(item);
                     }
                     if(item instanceof treeItemModule){
                         item.remove();
@@ -554,26 +580,40 @@ Std.ui.module("Tree",function(){
                 return data;
             },
             /*
-             * anchor mouse down
+             * anchor mouse events
             */
-            anchorMouseDown:function(e,node){
-                var that = this;
+            anchorMouseEvents:function(anchor,e){
+                var that          = this;
+                var li            = anchor.parent();
+                var node          = li.data("node");
+                var selectionMode = that.selectionMode();
 
-                switch(that.selectionMode()){
-                    case "none":
-                        break;
-                    case "item":
-                        that.clearSelected();
-                        node.selected(true);
-                        e.stopPropagation();
-                        break;
-                    case "items":
-                        if(!e.ctrlKey){
-                            that.clearSelected();
+                anchor.mouse({
+                    auto:false,
+                    click:function(e){
+                        that.emit("itemClick",[e,node],true);
+                    },
+                    dblclick:function(e){
+                        if(that.editable()){
+                            that.editNode(node);
+                        }else{
+                            node.expand(!node.expanded());
                         }
-                        node.selected(!node.selected());
-                        break;
-                }
+                        that.emit("itemDblClick",[e,node],true);
+                    },
+                    down:function(e){
+                        if(selectionMode == "item"){
+                            that.clearSelected();
+                            node.selected(true);
+                            e.stopPropagation();
+                        }else if(selectionMode == "items"){
+                            if(!e.ctrlKey){
+                                that.clearSelected();
+                            }
+                            node.selected(!node.selected());
+                        }
+                    }
+                },e);
             },
             /*
              * edit node
@@ -589,8 +629,13 @@ Std.ui.module("Tree",function(){
                     fontSize:input.css("fontSize"),
                     position:"absolute",
                     visibility:"hidden"
-                }).appendTo(that[0]);
+                });
 
+                if(node._editState){
+                    return that;
+                }
+                node._editState = true;
+                temp.appendTo(that[0]);
                 node.D.text.hide();
                 node.D.anchor.append(input.width(temp.text(text).width()).focus().on({
                     blur:function(){
@@ -601,6 +646,7 @@ Std.ui.module("Tree",function(){
                         if(text !== value){
                             that.emit("itemRename",[value,text],true);
                         }
+                        node._editState = false;
                     },
                     keydown:function(e){
                         if(e.keyCode === 13){
@@ -615,6 +661,22 @@ Std.ui.module("Tree",function(){
                 }));
                 input.dom.select();
 
+                return that;
+            },
+            /*
+             * init keyboard events
+            */
+            initKeyboardEvents:function(){
+                var that = this;
+
+                that[0].on("keydown",function(e){
+                    if(e.keyCode === 113 && that.editable()){
+                        var selectedItems = that._selectedItems;
+                        if(!isEmpty(selectedItems)){
+                            //that.editNode(selectedItems[0]);
+                        }
+                    }
+                });
                 return that;
             },
             /*
@@ -634,111 +696,122 @@ Std.ui.module("Tree",function(){
                 var targetType = null;
                 var cloneItem  = function(e){
                     visible = false;
-                    that[0].append([
-                        cloned = source.clone().className("_anchor _clone").css({
-                            top: e.pageY - treeOffset.y + 4,
-                            left: e.pageX - treeOffset.x + 4,
-                            height:that.itemHeight(),
+                    that[0].append(position = newDiv("_position").opacity(0.5));
+                    Std.dom("body").append(
+                        cloned = source.clone().className("StdUI_Tree_CloneAnchor").css({
+                            top: e.pageY + 10,
+                            left: e.pageX + 10,
                             opacity:0.8,
-                            position:"absolute"
-                        }),
-                        position = newDiv("_position").opacity(0.5)
-                    ]);
+                            position:"absolute",
+                            width:source.width()
+                        })
+                    );
+                };
+                var clear = function(){
+                    cloned.remove();
+                    position.remove();
+                    current = source = cloned = position = targetType = null;
+                };
+                var positionVisible = function(state){
+                    if(visible !== state){
+                        position.visible(visible = state);
+                    }
                 };
                 var mousemove = function(e){
                     var pageY = e.pageY - treeOffset.y;
+                    var type  = "";
 
                     if(state === false){
-                        state = true;
-                        cloneItem(e);
-                        return;
+                        e.preventDefault();
+                        return cloneItem(e,state = true);
                     }
                     if(pageY <= offset.y + 5){
-                        targetType = "before";
-                        position.css({
-                            top:offset.y,
-                            height:0
-                        });
+                        type = "before";
+                        positionVisible(true);
+                        position.top(offset.y);
                     }else if(pageY >= offset.y + (that.itemHeight())){
-                        targetType = "after";
-                        position.css({
-                            top:offset.y + that.itemHeight() + 4,
-                            height:0
-                        });
+                        type = "after";
+                        positionVisible(true);
+                        position.top(offset.y + that.itemHeight() + 4);
                     }else if(!current.is(source)){
-                        targetType = "in";
-                        position.css({
-                            top:offset.y,
-                            height:that.itemHeight() + 4
-                        });
+                        type = "in";
+                        positionVisible(false);
+                        position.top(offset.y);
                     }
-                    if(visible == false){
-                        position.visible(visible = true);
+                    if(type !== targetType){
+                        cloned.className("StdUI_Tree_CloneAnchor _" + type);
                     }
-                    position.css({left:offset.x,width:width});
-                    cloned.css({left: e.pageX - treeOffset.x + 4,top: e.pageY - treeOffset.y + 4});
+                    targetType = type;
+                    position.css({left:offset.x,width:width,height:0});
+                    cloned.css({left: e.pageX + 10,top: e.pageY + 10});
+                };
+                var release = function(e){
+                    var sourceNode  = source.parent();
+                    var currentNode = current.parent();
+                    var sourceItem  = sourceNode.data("node");
+                    var currentItem = currentNode.data("node");
+
+                    if((!currentNode.contains(e.target) && !position.is(e.target)) || sourceNode.contains(currentNode)){
+                        state = false;
+                        return clear();
+                    }
+                    if(source.is(current)){
+                        return;
+                    }
+                    var sourceIndex = sourceItem.index();
+                    sourceItem.parent()._items.remove(sourceIndex);
+
+                    switch(targetType){
+                        case "before":
+                            currentItem.parent()._items.insert(sourceItem,currentItem.index());
+                            sourceItem.parent(currentItem.parent());
+                            sourceNode.insertBefore(currentNode);
+                            break;
+                        case "after":
+                            currentItem.parent()._items.insert(sourceItem,currentItem.index());
+                            sourceItem.parent(currentItem.parent());
+                            sourceNode.insertAfter(currentNode);
+                            break;
+                        case "in":
+                            if(!currentItem.expanded()){
+                                currentItem.expand(true);
+                            }
+                            sourceItem.parent(currentItem);
+                            if(isEmpty(currentItem.D.ul)){
+                                currentItem._createChildNodes();
+                            }
+                            currentItem.D.ul.append(sourceNode);
+                            currentItem._items.push(sourceItem);
+                            break;
+                    }
+                    that.emit("itemPositionChange",[sourceItem,currentItem.update(),targetType],!(state = false));
+                    clear();
                 };
 
                 that[0].on("mouseenter","li._container_li > a._anchor",function(e){
                     current    = this;
-                    offset     = current.position();
                     width      = current.outerWidth();
+                    offset     = current.position();
                     treeOffset = that[0].offset();
 
                     !state && this.mouse({
                         auto:false,
-                        down:function(e){
-                            if(e.target.nodeName === "INPUT"){
-                                return;
-                            }
-                            current = source = this;
-                            Std.dom(document).on("mousemove",mousemove);
-                            e.preventDefault();
-                        },
-                        up:function(){
+                        up:function(e){
                             Std.dom(document).off("mousemove",mousemove);
-
-                            if(state == false){
-                                return;
+                            state && release(e);
+                        },
+                        down:function(e){
+                            var nodeName = e.target.nodeName;
+                            if(nodeName === "IMG"){
+                                e.preventDefault();
                             }
-                            var sourceNode  = source.parent();
-                            var currentNode = current.parent();
-                            var sourceItem  = sourceNode.data("node");
-                            var currentItem = currentNode.data("node");
-
-                            if(source.is(current)){
-                                return;
+                            if(e.which === 1 && nodeName !== "INPUT"){
+                                current = source = this;
+                                Std.dom(document).on("mousemove",mousemove);
                             }
-
-                            var sourceIndex = sourceItem.index();
-                            sourceItem.parent()._items.remove(sourceIndex);
-
-                            switch(targetType){
-                                case "before":
-                                    currentItem.parent()._items.insert(sourceItem,currentItem.index());
-                                    sourceItem.parent(currentItem.parent());
-                                    sourceNode.insertBefore(currentNode);
-                                    break;
-                                case "after":
-                                    currentItem.parent()._items.insert(sourceItem,currentItem.index());
-                                    sourceItem.parent(currentItem.parent());
-                                    sourceNode.insertAfter(currentNode);
-                                    break;
-                                case "in":
-                                    if(!currentItem.expanded()){
-                                        currentItem.expand(true);
-                                    }
-                                    sourceItem.parent(currentItem);
-                                    currentItem.D.ul.append(sourceNode);
-                                    currentItem._items.push(sourceItem);
-                                    break;
-                            }
-                            that.emit("itemPositionChange",[sourceItem,currentItem,targetType],!(state = false));
-                            cloned.remove();
-                            position.remove();
-                            current = source = cloned = position = targetType = null;
                         }
                     },e);
+
                 });
                 return that;
             },
@@ -822,26 +895,7 @@ Std.ui.module("Tree",function(){
                         }
                     },e);
                 }).on("mouseenter","li._container_li > a._anchor",function(e){
-                    var li   = this.parent();
-                    var node = li.data("node");
-
-                    this.mouse({
-                        auto:false,
-                        down:function(e){
-                            return that.anchorMouseDown(e,node);
-                        },
-                        click:function(e){
-                            that.emit("itemClick",[e,node],true);
-                        },
-                        dblclick:function(e){
-                            if(that.editable()){
-                                that.editNode(node);
-                            }else{
-                                node.expand(!node.expanded());
-                            }
-                            that.emit("itemDblClick",[e,node],true);
-                        }
-                    },e);
+                    that.anchorMouseEvents(this,e);
                 });
                 return that;
             },
@@ -886,13 +940,19 @@ Std.ui.module("Tree",function(){
                 that._CSSStyle.clear().append(CSSData);
 
                 return that;
+            },
+            /*
+             * update lines
+            */
+            updateLines:function(){
+
             }
         },
         /*[#module option:public]*/
         public:{
             /*
              * selection mode
-             */
+            */
             selectionMode:function(mode){
                 return this.opt("selectionMode",mode,function(){
                     this.emit("selectionModeChange",mode);
@@ -911,6 +971,18 @@ Std.ui.module("Tree",function(){
                 return this.opt("itemHeight",height,function(){
                     this.renderState && this.updateStyle();
                 });
+            },
+            /*
+             * insert before
+            */
+            insertBefore:function(source,target){
+                return this.insert(source,target,"before");
+            },
+            /*
+             * insert after
+            */
+            insertAfter:function(source,target){
+                return this.insert(source,target,"after");
             },
             /*
              * data source
@@ -957,8 +1029,21 @@ Std.ui.module("Tree",function(){
             */
             lines:function(lines){
                 return this.opt("lines",lines,function(){
-
+                    this.updateLines();
                 });
+            },
+            /*
+             * map
+            */
+            map:function(id,node){
+                var that  = this;
+                var IDMap = that._IDMap;
+
+                if(node === undefined){
+                    return IDMap[id];
+                }
+                IDMap[id] = node;
+                return that;
             },
             /*
              * types
@@ -1016,20 +1101,7 @@ Std.ui.module("Tree",function(){
                         that._items.insert(item,index);
                     }
                 }
-
                 return that;
-            },
-            /*
-             * insert before
-            */
-            insertBefore:function(source,target){
-                return this.insert(source,target,"before");
-            },
-            /*
-             * insert after
-            */
-            insertAfter:function(source,target){
-                return this.insert(source,target,"after");
             },
             /*
              * reload
@@ -1053,12 +1125,6 @@ Std.ui.module("Tree",function(){
                     });
                 }
                 return that;
-            },
-            /*
-             * query node by id
-            */
-            queryNodeByID:function(id){
-                return (id in this._IDMap) ? this._IDMap[id] : null;
             },
             /*
              * clear selected
@@ -1103,7 +1169,6 @@ Std.ui.module("Tree",function(){
                 Std.each(that._IDMap,function(id){
                     delete this[id];
                 });
-
                 return that.emit("clear");
             }
         },
