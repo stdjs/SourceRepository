@@ -13,6 +13,7 @@ Std.ui.module("Tree",function(){
             type:null,
             icon:null,
             text:"",
+            value:null,
             iconClass:null,
             parent:null,
             selected:false,
@@ -168,6 +169,12 @@ Std.ui.module("Tree",function(){
             */
             tree:function(tree){
                 return this.opt("tree",tree);
+            },
+            /*
+             * value
+            */
+            value:function(value){
+                return this.opt("value",value);
             },
             /*
              * parent
