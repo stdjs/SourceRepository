@@ -651,7 +651,7 @@ Std.ui.module("Tree",function(){
                         node.D.text.show().text(value);
                         Std.dom.united([temp,input]).remove();
                         if(text !== value){
-                            that.emit("itemRename",[value,text],true);
+                            that.emit("itemRename",[node,value,text],true);
                         }
                         node._editState = false;
                     },
