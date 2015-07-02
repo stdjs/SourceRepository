@@ -459,6 +459,7 @@ Std.ui.module("Tree",function(){
             append:function(source){
                 var that = this;
 
+                console.log(source);
                 if(isArray(source)){
                     Std.each(source,function(i,data){
                         that.add(data);
