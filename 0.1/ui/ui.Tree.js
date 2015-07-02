@@ -817,7 +817,6 @@ Std.ui.module("Tree",function(){
                             currentItem.parent()._items.insert(sourceItem,currentIndex);
                             sourceItem.parent(currentItem.parent());
                             sourceNode.insertAfter(currentNode);
-
                             break;
                         case "in":
                             if(!currentItem.expanded()){
