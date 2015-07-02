@@ -633,7 +633,7 @@ Std.ui.module("Tree",function(){
                 anchor.mouse({
                     auto:false,
                     click:function(e){
-                        that.emit("itemClick",[e,node],true);
+                        that.emit("itemClick",[node,e],true);
                     },
                     dblclick:function(e){
                         if(that.editable()){
@@ -641,7 +641,7 @@ Std.ui.module("Tree",function(){
                         }else{
                             node.expand(!node.expanded());
                         }
-                        that.emit("itemDblClick",[e,node],true);
+                        that.emit("itemDblClick",[node,e],true);
                     },
                     down:function(e){
                         if(selectionMode == "item"){
