@@ -449,7 +449,6 @@ Std.ui.module("Tree",function(){
 
                 opts.items.push(data);
                 if(!isEmpty(doms.ul)){
-                    console.log(data)
                     that._items.push(childNode.appendTo(doms.ul));
                 }
                 return childNode;
@@ -1141,9 +1140,10 @@ Std.ui.module("Tree",function(){
                 }
 
                 var item = new treeItemModule(that,source);
-                item.checkable(that.opts.checkable);
                 item.parent(that);
+                item.checkable(that.opts.checkable);
 
+                console.log(source)
                 if(insertType === undefined){
                     if(target === undefined){
                         item.insertTo(that[1]);
