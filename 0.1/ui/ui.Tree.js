@@ -1223,6 +1223,7 @@ Std.ui.module("Tree",function(){
             clear:function(){
                 var that = this;
 
+                that[1].clear();
                 that._items.clear();
                 that.clearChecked();
                 that.clearSelected();
