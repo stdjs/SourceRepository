@@ -732,6 +732,7 @@ Std.ui.module("Tree",function(){
                             left: e.pageX + 10,
                             opacity:0.8,
                             position:"absolute",
+                            zIndex:Std.ui.status.zIndex+1,
                             width:source.width()
                         })
                     );
