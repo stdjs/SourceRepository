@@ -245,6 +245,21 @@ Std.ui.module("Tree",function(){
                 return that;
             },
             /*
+             * count
+            */
+            count:function(){
+                var that = this;
+                var opts = that.opts;
+
+                if(opts.items){
+                    return opts.items.length;
+                }
+                if(that._items){
+                    return that._items.length;
+                }
+                return 0;
+            },
+            /*
              * path
             */
             path:function(type){
@@ -981,6 +996,10 @@ Std.ui.module("Tree",function(){
         /*[#module option:public]*/
         public:{
             /*
+             * length
+            */
+            length:0,
+            /*
              * selection mode
             */
             selectionMode:function(mode){
@@ -1074,6 +1093,21 @@ Std.ui.module("Tree",function(){
                 }
                 IDMap[id] = node;
                 return that;
+            },
+            /*
+             * count
+            */
+            count:function(){
+                var that = this;
+                var opts = that.opts;
+
+                if(opts.items){
+                    return opts.items.length;
+                }
+                if(that._items){
+                    return that._items.length;
+                }
+                return 0;
             },
             /*
              * types
