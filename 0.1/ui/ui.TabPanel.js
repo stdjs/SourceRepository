@@ -722,6 +722,7 @@ Std.ui.module("TabPanel",{
         */
         appendTab:function(data,checksum){
             var that = this;
+            var opts = that.opts;
             var doms = that.D;
             var item = that.createTab(data);
 
@@ -736,6 +737,7 @@ Std.ui.module("TabPanel",{
                     that.updateLayout();
                 }
                 if(!that.opts.deferRender){
+                    item.content.height(that.height() - opts.contentPadding * 2 - 2);
                     item.content.render();
                 }
             }
