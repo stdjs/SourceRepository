@@ -803,19 +803,21 @@ Std.ui.module("Tree",function(){
                     if(source.is(current)){
                         return;
                     }
-                    var sourceIndex = sourceItem.index();
+                    var sourceIndex  = sourceItem.index();
+                    var currentIndex = currentItem.index();
                     sourceItem.parent()._items.remove(sourceIndex);
 
                     switch(targetType){
                         case "before":
-                            currentItem.parent()._items.insert(sourceItem,currentItem.index());
+                            currentItem.parent()._items.insert(sourceItem,currentIndex);
                             sourceItem.parent(currentItem.parent());
                             sourceNode.insertBefore(currentNode);
                             break;
                         case "after":
-                            currentItem.parent()._items.insert(sourceItem,currentItem.index());
+                            currentItem.parent()._items.insert(sourceItem,currentIndex);
                             sourceItem.parent(currentItem.parent());
                             sourceNode.insertAfter(currentNode);
+
                             break;
                         case "in":
                             if(!currentItem.expanded()){
