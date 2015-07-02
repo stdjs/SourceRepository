@@ -251,11 +251,11 @@ Std.ui.module("Tree",function(){
                 var that = this;
                 var opts = that.opts;
 
-                if(opts.items){
-                    return opts.items.length;
-                }
                 if(that._items){
                     return that._items.length;
+                }
+                if(opts.items){
+                    return opts.items.length;
                 }
                 return 0;
             },
@@ -996,10 +996,6 @@ Std.ui.module("Tree",function(){
         /*[#module option:public]*/
         public:{
             /*
-             * length
-            */
-            length:0,
-            /*
              * selection mode
             */
             selectionMode:function(mode){
@@ -1101,11 +1097,11 @@ Std.ui.module("Tree",function(){
                 var that = this;
                 var opts = that.opts;
 
-                if(opts.items){
-                    return opts.items.length;
-                }
                 if(that._items){
                     return that._items.length;
+                }
+                if(opts.items){
+                    return opts.items.length;
                 }
                 return 0;
             },
