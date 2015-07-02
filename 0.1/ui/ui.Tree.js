@@ -1143,11 +1143,10 @@ Std.ui.module("Tree",function(){
                 item.parent(that);
                 item.checkable(that.opts.checkable);
 
-                console.log(source)
                 if(insertType === undefined){
                     if(target === undefined){
                         item.insertTo(that[1]);
-                        that._items.insert(item);
+                        that._items.push(item);
                     }
                 }
                 if(isNumber(target)){
@@ -1157,7 +1156,7 @@ Std.ui.module("Tree",function(){
                     var index = that._items.indexOf(target);
                     if(index === -1){
                         item.insertTo(that[1]);
-                        that._items.insert(item);
+                        that._items.push(item);
                     }else{
                         item.insertTo(that[1],index);
                         that._items.insert(item,index);
