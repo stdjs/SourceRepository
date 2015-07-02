@@ -449,7 +449,7 @@ Std.ui.module("Tree",function(){
 
                 opts.items.push(data);
                 if(!isEmpty(doms.ul)){
-                    that._items.push(childNode.appendTo(doms.ul));
+                    that._items.push(childNode.insertTo(doms.ul));
                 }
                 return childNode;
             },
