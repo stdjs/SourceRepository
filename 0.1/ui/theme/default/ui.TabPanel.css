@@ -57,7 +57,7 @@
 }
 
 /*********** TabContent widget***************/
-.StdUI_Tabs > ._contents > .StdUI_TabContent{
+.StdUI_TabPanel > ._contents > .StdUI_TabContent{
     font-size: 12px;
     clear: both;
     position: absolute;
@@ -68,40 +68,40 @@
     overflow: auto;
     visibility: hidden;
 }
-.StdUI_Tabs > ._contents > .StdUI_TabContent._visible{
+.StdUI_TabPanel > ._contents > .StdUI_TabContent._visible{
     visibility: visible;
     position: relative;
     z-index: 1;
 }
 
 /*********** Tab Widget **************/
-.StdUI_Tabs{
+.StdUI_TabPanel{
     position: relative;
     z-index: 2;
     outline: none;
     overflow: hidden;
     clear: both;
 }
-.StdUI_Tabs.disabled{
+.StdUI_TabPanel.disabled{
     cursor: not-allowed;
 }
-.StdUI_Tabs > ._tabBar{
+.StdUI_TabPanel > ._tabBar{
     position: relative;
     overflow: hidden;
 }
-.StdUI_Tabs > ._tabBar > ._buttons{
+.StdUI_TabPanel > ._tabBar > ._buttons{
     float: left;
 }
-.StdUI_Tabs > ._tabBar > ._tools{
+.StdUI_TabPanel > ._tabBar > ._tools{
     overflow: hidden;
 }
-.StdUI_Tabs > ._tabBar > ._tools._left{
+.StdUI_TabPanel > ._tabBar > ._tools._left{
     float: left;
 }
-.StdUI_Tabs > ._tabBar > ._tools._right{
+.StdUI_TabPanel > ._tabBar > ._tools._right{
     float: right;
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton{
     float: left;
     width: 12px;
     height: 100%;
@@ -113,26 +113,26 @@
     background: #D3D1CE;
     background: linear-gradient(to bottom,#CECBCA 0%,#CAC8C5 100%);
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton.hover{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton.hover{
     border-color: #6FD6FE;
     background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton.press{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton.press{
     background: #E5DFDD;
     border-color: #B2AFAC;
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton > ._icon{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton > ._icon{
     width: 12px;
     height: 100%;
     margin: 0 auto;
     background: url("images/StdUI_Global.png") no-repeat;
 }
-.StdUI_Tabs > ._tabBar > ._tabs{
+.StdUI_TabPanel > ._tabBar > ._tabs{
     float: left;
     position: relative;
     overflow: hidden;
 }
-.StdUI_Tabs > ._tabBar > ._line{
+.StdUI_TabPanel > ._tabBar > ._line{
     position: absolute;
     z-index: 4;
     top:0;
@@ -141,7 +141,7 @@
     width:100%;
     background: #B2AFAC;
 }
-.StdUI_Tabs > ._contents{
+.StdUI_TabPanel > ._contents{
     clear: both;
     position: relative;
     z-index: 1;
@@ -151,73 +151,73 @@
 }
 
 /*********** Tab Widget: top and bottom position scroll button icon**************/
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton._backward > ._icon{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton._backward > ._icon{
     background-position: -273px -350px;
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton._forward > ._icon{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton._forward > ._icon{
     background-position: -288px -350px;
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton._backward.hover{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton._backward.hover{
     background-position: -302px -350px;
 }
-.StdUI_Tabs > ._tabBar > ._tools > ._scrollButton._forward.hover{
+.StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton._forward.hover{
     background-position: -317px -350px;
 }
 
 /*********** Tab Widget: left and right position scroll button icon**************/
-.StdUI_Tabs._left > ._tabBar > ._tools > ._scrollButton._backward > ._icon,
-.StdUI_Tabs._right > ._tabBar > ._tools > ._scrollButton._backward > ._icon{
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._backward > ._icon,
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._backward > ._icon{
     background-position: -190px -352px;
 }
-.StdUI_Tabs._left > ._tabBar > ._tools > ._scrollButton._forward > ._icon,
-.StdUI_Tabs._right > ._tabBar > ._tools > ._scrollButton._forward > ._icon{
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._forward > ._icon,
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._forward > ._icon{
     background-position: -205px -352px;
 }
-.StdUI_Tabs._left > ._tabBar > ._tools > ._scrollButton._backward.hover,
-.StdUI_Tabs._right > ._tabBar > ._tools > ._scrollButton._backward.hover{
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._backward.hover,
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._backward.hover{
     background-position: -221px -352px;
 }
-.StdUI_Tabs._left > ._tabBar > ._tools > ._scrollButton._forward.hover,
-.StdUI_Tabs._right > ._tabBar > ._tools > ._scrollButton._forward.hover{
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._forward.hover,
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._forward.hover{
     background-position: -237px -352px;
 }
 
 
 /*********** Tab Widget: left position**************/
-.StdUI_Tabs._left > ._tabBar{
+.StdUI_TabPanel._left > ._tabBar{
     position: absolute;
     left: 0;
     z-index: 2;
     overflow: hidden;
 }
-.StdUI_Tabs._left > ._tabBar > ._tools{
+.StdUI_TabPanel._left > ._tabBar > ._tools{
     float: none;
     clear: both;
     overflow: hidden;
 }
-.StdUI_Tabs._left > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton{
     float: none;
     padding: 0;
 }
-.StdUI_Tabs._left > ._tabBar > ._tabs > ._buttons{
+.StdUI_TabPanel._left > ._tabBar > ._tabs > ._buttons{
     height: 9999px;
 }
-.StdUI_Tabs._left > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
+.StdUI_TabPanel._left > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
     float: none;
     margin: 0 0 2px 0;
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
 }
-.StdUI_Tabs._left > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
+.StdUI_TabPanel._left > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
     border-right: 1px solid transparent;
 }
-.StdUI_Tabs._left > ._tabBar > ._line{
+.StdUI_TabPanel._left > ._tabBar > ._line{
     position: absolute;
     z-index: 4;
     width: 1px;
     height: 100%;
 }
-.StdUI_Tabs._left > ._contents{
+.StdUI_TabPanel._left > ._contents{
     position: absolute;
     right: 1px;
     z-index: 1;
@@ -225,40 +225,40 @@
 }
 
 /*********** Tab Widget: right position**************/
-.StdUI_Tabs._right > ._tabBar{
+.StdUI_TabPanel._right > ._tabBar{
     position: absolute;
     right: 1px;
     z-index: 2;
     overflow: hidden;
 }
-.StdUI_Tabs._right > ._tabBar > ._tools{
+.StdUI_TabPanel._right > ._tabBar > ._tools{
     float: none;
     clear: both;
 }
-.StdUI_Tabs._right > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton{
     overflow: hidden;
     padding: 0;
 }
-.StdUI_Tabs._right > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
+.StdUI_TabPanel._right > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
     float: none;
     margin: 0 0 2px 0;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
 }
-.StdUI_Tabs._right > ._tabBar > ._tabs > ._buttons{
+.StdUI_TabPanel._right > ._tabBar > ._tabs > ._buttons{
     height: 9999px;
 }
-.StdUI_Tabs._right > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
+.StdUI_TabPanel._right > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
     border-left: 0;
 }
-.StdUI_Tabs._right > ._tabBar > ._line{
+.StdUI_TabPanel._right > ._tabBar > ._line{
     position: absolute;
     left:0;
     z-index: 4;
     width: 1px;
     height: 100%;
 }
-.StdUI_Tabs._right > ._contents{
+.StdUI_TabPanel._right > ._contents{
     position: absolute;
     left: 0;
     z-index: 1;
@@ -266,47 +266,47 @@
 }
 
 /*********** Tab Widget: top position **************/
-.StdUI_Tabs._top > ._contents{
+.StdUI_TabPanel._top > ._contents{
     border-top: 0;
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
     box-shadow: 1px 1px 1px rgba(184,181,179,0.7);
 }
-.StdUI_Tabs._top > ._tabBar > ._tabs > ._buttons{
+.StdUI_TabPanel._top > ._tabBar > ._tabs > ._buttons{
     width: 9999px;
 }
-.StdUI_Tabs._top > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel._top > ._tabBar > ._tools > ._scrollButton{
     border-bottom: 0;
 }
-.StdUI_Tabs._top > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
+.StdUI_TabPanel._top > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
     border-bottom: 0;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
 }
 
 /*********** Tab Widget: bottom position **************/
-.StdUI_Tabs._bottom > ._contents{
+.StdUI_TabPanel._bottom > ._contents{
     border-bottom: 0;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
     box-shadow: 1px -1px 1px rgba(184,181,179,0.7);
 }
-.StdUI_Tabs._bottom > ._tabBar > ._line{
+.StdUI_TabPanel._bottom > ._tabBar > ._line{
     top: 0;
 }
-.StdUI_Tabs._bottom > ._tabBar > ._tabs > ._buttons{
+.StdUI_TabPanel._bottom > ._tabBar > ._tabs > ._buttons{
     width: 9999px;
 }
-.StdUI_Tabs._bottom > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._scrollButton{
     border-top: 0;
     box-shadow: 0 1px 1px #E7E7E7 inset;
 }
-.StdUI_Tabs._bottom > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
+.StdUI_TabPanel._bottom > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton{
     border-top: 0;
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
     box-shadow: 0 0 1px #E7E7E7 inset;
 }
-.StdUI_Tabs._bottom > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
+.StdUI_TabPanel._bottom > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
 
 }
