@@ -649,7 +649,9 @@ Std.ui.module("Tree",function(){
                 var that  = this;
                 var text  = node.text();
                 var timer = null;
-                var input = newDom("input","_input").value(text);
+                var input = newDom("input","_input").value(text).on("mousedown",function(e){
+                    e.stopPropagation();
+                });
                 var temp  = newDom("span").css({
                     top:-99,
                     font:input.css("font"),
