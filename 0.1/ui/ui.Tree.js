@@ -192,11 +192,7 @@ Std.ui.module("Tree",function(){
              * index
             */
             index:function(){
-                var index = this.parent()._items.indexOf(this);
-                if(index !== -1){
-                    index++;
-                }
-                return index;
+                return this.parent()._items.indexOf(this);
             },
             /*
              * text
