@@ -223,14 +223,6 @@ Std.ui.module("Tree",function(){
                 return this.insert(source,target,"after");
             },
             /*
-             * append
-            */
-            append:Std.func(function(source){
-                this.insert(source);
-            },{
-                each:[isArray]
-            }),
-            /*
              * expandAll
             */
             expandAll:function(){
@@ -428,6 +420,40 @@ Std.ui.module("Tree",function(){
                 doms.hand.toggleClass("_expanded",expanded);
             }),
             /*
+             * append child
+            */
+            add:function(data){
+                var that      = this;
+                var opts      = that.opts;
+                var doms      = that.D;
+                var childNode = that._createChildNode(data);
+
+                if(!opts.items){
+                    opts.items = [];
+                }
+
+                opts.items.push(data);
+                if(!isEmpty(doms.ul)){
+                    that._items.push(childNode.insertTo(doms.ul));
+                }
+                return childNode;
+            },
+            /*
+             * append
+            */
+            append:function(source){
+                var that = this;
+
+                if(isArray(source)){
+                    Std.each(source,function(i,data){
+                        that.add(data);
+                    });
+                }else{
+                    that.add(source);
+                }
+                return that.update();
+            },
+            /*
              * insert
             */
             insert:function(source,target,type){
@@ -440,15 +466,10 @@ Std.ui.module("Tree",function(){
                 if(!opts.items){
                     opts.items = [];
                 }
-                if(!that._items){
-                    that._items = [];
-                }
+
                 if(target === undefined){
                     if(type === undefined){
-                        opts.items.push(source);
-                        if(!isEmpty(doms.ul)){
-                            that._items.push(childNode.insertTo(doms.ul));
-                        }
+                        return that.append(source);
                     }else if(type == "before"){
                         parent.insertBefore(source,that);
                     }else if(type == "after"){
@@ -463,10 +484,7 @@ Std.ui.module("Tree",function(){
                     var index = that._items.indexOf(target);
 
                     if(index === -1){
-                        opts.items.push(source);
-                        if(!isEmpty(doms.ul)){
-                            that._items.push(childNode.insertTo(doms.ul));
-                        }
+                        return that.append(source);
                     }else{
                         if(type === "after"){
                             index++;
@@ -477,7 +495,7 @@ Std.ui.module("Tree",function(){
                         }
                     }
                 }
-                return that;
+                return that.update();
             },
             /*
              * remove
@@ -498,12 +516,14 @@ Std.ui.module("Tree",function(){
                         delete tree._IDMap[opts.id];
                     }
                     that.D.li.remove();
+                    that.update();
                 }
             }
         },
         /*[#module option:main]*/
         main:function(tree,option){
             this.D = {};
+            this._items = [];
             this.init_opts(option);
             this.opts.tree = tree;
         }
