@@ -62,6 +62,12 @@ Std.ui.module("TabPanel",function(){
                 return this.parent.items.indexOf(this);
             },
             /*
+             * select
+            */
+            select:function(){
+                this.parent.select(this.index());
+            },
+            /*
              * remove
             */
             remove:function(){
