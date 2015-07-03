@@ -19,13 +19,46 @@ Std.ui.module("TabButton",{
         */
         selected:false
     },
+    protected:{
+        /*
+         * init closable element
+        */
+        initClosableElement:function(){
+            var that = this;
+            var doms = that.D;
+
+            doms.tr1.append(
+                doms.closeTD = newDom("td","_close").append(
+                    doms.closeButton = newDiv("_closeButton").mouse({
+                        down:function(e){
+                            e.stopPropagation();
+                        },
+                        click:function(e){
+                            var parent = that.parent();
+                            parent && parent.remove();
+                        }
+                    })
+                )
+            );
+            return that;
+        }
+    },
     /*[#module option:public]*/
     public:{
         /*
          * closable
-         */
+        */
         closable:function(state){
-            return this.opt("closable",state);
+            var that = this;
+
+            return that.opt("closable",state,function(){
+                if(state === true){
+                    that.initClosableElement();
+                }else{
+                    that.D.closeButton.remove();
+                    that.D.closeTD.remove();
+                }
+            });
         },
         /*
          * select
@@ -39,6 +72,13 @@ Std.ui.module("TabButton",{
             that.toggleClass("selected",that._selected = state);
 
             return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        console.log(opts.closable);
+        if(opts.closable){
+            that.initClosableElement();
         }
     }
 });
@@ -85,11 +125,13 @@ Std.ui.module("TabPanel",function(){
                 button = Std.ui("TabButton",{
                     parent:that,
                     text:opts.button,
-                    height:parent.opts.tabButtonHeight
+                    height:parent.opts.tabButtonHeight,
+                    closable:parent.opts.tabClosable
                 });
             }else if(isObject(opts.button)){
-                opts.button.parent = that;
-                opts.button.height = parent.opts.tabButtonHeight;
+                opts.button.parent   = that;
+                opts.button.height   = parent.opts.tabButtonHeight;
+                opts.button.closable = parent.opts.tabClosable;
 
                 button = Std.ui("TabButton",opts.button);
             }

@@ -55,6 +55,23 @@
     text-align: center;
     cursor: default;
 }
+.StdUI_TabButton > ._buttonBox > tbody > tr > td._close{
+    width: 16px;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td._close > ._closeButton{
+    margin-left: 3px;
+    width: 12px;
+    height: 16px;
+    background-image: url("images/StdUI_Global.png");
+    background-repeat: no-repeat;
+    background-position: -124px -96px;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td._close > ._closeButton.hover{
+    background-position: -257px -96px;
+}
+.StdUI_TabButton > ._buttonBox > tbody > tr > td._close > ._closeButton.press{
+    background-position: -505px -96px;
+}
 
 /*********** TabContent widget***************/
 .StdUI_TabPanel > ._contents > .StdUI_TabContent{
