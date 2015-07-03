@@ -197,7 +197,7 @@ Std.ui.module("TabPanel",function(){
             maxTabButtonWidth:"50%",
             contentPadding:5,
             deferRender:true,
-            activeItem:0,
+            activeIndex:0,
             items:null,
             tabAlign:"left",
             tabPosition:"top"
@@ -207,9 +207,9 @@ Std.ui.module("TabPanel",function(){
         /*[#module option:private]*/
         private:{
             /*
-             * active item
+             * active index
             */
-            activeItem:null,
+            activeIndex:null,
             /*
              * tab bar overflowed
             */
@@ -248,7 +248,7 @@ Std.ui.module("TabPanel",function(){
                 });
                 that.initEvents();
                 that.initKeyboard();
-                that.select(opts.activeItem);
+                that.select(opts.activeIndex);
                 that.tabBarOverflowCheck();
             },
             /*
@@ -756,29 +756,49 @@ Std.ui.module("TabPanel",function(){
                     index = that.convertIndex(index,reference);
                 }
                 if(index !== -1 && index < that.items.length){
-                    that.activeItem(index);
+                    that.activeIndex(index);
                     that.emit("tabSelect",index);
                 }
                 return that;
             },
             /*
-             * active Item
-             */
-            activeItem:function(index){
-                var that = this;
+             * active index
+            */
+            activeIndex:function(index){
+                var that  = this;
+                var items = that.items;
 
                 if(index === undefined){
-                    return that.items.indexOf(that._activeItem);
+                    return items.indexOf(that._activeItem);
                 }
-                var item       = that.items[index];
-                var activeItem = that._activeItem;
+                var item = items[index];
 
+                if(item){
+                    that.activeItem(item);
+                }
+                return that;
+            },
+            /*
+             * active Item
+            */
+            activeItem:function(item){
+                var that  = this;
+                var items = that.items;
+
+                if(item === undefined){
+                    var index = that.activeIndex();
+                    if(index == -1){
+                        return null;
+                    }
+                    return items[index];
+                }
+                var activeItem = that._activeItem;
                 if(activeItem){
                     activeItem.button.select(false);
                     activeItem.content.removeClass("_visible");
                 }
                 item.button.select(true);
-                that.items[that.opts.activeItem = index].content.addClass("_visible");
+                item.content.addClass("_visible");
                 that._activeItem = item;
                 that.updateLayout();
 
@@ -789,7 +809,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * append
-             */
+            */
             append:function(data){
                 var that = this;
 
@@ -809,7 +829,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * insert
-             */
+            */
             insertTab:function(data,index,checksum){
                 var that = this;
                 var opts = that.opts;
@@ -843,15 +863,15 @@ Std.ui.module("TabPanel",function(){
              * remove tab
             */
             removeTab:function(index){
-                var that       = this;
-                var items      = that.items;
-                var activeItem = that.activeItem();
+                var that        = this;
+                var items       = that.items;
+                var activeIndex = that.activeIndex();
 
                 items[index].button.remove();
                 items[index].content.remove();
                 that.items.remove(index);
 
-                if(index === activeItem){
+                if(index === activeIndex){
                     that.select("beside",index);
                 }
                 return that.tabBarOverflowCheck().emit("tabRemove",index);
