@@ -35,7 +35,12 @@ Std.ui.module("TabButton",{
                         },
                         click:function(e){
                             var parent = that.parent();
-                            parent && parent.remove();
+
+                            if(parent){
+                                var tabPanel = parent.parent;
+                                tabPanel.emit("tabClose",parent);
+                                parent.remove();
+                            }
                         }
                     })
                 )
@@ -191,7 +196,7 @@ Std.ui.module("TabPanel",function(){
             tabPosition:"top"
         },
         /*[#module option:events]*/
-        events:"tabSelect tabRemove",
+        events:"tabClose tabSelect tabRemove",
         /*[#module option:private]*/
         private:{
             /*
