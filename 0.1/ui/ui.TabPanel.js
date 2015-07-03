@@ -96,10 +96,17 @@ Std.ui.module("TabPanel",function(){
         /*[#module option:option]*/
         option:{
             button:null,
-            content:null
+            content:null,
+            value:null
         },
         /*[#module option:public]*/
         public:{
+            /*
+             * value
+            */
+            value:function(value){
+                return this.opt("value",value);
+            },
             /*
              * index
             */
