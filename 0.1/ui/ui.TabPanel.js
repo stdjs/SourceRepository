@@ -81,7 +81,6 @@ Std.ui.module("TabButton",{
     },
     /*[#module option:main]*/
     main:function(that,opts){
-        console.log(opts.closable);
         if(opts.closable){
             that.initClosableElement();
         }
