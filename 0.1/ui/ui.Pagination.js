@@ -251,12 +251,18 @@ Std.ui.module("Pagination",{
             var max   = that.pageCount();
             var half  = Math.floor(opts.pageSize / 2);
             var pages = [];
-
+            
             for(var i=page-1;i>page-1-half;i--){
-                if(i < 1) break; min = i;
+                if(i < 1){
+                    break;
+                }
+                min = i;
             }
             for(i=page+1;i<page+1+half;i++){
-                if(i > Math.ceil(opts.total / opts.pageSize)) break; max = i;
+                if(i > Math.ceil(opts.total / opts.pageSize) || i > max){
+                    break;
+                }
+                max = i;
             }
             for(i=min;i<=max;i++){
                 pages.push(i);
