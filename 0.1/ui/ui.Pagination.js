@@ -251,7 +251,7 @@ Std.ui.module("Pagination",{
             var max   = that.pageCount();
             var half  = Math.floor(opts.pageSize / 2);
             var pages = [];
-            
+
             for(var i=page-1;i>page-1-half;i--){
                 if(i < 1){
                     break;

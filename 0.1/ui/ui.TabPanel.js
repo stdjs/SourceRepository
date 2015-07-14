@@ -58,6 +58,7 @@ Std.ui.module("TabButton",{
 
             return that.opt("closable",state,function(){
                 if(state === true){
+
                     that.initClosableElement();
                     that.D.closeButton.remove();
                     that.D.closeTD.remove();
@@ -139,10 +140,13 @@ Std.ui.module("TabPanel",function(){
                     closable:parent.opts.tabClosable
                 });
             }else if(isObject(opts.button)){
-                opts.button.parent   = that;
-                opts.button.height   = parent.opts.tabButtonHeight;
-                opts.button.closable = parent.opts.tabClosable;
+                var buttonOption    = opts.button;
+                buttonOption.parent = that;
+                buttonOption.height = parent.opts.tabButtonHeight;
 
+                if(!("closable" in buttonOption)){
+                    buttonOption.closable = parent.opts.tabClosable;
+                }
                 button = Std.ui("TabButton",opts.button);
             }
 
