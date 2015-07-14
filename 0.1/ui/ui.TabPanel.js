@@ -58,8 +58,10 @@ Std.ui.module("TabButton",{
 
             return that.opt("closable",state,function(){
                 if(state === true){
-
-                    that.initClosableElement();
+                    if(!that.D.closeTD){
+                        that.initClosableElement();
+                    }
+                }else{
                     that.D.closeButton.remove();
                     that.D.closeTD.remove();
                 }
