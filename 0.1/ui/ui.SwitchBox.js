@@ -8,7 +8,7 @@ Std.ui.module("SwitchBox",{
     events:"change",
     /*#module option:option]*/
     option:{
-        level:2,
+        level:1,
         defaultClass:"StdUI_SwitchBox",
         height:26,
         value:null,

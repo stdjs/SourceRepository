@@ -74,6 +74,7 @@
     background: url("images/loading_12.gif") no-repeat;
 }
 .StdUI_Tree i._hand._empty{
+    cursor: default;
     background: none;
 }
 .StdUI_Tree i._hand.hover{
