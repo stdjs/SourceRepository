@@ -138,6 +138,7 @@
  * text
 */
 .StdUI_Tree a._anchor > span{
+    cursor: default;
     overflow: hidden;
 }
 /*

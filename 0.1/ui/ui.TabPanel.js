@@ -761,7 +761,7 @@ Std.ui.module("TabPanel",function(){
                 }
                 if(index !== -1 && index < that.items.length){
                     that.activeIndex(index);
-                    that.emit("tabSelect",index);
+                    that.emit("tabSelect",[that.items[index],index],true);
                 }
                 return that;
             },
