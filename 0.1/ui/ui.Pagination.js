@@ -195,7 +195,7 @@ Std.ui.module("Pagination",{
             if(page === undefined){
                 return int(opts.page)
             }
-            if(page !== opts.page){
+            if(page != opts.page){
                 opts.page = page = ~~page;
                 if(pageList && pageList.value() != page){
                     pageList.value(page);
