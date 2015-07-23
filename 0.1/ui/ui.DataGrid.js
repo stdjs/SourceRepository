@@ -1161,6 +1161,18 @@ Std.ui.module("DataGrid",function(){
         /*[#module option:public]*/
         public:{
             /*
+             * each
+            */
+            each:function(callback,makeReturn){
+                var that = this;
+
+                return Std.each(that._rows,function(i,row){
+                    if(isFunction(callback)){
+                        return callback.call(that,i,row);
+                    }
+                },makeReturn);
+            },
+            /*
              * data source
             */
             dataSource:function(dataSource){
