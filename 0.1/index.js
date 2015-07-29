@@ -206,6 +206,8 @@ Std.source.response("StdJS",function(){
         },
 	
 	    "plugin.upload":"plugin/upload.js",
-        "plugin.smoothWheel":"plugin/smoothWheel.js"
+        "plugin.smoothWheel":"plugin/smoothWheel.js",
+
+        "io.websocket":"io/websocket.js"
     };
 });
