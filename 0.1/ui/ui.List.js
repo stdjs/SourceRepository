@@ -267,7 +267,7 @@ Std.ui.module("List",{
                     type:read.type || "get",
                     success:function(responseJSON){
                         that.clear();
-                        that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                        that.append(Std.mold.dataPath(responseJSON,read.dataPath));
                         that.emit("dataSourceLoad",responseJSON);
                     }
                 });
