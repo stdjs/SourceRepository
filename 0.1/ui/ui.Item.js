@@ -209,7 +209,7 @@ Std.ui.module("Item",{
                 padding:input.css("padding")
             }).appendTo(that[0]);
 
-            input.select().on({
+            input.on({
                 mousedown:function(e){
                     e.stopPropagation();
                 },
@@ -236,7 +236,7 @@ Std.ui.module("Item",{
                 float:doms.text.css("float"),
                 width:temp.text(text).width(),
                 height:doms.text.height()
-            }).value(text);
+            }).value(text).select();
 
             doms.text.hide();
             that._editState = true;
