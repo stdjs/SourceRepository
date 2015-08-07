@@ -20,6 +20,7 @@ Std.ui.module("ComboBox",{
     option:{
         level:3,
         defaultClass:"StdUI_ComboBox",
+        boxSizing:"border-box",
         minWidth:40,
         minHeight:26,
         maxHeight:26,

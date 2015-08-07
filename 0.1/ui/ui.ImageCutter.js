@@ -298,6 +298,7 @@ Std.ui.module("ImageCutter",{
         level:4,
         pickerWidth:150,
         pickerHeight:150,
+        boxSizing:"border-box",
         image:null,
         scale:1,
         lockerOpacity:0.4

@@ -14,6 +14,7 @@ Std.ui.module("CodeView",{
         minWidth:12,
         minHeight:12,
         defaultClass:"StdUI_CodeView",
+        boxSizing:"border-box",
         value:""
     },
     /*[#module option:protected]*/

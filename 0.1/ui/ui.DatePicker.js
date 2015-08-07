@@ -17,6 +17,7 @@ Std.ui.module("DatePicker",{
         value:"",
         minWidth:233,
         maxWidth:233,
+        boxSizing:"border-box",
         format:"yyyy-MM-dd hh:mm:ss",
         footer:true,
         position:"none"

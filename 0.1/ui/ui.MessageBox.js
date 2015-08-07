@@ -10,6 +10,7 @@ Std.ui.module("MessageBox",{
     /*[#module option:option]*/
     option:{
         defaultClass:"StdUI_MessageBox",
+        boxSizing:"border-box",
         renderTo:"body",
         type:"information",   //information warning error question
         acceptEsc:true,

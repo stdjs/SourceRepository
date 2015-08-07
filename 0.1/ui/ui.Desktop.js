@@ -8,6 +8,7 @@ Std.ui.module("Desktop_Item",{
     option:{
         type:"file",//application,file,shortcut
         defaultClass:"StdUI_Desktop_Item",
+        boxSizing:"border-box",
         desktop:null,
         tabIndex:null,
         contextMenu:null
@@ -102,6 +103,7 @@ Std.ui.module("Desktop_Applications",{
     /*[#module option:option]*/
     option:{
         defaultClass:"Desktop_Applications",
+        boxSizing:"border-box",
         master:null,
         groups:null,
         visible:false
@@ -364,7 +366,8 @@ Std.ui.module("Desktop_ControlBar",{
         level:2,
         master:null,
         height:40,
-        defaultClass:"StdUI_Desktop_ControlBar"
+        defaultClass:"StdUI_Desktop_ControlBar",
+        boxSizing:"border-box",
     },
     /*[#module option:extend]*/
     extend:{
@@ -478,6 +481,7 @@ Std.ui.module("Desktop_Main",{
     option:{
         level:5,
         defaultClass:"StdUI_Desktop_Main",
+        boxSizing:"border-box",
         itemWidth:96,
         itemHeight:96,
         width:800,
@@ -1116,7 +1120,8 @@ Std.ui.module("Desktop_TaskBar",{
     /*[#module option:option]*/
     option:{
         level:4,
-        master:null
+        master:null,
+        boxSizing:"border-box"
     },
     /*[#module option:extend]*/
     extend:{
@@ -1460,6 +1465,7 @@ Std.ui.module("Desktop",function(){
             desktopItemWidth:100,
             desktopItemHeight:100,
             defaultClass:"StdUI_Desktop",
+            boxSizing:"border-box",
             wallpaper:null
         },
         /*[#module option:private]*/

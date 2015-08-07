@@ -14,6 +14,7 @@ Std.ui.module("ColorPicker",{
     option:{
         level:3,
         defaultClass:"StdUI_ColorPicker",
+        boxSizing:"border-box",
         fixedLayoutWidth:true,
         fixedLayoutHeight:true,
         minWidth:380,

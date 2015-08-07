@@ -26,7 +26,8 @@ Std.ui.module("Button",{
         checked:false,
         styleType:"text", //textBesideIcon,textUnderIcon,text,icon
         iconWidth:18,
-        iconHeight:18
+        iconHeight:18,
+        boxSizing:"border-box"
     },
     /*[#module option:extend]*/
     extend:{

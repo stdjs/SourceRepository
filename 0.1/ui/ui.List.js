@@ -60,6 +60,7 @@ Std.ui.module("List",{
         value:null,
         items:null,
         template:null,
+        dataSource:null,
         itemHeight:24,
         itemWidth:80,
         iconWidth:16,
@@ -225,6 +226,14 @@ Std.ui.module("List",{
             });
         },
         /*
+         * data source
+        */
+        dataSource:function(dataSource){
+            return this.opt("dataSource",dataSource,function(){
+                this.reload();
+            });
+        },
+        /*
          * template
         */
         template:function(template){
@@ -239,6 +248,29 @@ Std.ui.module("List",{
             }
             if(template instanceof Std.template){
                 opts.template = template;
+            }
+            return that;
+        },
+        /*
+         * reload
+         */
+        reload:function(data){
+            var that       = this;
+            var opts       = that.opts;
+            var dataSource = opts.dataSource;
+            var read       = dataSource.read;
+
+            if(dataSource && dataSource.type === "ajax" && isObject(read)){
+                Std.ajax.json({
+                    url:read.url,
+                    data:Std.extend(read.data || {},data),
+                    type:read.type || "get",
+                    success:function(responseJSON){
+                        that.clear();
+                        that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                        that.emit("dataSourceLoad",responseJSON);
+                    }
+                });
             }
             return that;
         },

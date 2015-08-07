@@ -14,6 +14,7 @@ Std.ui.module("DateTimeView",{
         fontSize:13,
         tabIndex:null,
         defaultClass:"StdUI_DateTimeView",
+        boxSizing:"border-box",
         dateFormat:"yyyy-MM-dd",
         timeFormat:"hh:mm:ss"
     },

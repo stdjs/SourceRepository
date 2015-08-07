@@ -17,7 +17,8 @@ Std.ui.module("Accordion",{
         titleHeight:30,
         collapsible:false,
         clientPadding:5,
-        activeItem:0
+        activeItem:0,
+        boxSizing:"border-box"
     },
     /*#module option:action]*/
     action:{

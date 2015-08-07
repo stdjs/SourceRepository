@@ -46,6 +46,7 @@ Std.ui.module("DataGrid",function(){
             dataSource:null,
             value:null,
             valueFormat:"auto",   //auto,array,object
+            boxSizing:"border-box",
             defaultClass:"StdUI_DataGrid"
         },
         /*[#module option:private]*/

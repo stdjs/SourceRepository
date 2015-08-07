@@ -10,6 +10,7 @@ Std.ui.module("FieldSet",{
     option:{
         level:1,
         defaultClass:"StdUI_FieldSet",
+        boxSizing:"border-box",
         items:null,
         spacing:5,
         width:300,

@@ -12,6 +12,7 @@ Std.model("ui.Edit",{
     option:{
         value:"",
         echoMode:"text",
+        boxSizing:"border-box",
         fontSize:null,
         maxLength:0,
         readOnly:false,

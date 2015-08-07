@@ -15,6 +15,7 @@ Std.ui.module("CodeEdit",{
         minWidth:12,
         minHeight:12,
         defaultClass:"StdUI_CodeEdit",
+        boxSizing:"border-box",
         value:""
     },
     /*[#module option:extend]*/
