@@ -202,8 +202,8 @@ Std.ui.module("Item",{
             var input = newDom("input","_edit");
             var temp  = newDom("span").css({
                 top:-99,
-                font:input.css("font"),
-                fontSize:input.css("fontSize"),
+                font:doms.text.css("font"),
+                fontSize:doms.text.css("fontSize"),
                 position:"absolute",
                 visibility:"hidden",
                 padding:input.css("padding")
