@@ -209,7 +209,7 @@ Std.ui.module("Item",{
                 padding:input.css("padding")
             }).appendTo(that[0]);
 
-            input.width(temp.text(text).width()).select().on({
+            input.select().on({
                 mousedown:function(e){
                     e.stopPropagation();
                 },
@@ -236,7 +236,7 @@ Std.ui.module("Item",{
                 font:doms.text.css("font"),
                 fontSize:doms.text.css("fontSize"),
                 float:doms.text.css("float"),
-                width:doms.text.width(),
+                width:temp.text(text).width(),
                 height:doms.text.height()
             }).value(text);
 
