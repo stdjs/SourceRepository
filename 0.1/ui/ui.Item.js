@@ -205,7 +205,8 @@ Std.ui.module("Item",{
                 font:input.css("font"),
                 fontSize:input.css("fontSize"),
                 position:"absolute",
-                visibility:"hidden"
+                visibility:"hidden",
+                padding:input.css("padding")
             }).appendTo(that[0]);
 
             input.width(temp.text(text).width()).select().on({
