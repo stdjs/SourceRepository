@@ -50,7 +50,7 @@ Std.ui.module("List",{
     events:"itemClick select",
     /*[#module option:action]*/
     action:{
-        children:"append"
+        children:"append itemRename"
     },
     /*[#module option:option]*/
     option:{
@@ -59,6 +59,7 @@ Std.ui.module("List",{
         type:"default",         //default,block
         value:null,
         items:null,
+        editable:false,
         template:null,
         dataSource:null,
         itemHeight:24,
@@ -144,6 +145,11 @@ Std.ui.module("List",{
 
                 item[0].mouse({
                     auto:false,
+                    dblclick:function(){
+                        if(that.editable()){
+                            that.editItem(item);
+                        }
+                    },
                     click:function(){
                         that.emit("itemClick",item);
                     },
@@ -152,6 +158,20 @@ Std.ui.module("List",{
                     }
                 },e);
             });
+            return that;
+        },
+        /*
+         * edit item
+        */
+        editItem:function(item){
+            var that = this;
+
+            if(item instanceof Std.ui("ListItem")){
+                item.edit(function(oldText,text){
+                    that.emit("itemRename",[item,oldText,text],true);
+                });
+            }
+
             return that;
         },
         /*
@@ -232,6 +252,12 @@ Std.ui.module("List",{
             return this.opt("dataSource",dataSource,function(){
                 this.reload();
             });
+        },
+        /*
+         * editable
+        */
+        editable:function(editable){
+            return this.opt("editable",editable);
         },
         /*
          * template

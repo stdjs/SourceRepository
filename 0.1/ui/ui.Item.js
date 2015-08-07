@@ -187,6 +187,58 @@ Std.ui.module("Item",{
                 }
                 doms.iconImg.attr("src",icon);
             });
+        },
+        /*
+         * edit
+        */
+        edit:function(callback){
+            if(this._editState){
+                return;
+            }
+            var that  = this;
+            var doms  = that.D;
+            var text  = doms.text.html();
+            var timer = null;
+            var input = newDom("input","_edit");
+            var temp  = newDom("span").css({
+                top:-99,
+                font:input.css("font"),
+                fontSize:input.css("fontSize"),
+                position:"absolute",
+                visibility:"hidden"
+            }).appendTo(that[0]);
+
+            input.width(temp.text(text).width()).select().on({
+                mousedown:function(e){
+                    e.stopPropagation();
+                },
+                keydown:function(e){
+                    if(e.keyCode === 13){
+                        input.blur()
+                    }else{
+                        clearTimeout(timer);
+                        timer = setTimeout(function(){
+                            input.width(temp.text(input.value()).width());
+                        },1);
+                    }
+                },
+                blur:function(){
+                    var value = input.value();
+                    doms.text.show();
+                    if(isFunction(callback)){
+                        callback.call(that.text(value),text,value);
+                    }
+                    input.remove();
+                    that._editState = false;
+                }
+            }).appendTo(that).focus().css({
+                float:doms.text.css("float"),
+                width:doms.text.width(),
+                height:doms.text.height()
+            }).value(text);
+
+            doms.text.hide();
+            that._editState = true;
         }
     },
     /*[#module option:main]*/

@@ -661,6 +661,9 @@ Std.ui.module("Tree",function(){
              * edit node
             */
             editNode:function(node){
+                if(node._editState){
+                    return this;
+                }
                 var that  = this;
                 var text  = node.text();
                 var timer = null;
@@ -674,14 +677,13 @@ Std.ui.module("Tree",function(){
                     position:"absolute",
                     visibility:"hidden"
                 });
-
-                if(node._editState){
-                    return that;
-                }
                 node._editState = true;
                 temp.appendTo(that[0]);
                 node.D.text.hide();
                 node.D.anchor.append(input.width(temp.text(text).width()).focus().on({
+                    mousedown:function(e){
+                        e.stopPropagation();
+                    },
                     blur:function(){
                         var value = input.value();
                         node.text(value);
@@ -703,7 +705,7 @@ Std.ui.module("Tree",function(){
                         }
                     }
                 }));
-                input.dom.select();
+                input.select();
 
                 return that;
             },

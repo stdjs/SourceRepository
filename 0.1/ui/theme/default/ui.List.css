@@ -55,6 +55,13 @@
     float: left;
     text-indent: 5px;
 }
+.StdUI_List > .StdUI_ListItem > input._edit{
+    float: left;
+    border: 0;
+    padding: 0 4px 0 4px;
+    background: white;
+    color: #272727;
+}
 
 /************ Template Item **************/
 .StdUI_List > .StdUI_TemplateItem{
