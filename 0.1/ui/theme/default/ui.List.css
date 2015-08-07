@@ -57,7 +57,6 @@
 }
 .StdUI_List > .StdUI_ListItem > input._edit{
     float: left;
-    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
     font-size: 12px;
     border: 0;
     padding: 0 4px 0 4px;
