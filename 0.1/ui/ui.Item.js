@@ -233,6 +233,8 @@ Std.ui.module("Item",{
                     that._editState = false;
                 }
             }).appendTo(that).focus().css({
+                font:doms.text.css("font"),
+                fontSize:doms.text.css("fontSize"),
                 float:doms.text.css("float"),
                 width:doms.text.width(),
                 height:doms.text.height()
