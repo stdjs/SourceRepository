@@ -47,10 +47,10 @@ Std.ui.module("List",{
     /*[#module option:parent]*/
     parent:"widget",
     /*[#module option:events]*/
-    events:"itemClick select",
+    events:"itemClick itemRename select",
     /*[#module option:action]*/
     action:{
-        children:"append itemRename"
+        children:"append"
     },
     /*[#module option:option]*/
     option:{
