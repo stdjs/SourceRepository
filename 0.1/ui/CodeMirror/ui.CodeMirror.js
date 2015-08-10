@@ -7,7 +7,8 @@ Std.ui.module("CodeMirror",{
         value:"",
         mode:"javascript",
         lineNumbers:true,
-        theme:"monokai"
+        theme:"monokai",
+        basePath:null
     },
     private:{
         timer:null
@@ -37,7 +38,7 @@ Std.ui.module("CodeMirror",{
                 autofocus:true
             },options));
 
-            Std.loader.js("mode/" + opts.mode + "/" + opts.mode + ".js",function(){
+            Std.loader.js(opts.basePath + "mode/" + opts.mode + "/" + opts.mode + ".js",function(){
                 that.option("mode",opts.mode);
             });
 
@@ -73,7 +74,7 @@ Std.ui.module("CodeMirror",{
             var that = this;
 
             return that.opt("theme",theme,function(){
-                Std.loader.css("theme/" + theme + ".css",function(){
+                Std.loader.css(opts.basePath + "theme/" + theme + ".css",function(){
                     that.option("theme",theme);
                 });
             });
@@ -106,6 +107,18 @@ Std.ui.module("CodeMirror",{
         }
     },
     main:function(that,opts,dom){
+        if(isEmpty(opts.basePath)){
+            Std.dom.united("script").each(function(i,script){
+                var src = script.attr("src") || "";
+                if(/codemirror[\w\-\.]*\.js/.test(src)) {
+                    return opts.basePath = src.substring(0, src.lastIndexOf('/') + 1);
+                }
+            });
+        }
+        if(isEmpty(opts.basePath)){
+            opts.basePath = "";
+        }
+
         that.call_opts("theme")
     }
 });

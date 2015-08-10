@@ -193,7 +193,7 @@ Std.source.response("StdJS",function(){
         },
         "ui.CodeMirror":{
             files:[
-                "ui/CodeMirror/lib/codemirror.css","ui/CodeMirror/lib/codemirror.min.js","ui/CodeMirror/ui.CodeMirror.js"
+                "ui/CodeMirror/codemirror.css","ui/CodeMirror/codemirror.min.js","ui/CodeMirror/ui.CodeMirror.js"
             ]
         },
 	
