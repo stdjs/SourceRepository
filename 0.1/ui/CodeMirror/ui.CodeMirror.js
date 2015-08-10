@@ -8,7 +8,14 @@ Std.ui.module("CodeMirror",{
         mode:"javascript",
         lineNumbers:true,
         theme:"monokai",
-        basePath:null
+        basePath:function(){
+            Std.dom.united("script").each(function(i,script){
+                var src = script.attr("src") || "";
+                if(/codemirror[\w\-\.]*\.js/.test(src.toLowerCase())) {
+                    return src.substring(0, src.lastIndexOf('/') + 1);
+                }
+            })
+        }()
     },
     private:{
         timer:null
@@ -107,17 +114,6 @@ Std.ui.module("CodeMirror",{
         }
     },
     main:function(that,opts,dom){
-        if(isEmpty(opts.basePath)){
-            Std.dom.united("script").each(function(i,script){
-                var src = script.attr("src") || "";
-                if(/codemirror[\w\-\.]*\.js/.test(src.toLowerCase())) {
-                    return opts.basePath = src.substring(0, src.lastIndexOf('/') + 1);
-                }
-            });
-        }
-        if(isEmpty(opts.basePath)){
-            opts.basePath = "";
-        }
 
         that.call_opts("theme")
     }
