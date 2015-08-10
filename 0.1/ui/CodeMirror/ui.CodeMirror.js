@@ -74,7 +74,7 @@ Std.ui.module("CodeMirror",{
             var that = this;
 
             return that.opt("theme",theme,function(){
-                Std.loader.css(opts.basePath + "theme/" + theme + ".css",function(){
+                Std.loader.css(that.opts.basePath + "theme/" + theme + ".css",function(){
                     that.option("theme",theme);
                 });
             });
