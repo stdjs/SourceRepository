@@ -9,12 +9,15 @@ Std.ui.module("CodeMirror",{
         lineNumbers:true,
         theme:"monokai",
         basePath:function(){
-            return Std.dom.united("script").each(function(i,script){
+            var path = "";
+            Std.dom.united("script").each(function(i,script){
                 var src = script.attr("src") || "";
                 if(/codemirror[\w\-\.]*\.js/.test(src.toLowerCase())) {
-                    return src.substring(0, src.lastIndexOf('/') + 1);
+                    return path = src.substring(0, src.lastIndexOf('/') + 1);
                 }
-            })
+            });
+            alert(path);
+            return path;
         }()
     },
     private:{
