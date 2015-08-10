@@ -110,8 +110,9 @@ Std.ui.module("CodeMirror",{
         if(isEmpty(opts.basePath)){
             Std.dom.united("script").each(function(i,script){
                 var src = script.attr("src") || "";
+                console.log(src)
                 if(/codemirror[\w\-\.]*\.js/.test(src)) {
-                    console.log(src.substring(0, src.lastIndexOf('/') + 1))
+                    console.log(src.substring(0, src.lastIndexOf('/') + 1));
                     return opts.basePath = src.substring(0, src.lastIndexOf('/') + 1);
                 }
             });
