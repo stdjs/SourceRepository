@@ -185,9 +185,15 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.ImageCutter")
             ]
         },
+
         "ui.KindEditor":{
             files:[
                "ui/kindeditor/themes/default/default.css","ui/kindeditor/kindeditor-all-min.js","ui/kindeditor/kindeditor.js"
+            ]
+        },
+        "ui.CodeMirror":{
+            files:[
+                "ui/CodeMirror/lib/codemirror.css","ui/CodeMirror/lib/codemirror.min.js","ui/CodeMirror/ui.CodeMirror.js"
             ]
         },
 	
