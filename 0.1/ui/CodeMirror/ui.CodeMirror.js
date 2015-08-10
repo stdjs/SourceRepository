@@ -9,7 +9,7 @@ Std.ui.module("CodeMirror",{
         lineNumbers:true,
         theme:"monokai",
         basePath:function(){
-            Std.dom.united("script").each(function(i,script){
+            return Std.dom.united("script").each(function(i,script){
                 var src = script.attr("src") || "";
                 if(/codemirror[\w\-\.]*\.js/.test(src.toLowerCase())) {
                     return src.substring(0, src.lastIndexOf('/') + 1);
