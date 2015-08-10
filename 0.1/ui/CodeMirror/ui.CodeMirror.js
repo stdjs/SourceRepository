@@ -16,7 +16,6 @@ Std.ui.module("CodeMirror",{
                     return path = src.substring(0, src.lastIndexOf('/') + 1);
                 }
             });
-            alert(path);
             return path;
         }()
     },
