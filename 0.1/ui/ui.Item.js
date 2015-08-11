@@ -207,7 +207,7 @@ Std.ui.module("Item",{
                 position:"absolute",
                 visibility:"hidden",
                 padding:input.css("padding")
-            }).appendTo(that[0]);
+            }).text(text).appendTo(that[0]);
 
             input.on({
                 mousedown:function(e){
@@ -234,7 +234,7 @@ Std.ui.module("Item",{
                 }
             }).appendTo(that).focus().css({
                 float:doms.text.css("float"),
-                width:temp.text(text).width(),
+                width:temp.width(),
                 height:doms.text.height()
             }).value(text).select();
 

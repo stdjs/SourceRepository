@@ -260,6 +260,18 @@ Std.ui.module("List",{
             return this.opt("editable",editable);
         },
         /*
+         * each
+         */
+        each:function(callback,makeReturn){
+            var that = this;
+
+            return Std.each(that.items,function(i,row){
+                if(isFunction(callback)){
+                    return callback.call(that,i,row);
+                }
+            },makeReturn);
+        },
+        /*
          * template
         */
         template:function(template){
