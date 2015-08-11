@@ -91,18 +91,22 @@ Std.ui.module("List",{
          * extend remove
         */
         remove:Std.func(function(item){
-            var that  = this;
-            var items = that.items;
+            var that          = this;
+            var items         = that.items;
+            var selectedItems = that.selectedItems;
 
-            if(isNumber(item)){
-                items[item].remove();
-                items.remove(items);
-            }else if(isObject(item)){
+            if(isObject(item)){
                 var index = items.indexOf(item);
                 if(index !== -1){
-                    items[index].remove();
-                    items.remove(index);
+                    item = index;
                 }
+            }
+            if(isNumber(item) && item < items.length){
+                if(selectedItems.has(item)){
+                    that.clearSelected(item);
+                }
+                items[item].remove();
+                items.remove(items);
             }
         },{
             each:[isArray]
