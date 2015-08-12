@@ -52,6 +52,9 @@ Std.source.response("StdJS",function(){
                 JSFile_UI("ui.DateTimeEdit")
             ]
         },
+        "ui.DateTimeView":{
+            files:JSFile_UI("ui.DateTimeView")
+        },
         "ui.Button":[
             CSSFile_UI("ui.Button"),
             JSFile_UI("ui.Button")
