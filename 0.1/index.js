@@ -5,6 +5,9 @@ Std.source.response("StdJS",function(){
     function JSFile_UI(name){
         return "ui/" + name + ".js";
     }
+    function JSCSSFile_UI(name){
+        return [CSSFile_UI(name),JSFile_UI(name)];
+    }
     function cryptoJS(name){
         return "crypto/"+name+".js";
     }
@@ -12,178 +15,75 @@ Std.source.response("StdJS",function(){
         "ui.Canvas":JSFile_UI("ui.Canvas"),
         "ui.Image":JSFile_UI("ui.Image"),
         "ui.Label":JSFile_UI("ui.Label"),
-        "ui.Item":JSFile_UI("ui.Item"),
         "ui.Splitter":JSFile_UI("ui.Splitter"),
-        "ui.FieldSet":[
-            CSSFile_UI("ui.FieldSet"),
-            JSFile_UI("ui.FieldSet")
-        ],
-        "ui.ToolTip":[
-            CSSFile_UI("ui.ToolTip"),
-            JSFile_UI("ui.ToolTip")
-        ],
-        "ui.CheckBox":[
-            CSSFile_UI("ui.CheckBox"),
-            JSFile_UI("ui.CheckBox")
-        ],
-        "ui.RadioBox":[
-            CSSFile_UI("ui.RadioBox"),
-            JSFile_UI("ui.RadioBox")
-        ],
+        "ui.Item":JSCSSFile_UI("ui.Item"),
+        "ui.FieldSet":JSCSSFile_UI("ui.FieldSet"),
+        "ui.ToolTip":JSCSSFile_UI("ui.ToolTip"),
+        "ui.CheckBox":JSCSSFile_UI("ui.CheckBox"),
+        "ui.RadioBox":JSCSSFile_UI("ui.RadioBox"),
 	    "ui.SpinBox":{
             basics:"ui.LineEdit",
-            files:[
-                CSSFile_UI("ui.SpinBox"),
-                JSFile_UI("ui.SpinBox")
-            ]
+            files:JSCSSFile_UI("ui.SpinBox")
         },
-        "ui.SwitchBox":[
-            CSSFile_UI("ui.SwitchBox"),
-            JSFile_UI("ui.SwitchBox")
-        ],
-        "ui.LineEdit":[
-            CSSFile_UI("ui.Edit"),
-            JSFile_UI("ui.Edit")
-        ],
-	    "ui.TextEdit":[
-            CSSFile_UI("ui.Edit"),
-            JSFile_UI("ui.Edit")
-        ],
+        "ui.SwitchBox":JSCSSFile_UI("ui.SwitchBox"),
+        "ui.LineEdit":JSCSSFile_UI("ui.Edit"),
+	    "ui.TextEdit":JSCSSFile_UI("ui.Edit"),
         "ui.DateTimeEdit":{
             basics:["ui.LineEdit","ui.DatePicker"],
-            files:[
-                CSSFile_UI("ui.DateTimeEdit"),
-                JSFile_UI("ui.DateTimeEdit")
-            ]
+            files:JSCSSFile_UI("ui.DateTimeEdit")
         },
         "ui.DateTimeView":{
             files:JSFile_UI("ui.DateTimeView")
         },
-        "ui.Button":[
-            CSSFile_UI("ui.Button"),
-            JSFile_UI("ui.Button")
-        ],
-        "ui.ColorPicker":[
-            CSSFile_UI("ui.ColorPicker"),
-            JSFile_UI("ui.ColorPicker")
-        ],
-        "ui.DatePicker":[
-            CSSFile_UI("ui.DatePicker"),
-            JSFile_UI("ui.DatePicker")
-        ],
+        "ui.Button":JSCSSFile_UI("ui.Button"),
+        "ui.ColorPicker":JSCSSFile_UI("ui.ColorPicker"),
+        "ui.DatePicker":JSCSSFile_UI("ui.DatePicker"),
         "ui.List":{
             basics:"ui.Item",
-            files:[
-                CSSFile_UI("ui.List"),
-                JSFile_UI("ui.List")
-            ]
+            files:JSCSSFile_UI("ui.List")
         },
         "ui.Menu":{
             basics:"ui.Item",
-            files:[
-                CSSFile_UI("ui.Menu"),
-                JSFile_UI("ui.Menu")
-            ]
+            files:JSCSSFile_UI("ui.Menu")
         },
-        "ui.MenuBar":[
-            CSSFile_UI("ui.MenuBar"),
-            JSFile_UI("ui.MenuBar")
-        ],
-        "ui.PathBar":[
-            CSSFile_UI("ui.PathBar"),
-            JSFile_UI("ui.PathBar")
-        ],
+        "ui.MenuBar":JSCSSFile_UI("ui.MenuBar"),
+        "ui.PathBar":JSCSSFile_UI("ui.PathBar"),
         "ui.ComboBox":{
             basics:"ui.Item",
-            files:[
-                CSSFile_UI("ui.ComboBox"),
-                JSFile_UI("ui.ComboBox")
-            ]
+            files:JSCSSFile_UI("ui.ComboBox")
         },
         "ui.ToolBar":{
-            basics:[
-                "ui.Button"
-            ],
-            files:[
-                CSSFile_UI("ui.ToolBar"),
-                JSFile_UI("ui.ToolBar")
-            ]
+            basics:"ui.Button",
+            files:JSCSSFile_UI("ui.ToolBar")
         },
         "ui.Panel":{
-            basics:[
-                "ui.ToolBar"
-            ],
-            files:[
-                CSSFile_UI("ui.Panel"),
-                JSFile_UI("ui.Panel")
-            ]
+            basics:"ui.ToolBar",
+            files:JSCSSFile_UI("ui.Panel")
         },
         "ui.Window":{
-            basics:[
-                "ui.Panel","ui.Menu"
-            ],
-            files:[
-                CSSFile_UI("ui.Window"),
-                JSFile_UI("ui.Window")
-            ]
+            basics:["ui.Panel","ui.Menu"],
+            files:JSCSSFile_UI("ui.Window")
         },
-        "ui.MessageBox":[
-            CSSFile_UI("ui.MessageBox"),
-            JSFile_UI("ui.MessageBox")
-        ],
+        "ui.MessageBox":JSCSSFile_UI("ui.MessageBox"),
         "ui.Pagination":{
             basics:"ui.ComboBox",
-            files:[
-                CSSFile_UI("ui.Pagination"),
-                JSFile_UI("ui.Pagination")
-            ]
+            files:JSCSSFile_UI("ui.Pagination")
         },
-        "ui.Progress":[
-            CSSFile_UI("ui.Progress"),
-            JSFile_UI("ui.Progress")
-        ],
+        "ui.Progress":JSCSSFile_UI("ui.Progress"),
         "ui.Accordion":{
-            basics:[
-                "ui.Item"
-            ],
-            files:[
-                CSSFile_UI("ui.Accordion"),
-                JSFile_UI("ui.Accordion")
-            ]
+            basics:"ui.Item",
+            files:JSCSSFile_UI("ui.Accordion")
         },
         "ui.TabPanel":{
-            basics:[
-                "ui.Button"
-            ],
-            files:[
-                CSSFile_UI("ui.TabPanel"),
-                JSFile_UI("ui.TabPanel")
-            ]
+            basics:"ui.Button",
+            files:JSCSSFile_UI("ui.TabPanel")
         },
-        "ui.Slider":[
-            CSSFile_UI("ui.Slider"),
-            JSFile_UI("ui.Slider")
-        ],
-        "ui.Tree":[
-            CSSFile_UI("ui.Tree"),
-            JSFile_UI("ui.Tree")
-        ],
-        "ui.DataGrid":[
-            CSSFile_UI("ui.DataGrid"),
-            JSFile_UI("ui.DataGrid")
-        ],
-        "ui.TreeGrid":[
-            CSSFile_UI("ui.TreeGrid"),
-            JSFile_UI("ui.TreeGrid")
-        ],
-        "ui.PropertyGird":[
-            CSSFile_UI("ui.PropertyGrid"),
-            JSFile_UI("ui.PropertyGrid")
-        ],
-        "ui.Video":[
-            CSSFile_UI("ui.Video"),
-            JSFile_UI("ui.Video")
-        ],
+        "ui.Slider":JSCSSFile_UI("ui.Slider"),
+        "ui.Tree":JSCSSFile_UI("ui.Tree"),
+        "ui.DataGrid":JSCSSFile_UI("ui.DataGrid"),
+        "ui.TreeGrid":JSCSSFile_UI("ui.TreeGrid"),
+        "ui.PropertyGird":JSCSSFile_UI("ui.PropertyGrid"),
+        "ui.Video":JSCSSFile_UI("ui.Video"),
         "ui.ImageCutter":{
             basics:[
                 "ui.Slider","ui.Button"
