@@ -46,7 +46,10 @@ Std.source.response("StdJS",function(){
             basics:"ui.Item",
             files:JSCSSFile_UI("ui.Menu")
         },
-        "ui.MenuBar":JSCSSFile_UI("ui.MenuBar"),
+        "ui.MenuBar":{
+            basics:"ui.Menu",
+            files:JSCSSFile_UI("ui.MenuBar")
+        },
         "ui.PathBar":JSCSSFile_UI("ui.PathBar"),
         "ui.ComboBox":{
             basics:"ui.Item",
