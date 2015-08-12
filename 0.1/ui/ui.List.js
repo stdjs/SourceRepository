@@ -132,15 +132,21 @@ Std.ui.module("List",{
          * init List Item events
         */
         initItemEvents:function(){
-            var that   = this;
-            var select = function(index,item){
-                switch(that.opts.selectionMode){
-                    case "single":
-                        that.select(index);
-                        break;
-                    case "multi":
-                        item._selected ? that.clearSelect(item) : that.select(item);
-                        break;
+            var that          = this;
+            var selectionMode = that.opts.selectionMode;
+            var select        = function(index,item,e){
+                if(selectionMode === "multi"){
+                    if(!e.ctrlKey){
+                        that.clearSelect();
+                    }
+                    if(item._selected){
+                        that.clearSelect(item);
+                    }else{
+                        that.select(item);
+                    }
+                }else if(selectionMode !== "none"){
+                    that.clearSelect();
+                    that.select(index);
                 }
             };
             that[0].delegate("mouseenter",".StdUI_ListItem,.StdUI_TemplateItem",function(e){
@@ -157,8 +163,8 @@ Std.ui.module("List",{
                     click:function(){
                         that.emit("itemClick",item);
                     },
-                    down:function(){
-                        select(index,item);
+                    down:function(e){
+                        select(index,item,e);
                     }
                 },e);
             });
