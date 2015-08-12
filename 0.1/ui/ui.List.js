@@ -202,7 +202,7 @@ Std.ui.module("List",{
                     textField:opts.textField,
                     valueField:opts.valueField
                 });
-            }else if(isString(data)){
+            }else if(isString(data) || isNumber(data)){
                 option.text = data;
             }else if(isObject(data)){
                 if(isString(data.ui)){

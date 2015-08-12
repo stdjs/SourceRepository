@@ -70,8 +70,10 @@ Std.ui.module("DateTimeEdit",{
         */
         initPicker:function(){
             var that   = this;
+            var opts   = that.opts;
             var picker = that._picker = Std.ui("DatePicker",{
-                format:that.opts.format,
+                footer:opts.footer,
+                format:opts.format,
                 renderTo:"body"
             });
             if(!isEmpty(that.value())){
