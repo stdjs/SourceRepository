@@ -14,6 +14,10 @@ Std.source.response("StdJS",function(){
         "ui.Label":JSFile_UI("ui.Label"),
         "ui.Item":JSFile_UI("ui.Item"),
         "ui.Splitter":JSFile_UI("ui.Splitter"),
+        "ui.FieldSet":[
+            CSSFile_UI("ui.FieldSet"),
+            JSFile_UI("ui.FieldSet")
+        ],
         "ui.ToolTip":[
             CSSFile_UI("ui.ToolTip"),
             JSFile_UI("ui.ToolTip")
