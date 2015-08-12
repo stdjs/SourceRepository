@@ -61,7 +61,7 @@ Std.model("ui.Progress",{
             var width = opts.width;
 
             if(!isNumber(width)){
-                width = that.clientWidth();
+                width = that.width() - that.boxSize.width;
             }
             that.D.location.width(int((that.value() - opts.min) * (width / (opts.max - opts.min))));
 
