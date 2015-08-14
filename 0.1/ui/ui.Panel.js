@@ -301,18 +301,13 @@ Std.ui.module("Panel",{
         */
         url:function(url,callback){
             var that = this;
-            var opts = that.opts;
 
-            return that.opt("url",url,function(){
-                Std.ajax({
-                    url:url,
-                    cache:opts.cache || false,
-                    success:function(result){
-                        that._central.html(result);
-                        Std_func(callback).call(that,result);
-                    }
-                });
-            });
+            if(url === undefined){
+                return that._central.url();
+            }
+            that._central.url(url,callback);
+
+            return that;
         },
         /*
          * html(rewrite)
