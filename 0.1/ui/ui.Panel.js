@@ -297,6 +297,25 @@ Std.ui.module("Panel",{
             });
         },
         /*
+         * load by url
+        */
+        url:function(url,callback){
+            var that = this;
+            var opts = that.opts;
+
+            return that.opt("url",url,function(){
+                Std_ajax({
+                    url:url,
+                    cache:opts.cache,
+                    success:function(result){
+                        that.removeLayout();
+                        that.html(result);
+                        Std_func(callback).call(that,result);
+                    }
+                });
+            });
+        },
+        /*
          * html(rewrite)
         */
         html:function(html){

@@ -276,6 +276,7 @@ Std.ui.module("Menu",{
                     parent.focus().hideChild();
                     parent.parent().focus();
                 }
+                return false;
             }
             //-----up key
             else if(keyCode === 38){
@@ -286,6 +287,7 @@ Std.ui.module("Menu",{
                     i = --i < 0 ? items.length - 1 : i;
                     check(items[i]) ? arguments.callee(i) : that.select(i);
                 })(index);
+                return false;
             }
             //-----right key
             else if(keyCode === 39){
@@ -293,6 +295,7 @@ Std.ui.module("Menu",{
                     currentItem.showChild();
                     currentItem.menu.focus().select(0);
                 }
+                return false;
             }
             //-----right key
             else if(keyCode === 40){
@@ -303,6 +306,7 @@ Std.ui.module("Menu",{
                     i = ++i >= items.length ? 0 : i;
                     check(items[i]) ? arguments.callee(i) : that.select(i);
                 })(index);
+                return false;
             }
         },
         /*
@@ -320,7 +324,7 @@ Std.ui.module("Menu",{
                     if(index == -1){
                         return;
                     }
-                    that.keyEvent(e.keyCode,currentItem,index);
+                    return that.keyEvent(e.keyCode,currentItem,index);
                 }
             });
             return that;

@@ -287,7 +287,8 @@ Std.ui.module("MessageBox",{
                 }
                 that.input = Std.ui(type,{
                     width:that.opts.inputWidth,
-                    height:that.opts.inputHeight
+                    height:that.opts.inputHeight,
+                    value:that.value()
                 });
             });
         },
