@@ -252,12 +252,15 @@ Std.ui.module("MessageBox",{
          * value
         */
         value:function(value){
-            var that = this;
+            var that  = this;
+            var opts  = that.opts;
+            var input = that.input;
 
             if(value === undefined){
-                return that.input.value();
+                return input ? input.value() : opts.value;
             }
-            that.input.value(value);
+            input && input.value(value);
+            opts.value = value;
 
             return that;
         },
@@ -430,10 +433,7 @@ Std.ui.module("MessageBox",{
         ]);
 
         //--------
-        dom.append([
-            that.D.Title,
-            that.D.Body
-        ]);
+        dom.append([that.D.Title,that.D.Body]);
 
         //--------
         if(opts.title === null){
