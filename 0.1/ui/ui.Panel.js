@@ -308,7 +308,7 @@ Std.ui.module("Panel",{
                     url:url,
                     cache:opts.cache || false,
                     success:function(result){
-                        that.html(result);
+                        that._central.html(result);
                         Std_func(callback).call(that,result);
                     }
                 });
@@ -323,7 +323,6 @@ Std.ui.module("Panel",{
             if(html === undefined){
                 return that._central.html();
             }
-            that._central.removeLayout();
             that._central.html(html);
 
             return that;
