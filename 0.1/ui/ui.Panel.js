@@ -304,11 +304,10 @@ Std.ui.module("Panel",{
             var opts = that.opts;
 
             return that.opt("url",url,function(){
-                Std_ajax({
+                Std.ajax({
                     url:url,
-                    cache:opts.cache,
+                    cache:opts.cache || false,
                     success:function(result){
-                        that.removeLayout();
                         that.html(result);
                         Std_func(callback).call(that,result);
                     }
@@ -324,6 +323,7 @@ Std.ui.module("Panel",{
             if(html === undefined){
                 return that._central.html();
             }
+            that._central.removeLayout();
             that._central.html(html);
 
             return that;
