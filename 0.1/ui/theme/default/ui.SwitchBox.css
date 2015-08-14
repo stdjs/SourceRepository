@@ -37,10 +37,17 @@
 .StdUI_SwitchBox.disabled,
 .StdUI_SwitchBox.disabled *
 {
+    filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)\0;
+    filter:grayscale(100%);
     cursor: not-allowed;
 }
 .StdUI_SwitchBox.disabled > ._state{
     color: #9A9A9A;
     text-shadow: 0 1px 0 white;
     background: #DAD6D3;
+}
+.StdUI_SwitchBox.disabled > ._handle{
+    border-color: #828282;
+    background: #8B8B8B;
+    box-shadow: 1px 1px 0 #959595 inset;
 }

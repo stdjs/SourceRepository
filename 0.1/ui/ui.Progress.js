@@ -18,7 +18,7 @@ Std.model("ui.Progress",{
         max:100,
         value:0,
         text:"%.2f%%",
-        color:"blue"  //blue,red,black,green,gray
+        color:"blue"  //blue,red,black,green
     },
     /*[#module option:extend]*/
     extend:{
