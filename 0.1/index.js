@@ -88,6 +88,7 @@ Std.source.response("StdJS",function(){
         "ui.PropertyGird":JSCSSFile_UI("ui.PropertyGrid"),
         "ui.Video":JSCSSFile_UI("ui.Video"),
         "ui.TaskBar":JSCSSFile_UI("ui.TaskBar"),
+        "ui.Tray":JSCSSFile_UI("ui.Tray"),
         "ui.ImageCutter":{
             basics:[
                 "ui.Slider","ui.Button"

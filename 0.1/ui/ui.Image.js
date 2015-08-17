@@ -124,8 +124,11 @@ Std.ui.module("Image",{
         }
     },
     /*[#module option:main]*/
-    main:function(that){
+    main:function(that,opts){
         that.D = {};
         that.call_opts("value",true);
+        if(opts.gray){
+            that.gray(true);
+        }
     }
 });
