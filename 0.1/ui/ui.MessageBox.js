@@ -200,7 +200,7 @@ Std.ui.module("MessageBox",{
                 Std.func(function(){
                     that.remove();
                 },{
-                    delay:ms.timeout
+                    delay:ms
                 })();
             });
         },
