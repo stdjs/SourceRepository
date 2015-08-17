@@ -367,7 +367,7 @@ Std.ui.module("Desktop_ControlBar",{
         master:null,
         height:40,
         defaultClass:"StdUI_Desktop_ControlBar",
-        boxSizing:"border-box",
+        boxSizing:"border-box"
     },
     /*[#module option:extend]*/
     extend:{

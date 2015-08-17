@@ -291,14 +291,15 @@ Std.plugin.module("ToolTip",{
             var opts = that.opts;
 
             if(!that._tooltip){
-                that.createWidget()._tooltip[0].mouse({
+                that.createWidget()._tooltip[0].hide().mouse({
                     enter:function(){
                         that.clearTimer();
+                        that._timer = setTimeout(function() {
+                            that._tooltip.show();
+                        },opts.timeout);
                     },
                     leave:function(){
-                        that._timer = setTimeout(function(){
-                            that.removeToolTip();
-                        },opts.timeout);
+                        that.removeToolTip();
                     }
                 });
             }

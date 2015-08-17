@@ -193,10 +193,8 @@ Std.ui.module("TaskBar",{
             var that = this;
 
             Std.dom(document).on("mousedown",that._docEvents = function(e){
-                if(that._taskMenu){
-                    if(!that._taskMenu[0].contains(e.target)){
-                        that._taskMenu.hide();
-                    }
+                if(that._taskMenu && !that._taskMenu[0].contains(e.target)){
+                    that._taskMenu.hide();
                 }
             });
         },
