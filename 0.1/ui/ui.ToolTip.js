@@ -402,7 +402,7 @@ Std.plugin.module("ToolTip",{
 
                 },
                 leave:function(){
-                    that.removeToolTip();
+                    that.clearTimer().removeToolTip();
                 }
             });
         };
