@@ -288,20 +288,9 @@ Std.plugin.module("ToolTip",{
         */
         initToolTip:function(){
             var that = this;
-            var opts = that.opts;
 
             if(!that._tooltip){
-                that.createWidget()._tooltip[0].hide().mouse({
-                    enter:function(){
-                        that.clearTimer();
-                        that._timer = setTimeout(function() {
-                            that._tooltip[0].show();
-                        },opts.timeout);
-                    },
-                    leave:function(){
-                        that.removeToolTip();
-                    }
-                });
+                that.createWidget();
             }
             return that;
         },
@@ -397,20 +386,23 @@ Std.plugin.module("ToolTip",{
         that._timer = null;
 
         var mouseevent = function(e){
+            var target = this;
             this.mouse({
                 auto:false,
                 enter:function(){
-                    if(!that._tooltip){
-                        that.initToolTip();
-                    }
                     that.clearTimer();
-                    that.target(this).emit("render",this);
-                    that._tooltip.relocate();
+                    that._timer = setTimeout(function(){
+                        if(!that._tooltip){
+                            that.initToolTip();
+                        }
+                        that.target(target);
+                        that.emit("render",target);
+                        that._tooltip.relocate();
+                    },opts.timeout)
+
                 },
                 leave:function(){
-                    that._timer = setTimeout(function(){
-                        that.removeToolTip();
-                    },opts.timeout);
+                    that.removeToolTip();
                 }
             });
         };
