@@ -3223,7 +3223,6 @@ _extend(KCmd, {
 	
 			if(format === false){
 			    frag = Std.dom.fragment(val);
-			    console.log(frag);
 			}else{
 			    frag = doc.createDocumentFragment();
 			    K('@' + val, doc).each(function() {
@@ -3243,7 +3242,6 @@ _extend(KCmd, {
 			}
 			return self;
 		}
-		alert(quickMode + "_" + format);
 		insertHtml(range, val,format);
 		return self;
 	},

@@ -1,3 +1,6 @@
+pre{
+	background:black;
+}
 /* common */
 .ke-inline-block {
 	display: -moz-inline-stack;
