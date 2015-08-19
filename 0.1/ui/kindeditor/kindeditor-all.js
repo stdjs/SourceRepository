@@ -3242,6 +3242,7 @@ _extend(KCmd, {
 			}
 			return self;
 		}
+		alert(value)
 		insertHtml(range, val);
 		return self;
 	},
