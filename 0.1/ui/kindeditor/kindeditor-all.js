@@ -904,9 +904,11 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 		}
 		return startNewline + '<' + startSlash + tagName + attr + endSlash + '>' + endNewline;
 	});
+	/*
 	html = html.replace(/(<(?:pre|pre\s[^>]*)>)([\s\S]*?)(<\/pre>)/ig, function($0, $1, $2, $3) {
 		return $1 + $2.replace(/\n/g, '<span id="__kindeditor_pre_newline__">\n') + $3;
 	});
+	*/
 	html = html.replace(/\n\s*\n/g, '\n');
 	html = html.replace(/<span id="__kindeditor_pre_newline__">\n/g, '\n');
 	return _trim(html);
@@ -3194,7 +3196,7 @@ _extend(KCmd, {
 		this.remove(map);
 		return this.select();
 	},
-	inserthtml : function(val, quickMode) {
+	inserthtml : function(val, quickMode,format) {
 		var self = this, range = self.range;
 		if (val === '') {
 			return self;
@@ -3215,12 +3217,19 @@ _extend(KCmd, {
 			self.select(false);
 		}
 		function insertHtml(range, val) {
-			var doc = range.doc,
-				frag = doc.createDocumentFragment();
-			K('@' + val, doc).each(function() {
+			var doc = range.doc;
+			var frag;
+				
+			if(format === false){
+			    frag = Std.dom.fragment(val);
+			    console.log(frag);
+			}else{
+			    frag = doc.createDocumentFragment();
+			    K('@' + val, doc).each(function() {
 				frag.appendChild(this);
-			});
-			range.deleteContents();
+			    });
+			    range.deleteContents();
+			}
 			range.insertNode(frag);
 			range.collapse(false);
 			self.select(false);
@@ -6695,7 +6704,7 @@ KindEditor.plugin('code', function(K) {
 							textarea[0].focus();
 							return;
 						}
-						self.insertHtml(html).hideDialog().focus();
+						self.insertHtml(html,false,false).hideDialog().focus();
 					}
 				}
 			}),
