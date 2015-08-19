@@ -3220,6 +3220,7 @@ _extend(KCmd, {
 			var doc = range.doc;
 			var frag;
 				
+				alert(format)
 			if(format === false){
 			    frag = Std.dom.fragment(val);
 			    console.log(frag);
@@ -3242,7 +3243,7 @@ _extend(KCmd, {
 			}
 			return self;
 		}
-		alert(value)
+	
 		insertHtml(range, val);
 		return self;
 	},
