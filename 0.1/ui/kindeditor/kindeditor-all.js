@@ -3243,7 +3243,7 @@ _extend(KCmd, {
 			}
 			return self;
 		}
-	
+		alert(quickMode + "_" + format);
 		insertHtml(range, val,format);
 		return self;
 	},
