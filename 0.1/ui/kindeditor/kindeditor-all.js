@@ -741,9 +741,11 @@ function _formatHtml(html, htmlTags, urlType, wellFormatted, indentChar) {
 	wellFormatted = _undef(wellFormatted, false);
 	indentChar = _undef(indentChar, '\t');
 	var fontSizeList = 'xx-small,x-small,small,medium,large,x-large,xx-large'.split(',');
+	/*
 	html = html.replace(/(<(?:pre|pre\s[^>]*)>)([\s\S]*?)(<\/pre>)/ig, function($0, $1, $2, $3) {
 		return $1 + $2.replace(/<(?:br|br\s[^>]*)>/ig, '\n') + $3;
 	});
+	*/
 	html = html.replace(/<(?:br|br\s[^>]*)\s*\/?>\s*<\/p>/ig, '</p>');
 	html = html.replace(/(<(?:p|p\s[^>]*)>)\s*(<\/p>)/ig, '$1<br />$2');
 	html = html.replace(/\u200B/g, '');
@@ -6684,10 +6686,10 @@ KindEditor.plugin('code', function(K) {
 				yesBtn : {
 					name : self.lang('yes'),
 					click : function(e) {
-						var type = K('.ke-code-type', dialog.div).val(),
-							code = textarea.val(),
-							cls = type,
-							html = '<pre><code class="' + cls + '">\n' + K.escape(code) + '</code></pre> ';
+						var type = K('.ke-code-type', dialog.div).val();
+						var code = textarea.val();
+						var html = '<pre class="' + type + '"><code class="' + type + '">\n' + K.escape(code) + '</code></pre> ';
+						
 						if (K.trim(code) === '') {
 							alert(lang.pleaseInput);
 							textarea[0].focus();
