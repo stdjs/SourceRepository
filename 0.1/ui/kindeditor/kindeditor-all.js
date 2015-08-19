@@ -3216,11 +3216,11 @@ _extend(KCmd, {
 			range.collapse(false);
 			self.select(false);
 		}
-		function insertHtml(range, val) {
+		function insertHtml(range, val,format) {
 			var doc = range.doc;
 			var frag;
 				
-				alert(format)
+	
 			if(format === false){
 			    frag = Std.dom.fragment(val);
 			    console.log(frag);
@@ -3244,7 +3244,7 @@ _extend(KCmd, {
 			return self;
 		}
 	
-		insertHtml(range, val);
+		insertHtml(range, val,format);
 		return self;
 	},
 	hr : function() {
