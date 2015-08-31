@@ -266,25 +266,9 @@ Std.ui.module("TabPanel",function(){
              */
             height:function(){
                 var that          = this;
-                var opts          = that.opts;
                 var doms          = that.D;
-                var height        = that.height();
-                var contentHeight = height - opts.contentPadding * 2 - 2;
+                var contentHeight = that.computeContentHeight();
 
-                switch(opts.tabPosition){
-                    case "left":
-                    case "right":
-                        doms.tabBar.height(height - that.boxSize.height);
-                        if(that._tabBarOverflowed){
-                            that.updateTabsHeight();
-                        }
-                        break;
-                    case "top":
-                        doms.line.css("top",opts.tabButtonHeight - 1);
-                    case "bottom":
-                        contentHeight -= opts.tabButtonHeight;
-                        break;
-                }
                 that.items.each(function(i,item){
                     item.content.height(contentHeight);
                 });
@@ -523,6 +507,32 @@ Std.ui.module("TabPanel",function(){
                 doms.buttons.css("margin-left",tabButtonSpacing);
 
                 return that.updateTabsWidth();
+            },
+            /*
+             * compute content height
+            */
+            computeContentHeight:function(){
+                var that          = this;
+                var opts          = that.opts;
+                var doms          = that.D;
+                var height        = that.height();
+                var contentHeight = height - opts.contentPadding * 2 - 2;
+
+                switch(opts.tabPosition){
+                    case "left":
+                    case "right":
+                        doms.tabBar.height(height - that.boxSize.height);
+                        if(that._tabBarOverflowed){
+                            that.updateTabsHeight();
+                        }
+                        break;
+                    case "top":
+                        doms.line.css("top",opts.tabButtonHeight - 1);
+                    case "bottom":
+                        contentHeight -= opts.tabButtonHeight;
+                        break;
+                }
+                return contentHeight;
             },
             /*
              * vertical tab button click
@@ -787,6 +797,7 @@ Std.ui.module("TabPanel",function(){
             */
             activeItem:function(item){
                 var that  = this;
+                var opts  = that.opts;
                 var items = that.items;
 
                 if(item === undefined){
@@ -807,6 +818,7 @@ Std.ui.module("TabPanel",function(){
                 that.updateLayout();
 
                 if(!item.content.renderState){
+                    item.content.height(that.computeContentHeight());
                     item.content.render();
                 }
                 return that;
@@ -857,7 +869,7 @@ Std.ui.module("TabPanel",function(){
                         that.updateLayout();
                     }
                     if(!opts.deferRender){
-                        item.content.height(that.height() - opts.contentPadding * 2 - 2);
+                        item.content.height(that.computeContentHeight());
                         item.content.render();
                     }
                 }
