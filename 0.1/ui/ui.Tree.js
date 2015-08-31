@@ -765,25 +765,27 @@ Std.ui.module("Tree",function(){
                     }
                 };
                 var mousemove = function(e){
-                    var pageY = e.pageY - treeOffset.y;
-                    var type  = "";
+                    var type      = "";
+                    var pageY     = e.pageY - treeOffset.y;
+                    var scrollTop = that[0].scrollTop();
 
                     if(state === false){
                         e.preventDefault();
                         return cloneItem(e,state = true);
                     }
+
                     if(pageY <= offset.y + 5){
                         type = "before";
                         positionVisible(true);
-                        position.top(offset.y);
+                        position.top(offset.y + scrollTop);
                     }else if(pageY >= offset.y + (that.itemHeight())){
                         type = "after";
                         positionVisible(true);
-                        position.top(offset.y + that.itemHeight() + 4);
+                        position.top(offset.y + scrollTop + that.itemHeight() + 4);
                     }else if(!current.is(source)){
                         type = "in";
                         positionVisible(false);
-                        position.top(offset.y);
+                        position.top(offset.y + scrollTop);
                     }
                     if(type !== targetType){
                         cloned.className("StdUI_Tree_CloneAnchor _" + type);
