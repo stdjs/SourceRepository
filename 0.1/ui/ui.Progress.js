@@ -147,7 +147,7 @@ Std.model("ui.Progress",{
         },
         /*
          * get or set value
-         */
+        */
         value:function(value){
             var that = this;
             var opts = that.opts;
@@ -189,6 +189,30 @@ Std.model("ui.Progress",{
     }
 });
 
+
+/**
+ * circular progress widget module
+*/
+Std.ui.module("CProgress",{
+    /*[#module option:model]*/
+    model:"ui.Progress",
+    /*[#module option:option]*/
+    option:{
+        width:128,
+        height:128,
+        minHeight:64,
+        minWidth:64,
+        color:"blue"
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * direction
+        */
+        direction:"circle"
+    }
+});
+
 /**
  * horizontal progress widget module
 */
@@ -209,6 +233,7 @@ Std.ui.module("HProgress",{
         direction:"horizontal"
     }
 });
+
 
 /**
  * vertical progress widget module

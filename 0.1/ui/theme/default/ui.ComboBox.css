@@ -119,4 +119,5 @@
 .StdUI_ComboBoxItem > ._text{
     float: left;
     text-indent: 5px;
+    cursor: default;
 }

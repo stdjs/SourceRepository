@@ -18,6 +18,9 @@ Std.ui.module("MenuItem",{
     },
     /*[#module option:private]*/
     private:{
+        /*
+         * child visible state
+        */
         childVisible:false
     },
     /*[#module option:extend]*/

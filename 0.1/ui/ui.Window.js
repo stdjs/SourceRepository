@@ -131,8 +131,7 @@ Std.ui.module("Window",{
                 offsetParent = Std.dom(window);
             }
             Std.dom(window).on("resize",that._windowResize = function(){
-                that.move(0,0);
-                that.size(offsetParent.outerWidth(),offsetParent.outerHeight());
+                that.move(0,0).size(offsetParent.outerWidth(),offsetParent.outerHeight());
             });
 
             return that;
