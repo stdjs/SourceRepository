@@ -35,12 +35,7 @@ Std.ui.module("TabButton",{
                         },
                         click:function(e){
                             var parent = that.parent();
-
-                            if(parent){
-                                var tabPanel = parent.parent;
-                                tabPanel.emit("closeTab",parent);
-                                parent.remove();
-                            }
+                            parent && parent.remove();
                         }
                     })
                 )
@@ -207,7 +202,7 @@ Std.ui.module("TabPanel",function(){
             tabPosition:"top"
         },
         /*[#module option:events]*/
-        events:"removeTab selectTab closeTab",
+        events:"removeTab selectTab",
         /*[#module option:private]*/
         private:{
             /*
@@ -915,7 +910,7 @@ Std.ui.module("TabPanel",function(){
                 }
                 if(index !== -1 && index < that.items.length){
                     that.activeIndex(index);
-                    that.emit("selectTab",[that.items[index],index],true);
+                    that.emit("selectTab",[index,that.items[index]],true);
                 }
                 return that;
             },
@@ -1032,7 +1027,7 @@ Std.ui.module("TabPanel",function(){
                 if(index === activeIndex){
                     that.select("beside",index);
                 }
-                return that.tabBarOverflowCheck().emit("removeTab",[index,item]);
+                return that.tabBarOverflowCheck().emit("removeTab",[index,item],true);
             },
             /*
              * clear
