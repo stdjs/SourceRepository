@@ -342,7 +342,7 @@ Std.ui.module("DataGrid",function(){
                     e.preventDefault();
                 };
                 var animateBack = function(){
-                    moveHandle.animate({
+                    moveHandle.animate("end").animate({
                         to:{
                             left:offset.x,
                             top:offset.y,

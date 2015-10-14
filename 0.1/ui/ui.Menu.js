@@ -123,7 +123,7 @@ Std.ui.module("MenuItem",{
             if(useAnimate === false){
                 that.menu.visible(that._childVisible = false);
             }else{
-                that.menu[0].animate({
+                that.menu[0].animate("end").animate({
                     to:{
                         opacity:0
                     }

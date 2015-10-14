@@ -1070,7 +1070,7 @@ Std.ui.module("Desktop_Main",{
                 top:item[0].offset().y,
                 width:item.width(),
                 height:item.width()
-            }).appendTo(that).animate({
+            }).appendTo(that).animate("end").animate({
                 0:{
                     filter: "blur(0px)",
                     opacity:0.9,

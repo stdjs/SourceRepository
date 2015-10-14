@@ -233,13 +233,17 @@ Std.ui.module("TabPanel",function(){
             /*
              * timer1
             */
-            timer1:null
+            timer1:null,
+            /*
+             * drop down menu
+            */
+            dropDownMenu:null
         },
         /*[#module option:extend]*/
         extend:{
             /*
              * extend render
-             */
+            */
             render:function(){
                 var that = this;
                 var opts = that.opts;
@@ -257,13 +261,13 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * width
-             */
+            */
             width:function(){
                 this.updateLayout();
             },
             /*
              * extend height
-             */
+            */
             height:function(){
                 var that          = this;
                 var doms          = that.D;
@@ -276,12 +280,15 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * extend remove
-             */
+            */
             remove:function(data){
                 var that  = this;
                 var items = that.items;
 
                 if(data === undefined){
+                    if(that._dropDownMenu){
+                        that._dropDownMenu.remove();
+                    }
                     items.each(function(i,item){
                         item.button.remove();
                         item.content.remove();
@@ -301,7 +308,7 @@ Std.ui.module("TabPanel",function(){
         protected:{
             /*
              * init keyboard
-             */
+            */
             initKeyboard:function(){
                 var that = this;
 
@@ -310,7 +317,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * init data
-             */
+            */
             initData:function(){
                 var that = this;
                 var opts = that.opts;
@@ -324,7 +331,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * init DOMTree
-             */
+            */
             initElements:function(){
                 var that = this;
                 var doms = that.D = {};
@@ -336,7 +343,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * init events
-             */
+            */
             initEvents:function(){
                 var that = this;
 
@@ -415,18 +422,31 @@ Std.ui.module("TabPanel",function(){
                         longpress:longpress1
                     })).append(newDiv("_icon"))
                 );
-                doms.rightTools.append(
-                    doms.nextButton = newDiv("_scrollButton _forward").height(opts.tabButtonHeight - 1).mouse(Std.extend(mouseOpts,{
+                doms.rightTools.append([
+                    doms.nextButton  = newDiv("_scrollButton _forward").height(opts.tabButtonHeight - 1).mouse(Std.extend(mouseOpts,{
                         longpress:longpress2
-                    })).append(newDiv("_icon"))
-                );
+                    })).append(newDiv("_icon")),
+                    doms.controlHand = newDiv("_controlHand").height(opts.tabButtonHeight - 1).mouse({
+                        down:function(e){
+                            if(e.which !== 1){
+                                return;
+                            }
+                            if(that._dropDownMenu){
+                                that._dropDownMenu.remove();
+                            }else{
+                                this.addClass("selected");
+                                that.initDropDownMenu();
+                            }
+                        }
+                    }).append(newDiv("_icon"))
+                ]);
                 that._tabBarOverflowed = true;
 
                 return that;
             },
             /*
              * init horizontal scroll buttons
-             */
+            */
             initHScrollButtons:function(){
                 if(this._tabBarOverflowed){
                     return this;
@@ -458,12 +478,15 @@ Std.ui.module("TabPanel",function(){
                     }
                 });
 
-                var styles = {
+                Std.dom.united([
+                    doms.prevBtn,
+                    doms.nextButton,
+                    doms.controlHand
+                ]).css({
                     height:25,
                     width:tabBarWidth
-                };
-                doms.prevBtn.css(styles);
-                doms.nextButton.css(styles);
+                });
+
                 doms.buttons.css("margin-top",tabButtonSpacing);
 
                 return that.updateTabsHeight();
@@ -475,6 +498,7 @@ Std.ui.module("TabPanel",function(){
                 if(this._tabBarOverflowed){
                     return this;
                 }
+
                 var that             = this;
                 var opts             = that.opts;
                 var doms             = that.D;
@@ -492,7 +516,6 @@ Std.ui.module("TabPanel",function(){
                     Std.each(that.items,function(i,item){
                         width += item.button.width() + tabButtonSpacing;
                     });
-
                 },function(){
                     if(marginLeft < tabButtonSpacing){
                         doms.buttons.css("margin-left",marginLeft+=3);
@@ -507,6 +530,105 @@ Std.ui.module("TabPanel",function(){
                 doms.buttons.css("margin-left",tabButtonSpacing);
 
                 return that.updateTabsWidth();
+            },
+            /*
+             * init drop down menu
+            */
+            initDropDownMenu:function(){
+                var that            = this;
+                var doms            = that.D;
+                var tabButtonHeight = that.opts.tabButtonHeight;
+
+                if(that._dropDownMenu){
+                    return that;
+                }
+                var documentClick = function(e){
+                    var target = e.target;
+                    if(!dropDownMenu[0].contains(target) && !doms.controlHand.contains(target)){
+                        dropDownMenu.remove();
+                    }
+                };
+                var dropDownMenu  = that._dropDownMenu = Std.ui("Menu",{
+                    renderTo:that,
+                    maxHeight:that.height() - tabButtonHeight,
+                    css:{
+                        position:"absolute",
+                        boxShadow:"none"
+                    },
+                    items:[
+                        {
+                            text:"Close All",
+                            click:function(){
+                                Std.each(that.items,function(i,item){
+                                    if(item && item.button.closable()){
+                                        that.remove(item);
+                                    }
+                                });
+                                that.tabBarOverflowCheck();
+                            }
+                        },{
+                            text:"First Page",
+                            click:function(){
+                                that.activeIndex(0).updateTabScroll()
+                            }
+                        },{
+                            text:"Last Page",
+                            click:function(){
+                                that.activeIndex(that.items.length - 1).updateTabScroll();
+                            }
+                        },{
+                            ui:"sep"
+                        }
+                    ],
+                    on:{
+                        itemPress:function(){
+                            dropDownMenu.remove();
+                        },
+                        visible:function(state){
+                            doms.controlHand.toggleClass("selected",state);
+                        },
+                        remove:function(){
+                            doms.controlHand.removeClass("selected");
+                            that._dropDownMenu = null;
+                            Std.dom(document).off("mousedown",documentClick);
+                        }
+                    }
+                }).toForeground();
+
+                switch(that.opts.tabPosition){
+                    case "top":
+                        dropDownMenu[0].css({right:0,top:tabButtonHeight - 1});
+                        break;
+                    case "right":
+                        dropDownMenu[0].css({right:0,bottom:doms.controlHand.outerHeight() - 1});
+                        break;
+                    case "bottom":
+                        dropDownMenu[0].css({right:0,bottom:tabButtonHeight});
+                        break;
+                    case "left":
+                        dropDownMenu[0].css({left:0,bottom:doms.controlHand.outerHeight() - 1});
+                        break;
+                }
+
+                Std.each(that.items,function(i,item){
+                    var button    = item.button;
+                    var text      = button.text();
+                    var icon      = button.icon();
+                    var iconClass = button.iconClass();
+
+                    dropDownMenu.append({
+                        text:text,
+                        icon:icon,
+                        iconClass:iconClass,
+                        checked:that._activeItem === item,
+                        click:function(){
+                            that.activeItem(item).updateTabScroll();
+                        }
+                    });
+                });
+                Std.dom(document).on("mousedown",documentClick);
+
+                return that;
             },
             /*
              * compute content height
@@ -536,7 +658,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * vertical tab button click
-             */
+            */
             verticalTabButtonClick:function(index,button){
                 var that             = this;
                 var width            = button.width();
@@ -545,13 +667,13 @@ Std.ui.module("TabPanel",function(){
                 var tabButtonSpacing = that.opts.tabButtonSpacing;
 
                 if(positionX + width > tabWidth){
-                    that.D.buttons.animate({
+                    that.D.buttons.animate("end").animate({
                         to:{
                             "margin-left[+]": tabWidth - (positionX + width) - tabButtonSpacing
                         }
                     },100);
                 }else if(positionX < 0){
-                    that.D.buttons.animate({
+                    that.D.buttons.animate("end").animate({
                         to:{
                             "margin-left[-]": positionX - tabButtonSpacing
                         }
@@ -561,7 +683,7 @@ Std.ui.module("TabPanel",function(){
             },
             /*
              * horizontal tab button click
-             */
+            */
             horizontalTabButtonClick:function(index,button){
                 var that             = this;
                 var height           = button.height();
@@ -570,13 +692,13 @@ Std.ui.module("TabPanel",function(){
                 var tabButtonSpacing = that.opts.tabButtonSpacing;
 
                 if(positionY + height > tabHeight){
-                    that.D.buttons.animate({
+                    that.D.buttons.animate("end").animate({
                         to:{
                             "margin-top[+]":tabHeight - (positionY + height) - tabButtonSpacing
                         }
                     },100);
                 }else if(positionY < 0){
-                    that.D.buttons.animate({
+                    that.D.buttons.animate("end").animate({
                         to:{
                             "margin-top[-]": positionY - tabButtonSpacing
                         }
@@ -624,13 +746,21 @@ Std.ui.module("TabPanel",function(){
                 var that = this;
                 var doms = that.D;
 
-                that._tabBarOverflowed = false;
-                doms.prevBtn.remove();
-                doms.nextButton.remove();
                 doms.buttons.css({
                     marginTop:0,
                     marginLeft:0
                 });
+                Std.dom.united([
+                    doms.prevBtn,
+                    doms.nextButton,
+                    doms.controlHand
+                ]).remove();
+
+                if(that._dropDownMenu){
+                    that._dropDownMenu.remove();
+                }
+                that._tabBarOverflowed = false;
+
                 return that.updateTabsWidth();
             },
             /*
@@ -658,8 +788,21 @@ Std.ui.module("TabPanel",function(){
                 return that;
             },
             /*
+             * update tab scroll
+            */
+            updateTabScroll:function(){
+                var that        = this;
+                var activeIndex = that.activeIndex();
+
+                that[that._direction === "horizontal" ? "horizontalTabButtonClick" : "verticalTabButtonClick"](
+                    activeIndex,
+                    that.items[activeIndex].button
+                );
+                return that;
+            },
+            /*
              * update Horizontal layout
-             */
+            */
             updateHorizontalLayout:function(){
                 var that        = this;
                 var doms        = that.D;
@@ -785,10 +928,8 @@ Std.ui.module("TabPanel",function(){
                 if(index === undefined){
                     return items.indexOf(that._activeItem);
                 }
-                var item = items[index];
-
-                if(item){
-                    that.activeItem(item);
+                if(items[index]){
+                    that.activeItem(items[index]);
                 }
                 return that;
             },
@@ -797,7 +938,6 @@ Std.ui.module("TabPanel",function(){
             */
             activeItem:function(item){
                 var that  = this;
-                var opts  = that.opts;
                 var items = that.items;
 
                 if(item === undefined){

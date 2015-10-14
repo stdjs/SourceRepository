@@ -141,7 +141,7 @@ Std.ui.module("Accordion",{
                 if(!widget.renderState){
                     widget.render();
                 }
-                client.main.animate("stop");
+                client.main.animate("end");
                 widget.height(height);
             }
         },
@@ -346,7 +346,7 @@ Std.ui.module("Accordion",{
 
             if(current != null){
                 current[0].removeClass("selected");
-                current.client.main.css("overflow","hidden").animate({
+                current.client.main.css("overflow","hidden").animate("end").animate({
                     100:{height:0}
                 },150);
             }
@@ -357,7 +357,7 @@ Std.ui.module("Accordion",{
             if(that._current !== items[index]){
                 that.emit("change",index);
             }
-            items[index].client.main.removeClass("overflow").animate({
+            items[index].client.main.removeClass("overflow").animate("end").animate({
                 100:{
                     height:height
                 }

@@ -409,7 +409,7 @@ Std.ui.module("Tree",function(){
                         height:0,
                         opacity:0.5,
                         overflow:"hidden"
-                    }).animate({
+                    }).animate("end").animate({
                         50:{opacity:1},
                         to:{
                             opacity:1,
@@ -423,7 +423,7 @@ Std.ui.module("Tree",function(){
                         width:doms.ul.width(),
                         overflow:"hidden",
                         opacity:1
-                    }).animate({
+                    }).animate("end").animate({
                         to:{
                             height:0,
                             opacity:0.5

@@ -451,7 +451,7 @@ Std.ui.module("Tray",{
                 if(that[3].height() == 0){
                     that.hideIconView();
                 }else{
-                    that[3].animate({
+                    that[3].animate("end").animate({
                         to:{
                             top:offset.y - outerHeight,
                             outerHeight:outerHeight
@@ -565,7 +565,7 @@ Std.ui.module("Tray",{
             if(that._tooltip.css("visibility") === "hidden"){
                 that._tooltip.removeStyle("visibility").css("left",x);
             }
-            that._tooltip.css("zIndex",++Std.ui.status.zIndex).animate({
+            that._tooltip.css("zIndex",++Std.ui.status.zIndex).animate("end").animate({
                 to:{
                     top:y,
                     left:x
@@ -606,7 +606,7 @@ Std.ui.module("Tray",{
             var outerHeight = that[3].outerHeight();
 
             that[2].addClass("_visibled");
-            that[3].height(0).animate({
+            that[3].height(0).animate("end").animate({
                 to:{
                     top:offset.y - outerHeight,
                     outerHeight:outerHeight
@@ -624,7 +624,7 @@ Std.ui.module("Tray",{
 
             if(that[2] && that[3]){
                 that[2].removeClass("_visibled");
-                that[3].animate({
+                that[3].animate("end").animate({
                     to:{
                         top:that[0].offset().y - that[3].boxSize().height,
                         height:0

@@ -405,7 +405,7 @@ Std.ui.module("Panel",{
                 that.D.body.css({zIndex:-1, position:"absolute", visibility:"hidden"});
             };
             var animateTo = function(height,callback){
-                that.D.body.animate({
+                that.D.body.animate("end").animate({
                     to:{
                         height:height
                     }

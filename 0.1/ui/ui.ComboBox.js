@@ -610,7 +610,7 @@ Std.ui.module("ComboBox",{
                 height   : 0,
                 opacity  : 0,
                 overflow : "hidden"
-            }).animate({
+            }).animate("end").animate({
                 100:animates
             },{
                 duration:150,
@@ -646,7 +646,7 @@ Std.ui.module("ComboBox",{
                 animates.top = offset.y;
             }
             doms.handle.removeClass("_open");
-            doms.list && doms.list.css("overflow","hidden").animate({
+            doms.list && doms.list.css("overflow","hidden").animate("end").animate({
                 100:animates
             },140,function(){
                 doms.list.hide().removeStyle("overflow height").removeClass("_top");

@@ -118,6 +118,7 @@
 .StdUI_TabPanel > ._tabBar > ._tools._right{
     float: right;
 }
+.StdUI_TabPanel > ._tabBar > ._tools > ._controlHand,
 .StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton{
     float: left;
     width: 12px;
@@ -130,14 +131,17 @@
     background: #D3D1CE;
     background: linear-gradient(to bottom,#CECBCA 0%,#CAC8C5 100%);
 }
+.StdUI_TabPanel > ._tabBar > ._tools > ._controlHand.hover,
 .StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton.hover{
     border-color: #6FD6FE;
     background: linear-gradient(to bottom,#E1DEDB 0%,#D9D6D3 100%);
 }
+.StdUI_TabPanel > ._tabBar > ._tools > ._controlHand.selected,
 .StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton.press{
     background: #E5DFDD;
     border-color: #B2AFAC;
 }
+.StdUI_TabPanel > ._tabBar > ._tools > ._controlHand > ._icon,
 .StdUI_TabPanel > ._tabBar > ._tools > ._scrollButton > ._icon{
     width: 12px;
     height: 100%;
@@ -182,19 +186,19 @@
 }
 
 /*********** Tab Widget: left and right position scroll button icon**************/
-.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._backward > ._icon,
+.StdUI_TabPanel._left  > ._tabBar > ._tools > ._scrollButton._backward > ._icon,
 .StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._backward > ._icon{
     background-position: -190px -352px;
 }
-.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._forward > ._icon,
+.StdUI_TabPanel._left  > ._tabBar > ._tools > ._scrollButton._forward > ._icon,
 .StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._forward > ._icon{
     background-position: -205px -352px;
 }
-.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._backward.hover,
+.StdUI_TabPanel._left  > ._tabBar > ._tools > ._scrollButton._backward.hover,
 .StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._backward.hover{
     background-position: -221px -352px;
 }
-.StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton._forward.hover,
+.StdUI_TabPanel._left  > ._tabBar > ._tools > ._scrollButton._forward.hover,
 .StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton._forward.hover{
     background-position: -237px -352px;
 }
@@ -212,6 +216,7 @@
     clear: both;
     overflow: hidden;
 }
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._controlHand,
 .StdUI_TabPanel._left > ._tabBar > ._tools > ._scrollButton{
     float: none;
     padding: 0;
@@ -252,7 +257,9 @@
     float: none;
     clear: both;
 }
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._controlHand,
 .StdUI_TabPanel._right > ._tabBar > ._tools > ._scrollButton{
+    float: none;
     overflow: hidden;
     padding: 0;
 }
@@ -292,6 +299,7 @@
 .StdUI_TabPanel._top > ._tabBar > ._tabs > ._buttons{
     width: 9999px;
 }
+.StdUI_TabPanel._top > ._tabBar > ._tools > ._controlHand,
 .StdUI_TabPanel._top > ._tabBar > ._tools > ._scrollButton{
     border-bottom: 0;
 }
@@ -314,7 +322,8 @@
 .StdUI_TabPanel._bottom > ._tabBar > ._tabs > ._buttons{
     width: 9999px;
 }
-.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._scrollButton{
+.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._scrollButton,
+.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._controlHand{
     border-top: 0;
     box-shadow: 0 1px 1px #E7E7E7 inset;
 }
@@ -326,4 +335,31 @@
 }
 .StdUI_TabPanel._bottom > ._tabBar > ._tabs > ._buttons > .StdUI_TabButton.selected{
 
+}
+
+/************ control hand ***********/
+.StdUI_TabPanel._top > ._tabBar > ._tools > ._controlHand,
+.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._controlHand{
+    margin-left: 1px;
+}
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._controlHand,
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._controlHand{
+    margin-top: 1px;
+}
+
+.StdUI_TabPanel._top > ._tabBar > ._tools > ._controlHand > ._icon{
+    background-position: -28px -428px;
+}
+.StdUI_TabPanel._bottom > ._tabBar > ._tools > ._controlHand > ._icon{
+    background-position: -7px -429px;
+}
+.StdUI_TabPanel._left > ._tabBar > ._tools > ._controlHand > ._icon{
+    width: 12px;
+    height: 100%;
+    background-position: -8px -352px;
+}
+.StdUI_TabPanel._right > ._tabBar > ._tools > ._controlHand > ._icon{
+    width: 12px;
+    height: 100%;
+    background-position: -29px -352px;
 }

@@ -87,7 +87,7 @@ Std.ui.module("SwitchBox",{
                     that._selected = item;
                     that.emit("change",that.opts.value = item.value);
                 }
-                that.initHandle()[1].html(item.dom.html()).animate({
+                that.initHandle()[1].html(item.dom.html()).animate("stop").animate({
                     to:{
                         width:item.dom.width() - 2,
                         left:item.dom.offsetLeft()
