@@ -207,7 +207,7 @@ Std.ui.module("TabPanel",function(){
             tabPosition:"top"
         },
         /*[#module option:events]*/
-        events:"tabClose tabSelect tabRemove",
+        events:"removeTab selectTab closeTab",
         /*[#module option:private]*/
         private:{
             /*
