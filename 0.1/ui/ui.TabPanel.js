@@ -38,7 +38,7 @@ Std.ui.module("TabButton",{
 
                             if(parent){
                                 var tabPanel = parent.parent;
-                                tabPanel.emit("tabClose",parent);
+                                tabPanel.emit("closeTab",parent);
                                 parent.remove();
                             }
                         }
@@ -915,7 +915,7 @@ Std.ui.module("TabPanel",function(){
                 }
                 if(index !== -1 && index < that.items.length){
                     that.activeIndex(index);
-                    that.emit("tabSelect",[that.items[index],index],true);
+                    that.emit("selectTab",[that.items[index],index],true);
                 }
                 return that;
             },
@@ -1022,6 +1022,7 @@ Std.ui.module("TabPanel",function(){
             removeTab:function(index){
                 var that        = this;
                 var items       = that.items;
+                var item        = items[index];
                 var activeIndex = that.activeIndex();
 
                 items[index].button.remove();
@@ -1031,7 +1032,7 @@ Std.ui.module("TabPanel",function(){
                 if(index === activeIndex){
                     that.select("beside",index);
                 }
-                return that.tabBarOverflowCheck().emit("tabRemove",index);
+                return that.tabBarOverflowCheck().emit("removeTab",[index,item]);
             },
             /*
              * clear
