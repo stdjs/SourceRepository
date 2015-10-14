@@ -559,11 +559,12 @@ Std.ui.module("TabPanel",function(){
                         {
                             text:"Close All",
                             click:function(){
-                                Std.each(that.items,function(i,item){
+                                for(var i=that.items.length-1;i>=0;i--){
+                                    var item = that.items[i];
                                     if(item && item.button.closable()){
                                         that.remove(item);
                                     }
-                                });
+                                }
                                 that.tabBarOverflowCheck();
                             }
                         },{
