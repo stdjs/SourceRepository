@@ -84,6 +84,7 @@
     outline: none;
     overflow: auto;
     visibility: hidden;
+    background: #E5DFDD;
 }
 .StdUI_TabPanel > ._contents > .StdUI_TabContent._visible{
     visibility: visible;

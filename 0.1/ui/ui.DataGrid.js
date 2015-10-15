@@ -1956,7 +1956,7 @@ Std.ui.module("DataGrid",function(){
             }),
             /*
              * remove column
-             */
+            */
             removeColumn:function(data){
                 var that    = this;
                 var columns = that._columns;
@@ -2003,7 +2003,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * clear
-             */
+            */
             clear:function(){
                 var that = this;
 
@@ -2016,7 +2016,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * clear cell widgets
-             */
+            */
             clearCellWidgets:function(){
                 var that = this;
 
@@ -2029,7 +2029,7 @@ Std.ui.module("DataGrid",function(){
             },
             /*
              * clear row blocks
-             */
+            */
             clearRowBlocks:function(){
                 var that = this;
 
