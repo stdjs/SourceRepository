@@ -1,0 +1,1 @@
+Std.model("ui.Splitter",{parent:"widget",option:{tabIndex:NULL,className:"StdUI_Splitter",resizable:!0},"protected":{resizable:function(e){return this.opt("resizable",e,function(){this[0].css("cursor",e?"row-resize":"default")})}}});
