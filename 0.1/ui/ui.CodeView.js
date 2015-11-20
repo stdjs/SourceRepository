@@ -1,0 +1,1 @@
+Std.ui.module("CodeView",{parent:"widget",action:{content:"value"},option:{level:3,minWidth:12,minHeight:12,defaultClass:"StdUI_CodeView",boxSizing:"border-box",value:""},"protected":{initEvents:function(){}},"public":{value:function(){}},main:function(){}});
