@@ -83,15 +83,15 @@
             color: #96DBFF;
             border-color: #96DBFF;
         }
-        .header.--gray{
+        .header.__gray__{
             background-color: #D9D5D3;
             border-bottom-color: #B5B0AD;
             text-shadow: 0 1px 0 #E1DAD6;
         }
-        .header.--gray > ._location{
+        .header.__gray__ > ._location{
             color: #474442;
         }
-        .header.--gray > ._location.selected{
+        .header.__gray__ > ._location.selected{
             color: #238EC1;
             border-color: #28A0DA;
         }
@@ -651,7 +651,7 @@ Std.use("<?=packageName?>",function(){
                     code += ","
                 });
                 if(code[code.length - 1] === ","){
-                    code.slice(0,code.length - 1)
+                    code = code.substr(0,code.length - 1)
                 }
                 return code + "}});";
             };
@@ -867,12 +867,12 @@ Std.use("<?=packageName?>",function(){
                 if(hash === "#page_resource"){
                     showResourcePage();
                 }else if(hash === "#page_packages"){
-                    changeTheme  = true;
+                    changeTheme = true;
                     showPackagesPage();
                 }else if(hash !== "#page_home"){
                     return;
                 }
-                header.toggleClass("--gray",changeTheme);
+                header.toggleClass("__gray__",changeTheme);
                 Std.dom("#"+currentPage).hide();
                 Std.dom("#"+(currentPage = location.hash.substr(1))).show();
                 Std.dom(".header >._location.selected").removeClass("selected");
