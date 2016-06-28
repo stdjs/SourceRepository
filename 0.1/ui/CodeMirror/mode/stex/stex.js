@@ -1,1 +1,251 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("stex",function(){function t(t,e){t.cmdState.push(e)}function e(t){return t.cmdState.length>0?t.cmdState[t.cmdState.length-1]:null}function n(t){var e=t.cmdState.pop();e&&e.closeBracket()}function r(t){for(var e=t.cmdState,n=e.length-1;n>=0;n--){var r=e[n];if("DEFAULT"!=r.name)return r}return{styleIdentifier:function(){return null}}}function i(t,e,n){return function(){this.name=t,this.bracketNo=0,this.style=e,this.styles=n,this.argument=null,this.styleIdentifier=function(){return this.styles[this.bracketNo-1]||null},this.openBracket=function(){return this.bracketNo++,"bracket"},this.closeBracket=function(){}}}function a(t,e){t.f=e}function c(n,i){var c;if(n.match(/^\\[a-zA-Z@]+/)){var s=n.current().slice(1);return c=f[s]||f.DEFAULT,c=new c,t(i,c),a(i,o),c.style}if(n.match(/^\\[$&%#{}_]/))return"tag";if(n.match(/^\\[,;!\/\\]/))return"tag";if(n.match("\\["))return a(i,function(t,e){return u(t,e,"\\]")}),"keyword";if(n.match("$$"))return a(i,function(t,e){return u(t,e,"$$")}),"keyword";if(n.match("$"))return a(i,function(t,e){return u(t,e,"$")}),"keyword";var m=n.next();return"%"==m?(n.skipToEnd(),"comment"):"}"==m||"]"==m?(c=e(i))?(c.closeBracket(m),a(i,o),"bracket"):"error":"{"==m||"["==m?(c=f.DEFAULT,c=new c,t(i,c),"bracket"):/\d/.test(m)?(n.eatWhile(/[\w.%]/),"atom"):(n.eatWhile(/[\w\-_]/),c=r(i),"begin"==c.name&&(c.argument=n.current()),c.styleIdentifier())}function u(t,e,n){if(t.eatSpace())return null;if(t.match(n))return a(e,c),"keyword";if(t.match(/^\\[a-zA-Z@]+/))return"tag";if(t.match(/^[a-zA-Z]+/))return"variable-2";if(t.match(/^\\[$&%#{}_]/))return"tag";if(t.match(/^\\[,;!\/]/))return"tag";if(t.match(/^[\^_&]/))return"tag";if(t.match(/^[+\-<>|=,\/@!*:;'"`~#?]/))return null;if(t.match(/^(\d+\.\d*|\d*\.\d+|\d+)/))return"number";var r=t.next();return"{"==r||"}"==r||"["==r||"]"==r||"("==r||")"==r?"bracket":"%"==r?(t.skipToEnd(),"comment"):"error"}function o(t,r){var i,u=t.peek();return"{"==u||"["==u?(i=e(r),i.openBracket(u),t.eat(u),a(r,c),"bracket"):/[ \t\r]/.test(u)?(t.eat(u),null):(a(r,c),n(r),c(t,r))}var f={};return f.importmodule=i("importmodule","tag",["string","builtin"]),f.documentclass=i("documentclass","tag",["","atom"]),f.usepackage=i("usepackage","tag",["atom"]),f.begin=i("begin","tag",["atom"]),f.end=i("end","tag",["atom"]),f.DEFAULT=function(){this.name="DEFAULT",this.style="tag",this.styleIdentifier=this.openBracket=this.closeBracket=function(){}},{startState:function(){return{cmdState:[],f:c}},copyState:function(t){return{cmdState:t.cmdState.slice(),f:t.f}},token:function(t,e){return e.f(t,e)},blankLine:function(t){t.f=c,t.cmdState.length=0},lineComment:"%"}}),t.defineMIME("text/x-stex","stex"),t.defineMIME("text/x-latex","stex")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+/*
+ * Author: Constantin Jucovschi (c.jucovschi@jacobs-university.de)
+ * Licence: MIT
+ */
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineMode("stex", function() {
+    "use strict";
+
+    function pushCommand(state, command) {
+      state.cmdState.push(command);
+    }
+
+    function peekCommand(state) {
+      if (state.cmdState.length > 0) {
+        return state.cmdState[state.cmdState.length - 1];
+      } else {
+        return null;
+      }
+    }
+
+    function popCommand(state) {
+      var plug = state.cmdState.pop();
+      if (plug) {
+        plug.closeBracket();
+      }
+    }
+
+    // returns the non-default plugin closest to the end of the list
+    function getMostPowerful(state) {
+      var context = state.cmdState;
+      for (var i = context.length - 1; i >= 0; i--) {
+        var plug = context[i];
+        if (plug.name == "DEFAULT") {
+          continue;
+        }
+        return plug;
+      }
+      return { styleIdentifier: function() { return null; } };
+    }
+
+    function addPluginPattern(pluginName, cmdStyle, styles) {
+      return function () {
+        this.name = pluginName;
+        this.bracketNo = 0;
+        this.style = cmdStyle;
+        this.styles = styles;
+        this.argument = null;   // \begin and \end have arguments that follow. These are stored in the plugin
+
+        this.styleIdentifier = function() {
+          return this.styles[this.bracketNo - 1] || null;
+        };
+        this.openBracket = function() {
+          this.bracketNo++;
+          return "bracket";
+        };
+        this.closeBracket = function() {};
+      };
+    }
+
+    var plugins = {};
+
+    plugins["importmodule"] = addPluginPattern("importmodule", "tag", ["string", "builtin"]);
+    plugins["documentclass"] = addPluginPattern("documentclass", "tag", ["", "atom"]);
+    plugins["usepackage"] = addPluginPattern("usepackage", "tag", ["atom"]);
+    plugins["begin"] = addPluginPattern("begin", "tag", ["atom"]);
+    plugins["end"] = addPluginPattern("end", "tag", ["atom"]);
+
+    plugins["DEFAULT"] = function () {
+      this.name = "DEFAULT";
+      this.style = "tag";
+
+      this.styleIdentifier = this.openBracket = this.closeBracket = function() {};
+    };
+
+    function setState(state, f) {
+      state.f = f;
+    }
+
+    // called when in a normal (no environment) context
+    function normal(source, state) {
+      var plug;
+      // Do we look like '\command' ?  If so, attempt to apply the plugin 'command'
+      if (source.match(/^\\[a-zA-Z@]+/)) {
+        var cmdName = source.current().slice(1);
+        plug = plugins[cmdName] || plugins["DEFAULT"];
+        plug = new plug();
+        pushCommand(state, plug);
+        setState(state, beginParams);
+        return plug.style;
+      }
+
+      // escape characters
+      if (source.match(/^\\[$&%#{}_]/)) {
+        return "tag";
+      }
+
+      // white space control characters
+      if (source.match(/^\\[,;!\/\\]/)) {
+        return "tag";
+      }
+
+      // find if we're starting various math modes
+      if (source.match("\\[")) {
+        setState(state, function(source, state){ return inMathMode(source, state, "\\]"); });
+        return "keyword";
+      }
+      if (source.match("$$")) {
+        setState(state, function(source, state){ return inMathMode(source, state, "$$"); });
+        return "keyword";
+      }
+      if (source.match("$")) {
+        setState(state, function(source, state){ return inMathMode(source, state, "$"); });
+        return "keyword";
+      }
+
+      var ch = source.next();
+      if (ch == "%") {
+        source.skipToEnd();
+        return "comment";
+      } else if (ch == '}' || ch == ']') {
+        plug = peekCommand(state);
+        if (plug) {
+          plug.closeBracket(ch);
+          setState(state, beginParams);
+        } else {
+          return "error";
+        }
+        return "bracket";
+      } else if (ch == '{' || ch == '[') {
+        plug = plugins["DEFAULT"];
+        plug = new plug();
+        pushCommand(state, plug);
+        return "bracket";
+      } else if (/\d/.test(ch)) {
+        source.eatWhile(/[\w.%]/);
+        return "atom";
+      } else {
+        source.eatWhile(/[\w\-_]/);
+        plug = getMostPowerful(state);
+        if (plug.name == 'begin') {
+          plug.argument = source.current();
+        }
+        return plug.styleIdentifier();
+      }
+    }
+
+    function inMathMode(source, state, endModeSeq) {
+      if (source.eatSpace()) {
+        return null;
+      }
+      if (source.match(endModeSeq)) {
+        setState(state, normal);
+        return "keyword";
+      }
+      if (source.match(/^\\[a-zA-Z@]+/)) {
+        return "tag";
+      }
+      if (source.match(/^[a-zA-Z]+/)) {
+        return "variable-2";
+      }
+      // escape characters
+      if (source.match(/^\\[$&%#{}_]/)) {
+        return "tag";
+      }
+      // white space control characters
+      if (source.match(/^\\[,;!\/]/)) {
+        return "tag";
+      }
+      // special math-mode characters
+      if (source.match(/^[\^_&]/)) {
+        return "tag";
+      }
+      // non-special characters
+      if (source.match(/^[+\-<>|=,\/@!*:;'"`~#?]/)) {
+        return null;
+      }
+      if (source.match(/^(\d+\.\d*|\d*\.\d+|\d+)/)) {
+        return "number";
+      }
+      var ch = source.next();
+      if (ch == "{" || ch == "}" || ch == "[" || ch == "]" || ch == "(" || ch == ")") {
+        return "bracket";
+      }
+
+      if (ch == "%") {
+        source.skipToEnd();
+        return "comment";
+      }
+      return "error";
+    }
+
+    function beginParams(source, state) {
+      var ch = source.peek(), lastPlug;
+      if (ch == '{' || ch == '[') {
+        lastPlug = peekCommand(state);
+        lastPlug.openBracket(ch);
+        source.eat(ch);
+        setState(state, normal);
+        return "bracket";
+      }
+      if (/[ \t\r]/.test(ch)) {
+        source.eat(ch);
+        return null;
+      }
+      setState(state, normal);
+      popCommand(state);
+
+      return normal(source, state);
+    }
+
+    return {
+      startState: function() {
+        return {
+          cmdState: [],
+          f: normal
+        };
+      },
+      copyState: function(s) {
+        return {
+          cmdState: s.cmdState.slice(),
+          f: s.f
+        };
+      },
+      token: function(stream, state) {
+        return state.f(stream, state);
+      },
+      blankLine: function(state) {
+        state.f = normal;
+        state.cmdState.length = 0;
+      },
+      lineComment: "%"
+    };
+  });
+
+  CodeMirror.defineMIME("text/x-stex", "stex");
+  CodeMirror.defineMIME("text/x-latex", "stex");
+
+});

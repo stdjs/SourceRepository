@@ -1,1 +1,6 @@
-.StdUI_Window{position:absolute}
+
+/************* Window *************/
+.StdUI_Window{
+    position: absolute;
+}
+

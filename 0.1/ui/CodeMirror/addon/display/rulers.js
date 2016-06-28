@@ -1,1 +1,63 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function r(e){for(var r=e.display.lineSpace.childNodes.length-1;r>=0;r--){var o=e.display.lineSpace.childNodes[r];/(^|\s)CodeMirror-ruler($|\s)/.test(o.className)&&o.parentNode.removeChild(o)}}function o(r){for(var o=r.getOption("rulers"),t=r.defaultCharWidth(),i=r.charCoords(e.Pos(r.firstLine(),0),"div").left,l=r.display.scroller.offsetHeight+30,s=0;s<o.length;s++){var n=document.createElement("div");n.className="CodeMirror-ruler";var d,c=o[s];"number"==typeof c?d=c:(d=c.column,c.className&&(n.className+=" "+c.className),c.color&&(n.style.borderColor=c.color),c.lineStyle&&(n.style.borderLeftStyle=c.lineStyle),c.width&&(n.style.borderLeftWidth=c.width)),n.style.left=i+d*t+"px",n.style.top="-50px",n.style.bottom="-20px",n.style.minHeight=l+"px",r.display.lineSpace.insertBefore(n,r.display.cursorDiv)}}function t(e){r(e),o(e)}e.defineOption("rulers",!1,function(i,l,s){s&&s!=e.Init&&(r(i),i.off("refresh",t)),l&&l.length&&(o(i),i.on("refresh",t))})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineOption("rulers", false, function(cm, val, old) {
+    if (old && old != CodeMirror.Init) {
+      clearRulers(cm);
+      cm.off("refresh", refreshRulers);
+    }
+    if (val && val.length) {
+      setRulers(cm);
+      cm.on("refresh", refreshRulers);
+    }
+  });
+
+  function clearRulers(cm) {
+    for (var i = cm.display.lineSpace.childNodes.length - 1; i >= 0; i--) {
+      var node = cm.display.lineSpace.childNodes[i];
+      if (/(^|\s)CodeMirror-ruler($|\s)/.test(node.className))
+        node.parentNode.removeChild(node);
+    }
+  }
+
+  function setRulers(cm) {
+    var val = cm.getOption("rulers");
+    var cw = cm.defaultCharWidth();
+    var left = cm.charCoords(CodeMirror.Pos(cm.firstLine(), 0), "div").left;
+    var minH = cm.display.scroller.offsetHeight + 30;
+    for (var i = 0; i < val.length; i++) {
+      var elt = document.createElement("div");
+      elt.className = "CodeMirror-ruler";
+      var col, conf = val[i];
+      if (typeof conf == "number") {
+        col = conf;
+      } else {
+        col = conf.column;
+        if (conf.className) elt.className += " " + conf.className;
+        if (conf.color) elt.style.borderColor = conf.color;
+        if (conf.lineStyle) elt.style.borderLeftStyle = conf.lineStyle;
+        if (conf.width) elt.style.borderLeftWidth = conf.width;
+      }
+      elt.style.left = (left + col * cw) + "px";
+      elt.style.top = "-50px";
+      elt.style.bottom = "-20px";
+      elt.style.minHeight = minH + "px";
+      cm.display.lineSpace.insertBefore(elt, cm.display.cursorDiv);
+    }
+  }
+
+  function refreshRulers(cm) {
+    clearRulers(cm);
+    setRulers(cm);
+  }
+});

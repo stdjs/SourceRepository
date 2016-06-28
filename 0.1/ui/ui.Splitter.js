@@ -1,1 +1,25 @@
-Std.model("ui.Splitter",{parent:"widget",option:{tabIndex:NULL,className:"StdUI_Splitter",resizable:!0},"protected":{resizable:function(e){return this.opt("resizable",e,function(){this[0].css("cursor",e?"row-resize":"default")})}}});
+/**
+ *  splitter model
+*/
+Std.model("ui.Splitter",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:option]*/
+    option:{
+        tabIndex:NULL,
+        className:"StdUI_Splitter",
+        resizable:true
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * resizable
+        */
+        resizable:function(resizable){
+            return this.opt("resizable",resizable,function(){
+                this[0].css("cursor",resizable ? "row-resize" : "default");
+            });
+        }
+    }
+
+});

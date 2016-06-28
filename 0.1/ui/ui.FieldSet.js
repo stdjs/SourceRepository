@@ -1,1 +1,172 @@
-Std.ui.module("FieldSet",{nodeName:"fieldset",parent:"widget",option:{level:1,defaultClass:"StdUI_FieldSet",boxSizing:"border-box",layout:"VBoxLayout",items:null,spacing:5,width:300,height:150,tabIndex:null,title:"FieldSet"},action:{children:"append"},extend:{render:function(){var t=this;t._layout.render().update()},remove:function(t){var e=this;e._layout&&e._layout.remove(t)},width:function(){var t=this;t.D.client.width(t.width()-t.boxSize.width)}},"protected":{initLayout:function(){var t=this;return t._layout=Std.ui(t.opts.layout,{parent:t.D.client,spacing:t.spacing()}),t},initElements:function(){var t=this,e=t.D={legend:newDom("legend","_title"),client:newDiv("_client")};return t[0].append([e.legend.html(t.title()),e.client]),t}},"public":{refreshLevel:function(){var t=this;return t.level(t._layout),t},title:function(t){return this.opt("title",t,function(){this.D.label.html(t)})},spacing:function(t){return this.opt("spacing",t,function(){this[0].padding(t)})},update:function(){var t=this;return t._layout.update(),t},insert:function(t,e){var n=this;return n._layout.insert(t,e),n.refreshLevel(),n.renderState&&n.update(),n},append:function(t){var e=this;return e._layout.append(t),e.refreshLevel(),e.renderState&&e.update(),e},clear:function(){var t=this;return t._layout.clear(),t}},main:function(t,e){t.initElements(),t.initLayout(),t.call_opts("spacing"),e.items&&t.append(e.items)}});
+/**
+ * FieldSet Widget Module
+*/
+Std.ui.module("FieldSet",{
+    /*[#module option:nodeName]*/
+    nodeName:"fieldset",
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:option]*/
+    option:{
+        level:1,
+        defaultClass:"StdUI_FieldSet",
+        boxSizing:"border-box",
+        layout:"VBoxLayout",
+        items:null,
+        spacing:5,
+        width:300,
+        height:150,
+        tabIndex:null,
+        title:"FieldSet"
+    },
+    /*[#module option:action]*/
+    action:{
+        children:"append"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that._layout.render().update();
+        },
+        /*
+         * remove
+        */
+        remove:function(index){
+            var that = this;
+
+            if(that._layout){
+                that._layout.remove(index);
+            }
+        },
+        /*
+         * width
+        */
+        width:function(){
+            var that = this;
+
+            that.D.client.width(that.width() - that.boxSize.width);
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init layout
+        */
+        initLayout:function(){
+            var that = this;
+
+            that._layout = Std.ui(that.opts.layout,{
+                parent:that.D.client,
+                spacing:that.spacing()
+            });
+
+            return that;
+        },
+        /*
+         * init elements
+        */
+        initElements:function(){
+            var that = this;
+            var doms = that.D = {
+                legend : newDom("legend","_title"),
+                client : newDiv("_client")
+            };
+            that[0].append([
+                doms.legend.html(that.title()),
+                doms.client
+            ]);
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * refresh level
+         */
+        refreshLevel:function(){
+            var that = this;
+
+            that.level(that._layout);
+            return that;
+        },
+        /*
+         * title
+        */
+        title:function(title){
+            return this.opt("title",title,function(){
+                this.D.label.html(title);
+            });
+        },
+        /*
+         * spacing
+        */
+        spacing:function(spacing){
+            return this.opt("spacing",spacing,function(){
+                this[0].padding(spacing);
+            });
+        },
+        /*
+         * update
+        */
+        update:function(){
+            var that = this;
+
+            that._layout.update();
+
+            return that;
+        },
+        /*
+         * insert
+        */
+        insert:function(item,index){
+            var that = this;
+
+            that._layout.insert(item,index);
+            that.refreshLevel();
+
+            if(that.renderState){
+                that.update();
+            }
+            return that;
+        },
+        /*
+         * append
+        */
+        append:function(items){
+            var that = this;
+
+            that._layout.append(items);
+            that.refreshLevel();
+
+            if(that.renderState){
+                that.update();
+            }
+            return that;
+        },
+        /*
+         * clear
+        */
+        clear:function(){
+            var that = this;
+
+            that._layout.clear();
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        that.initElements();
+        that.initLayout();
+        that.call_opts("spacing");
+
+        if(opts.items){
+            that.append(opts.items);
+        }
+    }
+});

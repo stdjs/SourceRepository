@@ -1,1 +1,360 @@
-Std.model("ui.Slider",{parent:"widget",events:"dragStart dragStop change",action:{content:"value"},option:{min:0,max:100,value:0,color:"#5FA8DB",defaultClass:"StdUI_Slider",handleWidth:18,handleHeight:18},extend:{init_boxSize:function(){var e=this;e.handleBoxSize=e.D.handle.boxSize()},render:function(){var e=this,t=e.opts;e.D.handle.css({width:t.handleWidth-e.handleBoxSize.width,height:t.handleHeight-e.handleBoxSize.height}),e.call_opts("color"),e.on("resize",e.refresh.bind(e)),e.refresh(),e.initDrag(),e.initEvents()}},"protected":{updateProgress:function(e){var t=this;switch(t._direction){case"horizontal":t.D.progress.width(e);break;case"vertical":t.D.progress.height(e)}return t},updateValue:function(e){var t=this,i=t.opts,n=0,o=0,a=0,r="",h=null,d=i.max-i.min,s=t._direction;return"horizontal"===s?(n=t.width(),r="left",o=t.boxSize.width,a=i.handleWidth,h=Math.round((n-o-a)/d*(e-i.min)),t.D.handle.css(r,h)):"vertical"===s&&(n=t.height(),r="top",o=t.boxSize.height,a=i.handleHeight,h=Math.round((n-o-a)/d*(e-i.min)),t.D.handle.css(r,(n-o-a)/d*(d-e-i.min))),t.updateProgress(h+a/2),t.emit("change",i.value=e)},initEvents:function(){var e=this,t=!1;return e[0].focussing(function(){this.addClass("focus"),t===!1&&(t=!0,e.initKeyboard())},function(){this.removeClass("focus")}),e},initKeyboard:function(){var e=this;return e.on("keydown",function(t){switch(t.keyCode){case 37:case 38:e.value(e.value()-1);break;case 39:case 40:e.value(e.value()+1)}})},initDrag:function(){var e,t,i,n=this,o=n.opts,a=0,r=0,h=function(){e=n[0].offset(),"horizontal"===n._direction?(t="pageX",i="x",r=o.handleWidth,a=n.width()-n.boxSize.width):"vertical"===n._direction&&(t="pageY",i="y",r=o.handleHeight,a=n.height()-n.boxSize.height)},d=function(h){var d=h[t]-e[i],s=0;"pageX"===t?s=o.min+Math.round((d-r/2)/(a-r)*(o.max-o.min)):"pageY"===t&&(s=o.min+Math.round((a-d-r/2)/(a-r)*(o.max-o.min))),n.value(s)};return n[0].mouse({down:function(e){1===e.which&&(h(),Std.dom(document).on("mousemove",d(e)||d),e.preventDefault(),n.emit("dragStart"))},up:function(){Std.dom(document).off("mousemove",d),n.emit("dragStop")}}),n}},"public":{refresh:function(){return this.value(this.opts.value)},min:function(e){return this.opt("min",e,function(){this.refresh()})},max:function(e){return this.opt("max",e,function(){this.refresh()})},color:function(e){return this.opt("color",e,function(){this.D.progress.css("background",e)})},range:function(e,t){var i=this,n=i.opts;return void 0===e?{min:n.min,max:n.max}:(n.min=e,n.max=t,i)},value:function(e){var t=this,i=t.opts;return void 0===e?i.value:((e=int(e))<i.min?e=i.min:e>i.max&&(e=i.max),t.updateValue(e),t)}},main:function(e,t,i){var n=e.D={};i.addClass("_"+e._direction).append([n.client=newDiv("_client").append(n.progress=newDiv("_progress")),n.handle=newDiv("_handle").attr("tabindex",1)])}}),Std.ui.module("HSlider",{model:"ui.Slider",option:{level:3,height:22},"private":{direction:"horizontal"},extend:{height:function(){var e=this,t=e.opts,i=e.D,n=e.height();if(e.handleBoxSize){var o=t.handleHeight-e.handleBoxSize.height;i.handle.css({top:(n-o)/2})}i.client.css("top",Math.round((n-i.client.height())/2))}}}),Std.ui.module("VSlider",{model:"ui.Slider",option:{level:3,width:22,height:200},"private":{direction:"vertical"},extend:{width:function(){var e=this,t=e.opts,i=e.D,n=e.width();if(e.handleBoxSize){var o=t.handleWidth-e.handleBoxSize.width;i.handle.css({left:(n-o)/2})}i.client.css("left",Math.round((n-i.client.width())/2))}}});
+/**
+ *  slider model
+*/
+Std.model("ui.Slider",{
+    /*[#module option:widget]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"dragStart dragStop change",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        min:0,
+        max:100,
+        value:0,
+        color:"#5FA8DB",
+        defaultClass:"StdUI_Slider",
+        handleWidth:18,
+        handleHeight:18
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         *  load handle box size
+         */
+        init_boxSize:function(){
+            var that = this;
+            that.handleBoxSize = that.D.handle.boxSize();
+        },
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.D.handle.css({
+                width  : opts.handleWidth  - that.handleBoxSize.width,
+                height : opts.handleHeight - that.handleBoxSize.height
+            });
+
+            that.call_opts("color");
+            that.on("resize",that.refresh.bind(that));
+            that.refresh();
+            that.initDrag();
+            that.initEvents();
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * update progress
+        */
+        updateProgress:function(size){
+            var that = this;
+
+            switch(that._direction){
+                case "horizontal":
+                    that.D.progress.width(size);
+                    break;
+                case "vertical":
+                    that.D.progress.height(size);
+                    break;
+            }
+            return that;
+        },
+        /*
+         * update value
+        */
+        updateValue:function(value){
+            var that        = this;
+            var opts        = that.opts;
+            var size        = 0;
+            var boxSize     = 0;
+            var handleSize  = 0;
+            var cssName     = "";
+            var position    = null;
+            var valueRange  = opts.max - opts.min;
+            var direction   = that._direction;
+
+            if(direction === "horizontal"){
+                size       = that.width();
+                cssName    = "left";
+                boxSize    = that.boxSize.width;
+                handleSize = opts.handleWidth;
+                position   = Math.round((size - boxSize - handleSize) / valueRange * (value - opts.min));
+                that.D.handle.css(cssName,position);
+            }else if(direction === "vertical"){
+                size       = that.height();
+                cssName    = "top";
+                boxSize    = that.boxSize.height;
+                handleSize = opts.handleHeight;
+                position   = Math.round((size - boxSize - handleSize) / valueRange * (value - opts.min));
+                that.D.handle.css(cssName,(size - boxSize - handleSize) / valueRange * (valueRange - value - opts.min));
+            }
+            that.updateProgress(position + handleSize / 2);
+
+            return that.emit("change",opts.value = value);
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that  = this;
+            var state = false;
+
+            that[0].focussing(function(){
+                this.addClass("focus");
+                if(state === false){
+                    state = true;
+                    that.initKeyboard();
+                }
+            },function(){
+                this.removeClass("focus");
+            });
+
+            return that;
+        },
+        /*
+         * init key board
+        */
+        initKeyboard:function(){
+            var that = this;
+
+            return that.on("keydown",function(e){
+                switch(e.keyCode){
+                    case 37:
+                    case 38:
+                        that.value(that.value() - 1);
+                        break;
+                    case 39:
+                    case 40:
+                        that.value(that.value() + 1);
+                        break;
+                }
+            });
+        },
+        /*
+         * init drag
+        */
+        initDrag:function(){
+            var that       = this;
+            var opts       = that.opts;
+            var clientSize = 0;
+            var handleSize = 0;
+            var offset,page,direction;
+
+            var loadSize = function(){
+                offset = that[0].offset();
+                if(that._direction === "horizontal"){
+                    page       = "pageX";
+                    direction  = "x";
+                    handleSize = opts.handleWidth;
+                    clientSize = that.width() - that.boxSize.width;
+                }else if(that._direction === "vertical"){
+                    page       = "pageY";
+                    direction  = "y";
+                    handleSize = opts.handleHeight;
+                    clientSize = that.height() - that.boxSize.height;
+                }
+            };
+            var mousemove = function(e){
+                var pos   = e[page] - offset[direction];
+                var value = 0;
+
+                if(page === "pageX"){
+                    value = opts.min + Math.round((pos - handleSize / 2) / (clientSize - handleSize) * (opts.max - opts.min));
+                }else if(page === "pageY"){
+                    value = opts.min + Math.round((clientSize - pos - handleSize / 2) / (clientSize - handleSize) * (opts.max - opts.min));
+                }
+                that.value(value);
+            };
+
+            that[0].mouse({
+                down:function(e){
+                    if(e.which !== 1){
+                        return;
+                    }
+                    loadSize();
+                    Std.dom(document).on("mousemove",mousemove(e) || mousemove);
+                    e.preventDefault();
+                    that.emit("dragStart");
+                },
+                up:function(){
+                    Std.dom(document).off("mousemove",mousemove);
+                    that.emit("dragStop");
+                }
+            });
+
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * refresh
+         */
+        refresh:function(){
+            return this.value(this.opts.value);
+        },
+        /*
+         * min
+        */
+        min:function(n){
+            return this.opt("min",n,function(){
+                this.refresh();
+            });
+        },
+        /*
+         * max
+         */
+        max:function(n){
+            return this.opt("max",n,function(){
+                this.refresh();
+            });
+        },
+        /*
+         * color
+        */
+        color:function(color){
+            return this.opt("color",color,function(){
+                this.D.progress.css("background",color);
+            });
+        },
+        /*
+         * slider range
+        */
+        range:function(min,max){
+            var that = this;
+            var opts = that.opts;
+
+            if(min === undefined){
+                return {
+                    min:opts.min,
+                    max:opts.max
+                };
+            }
+            opts.min = min;
+            opts.max = max;
+
+            return that;
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+            var opts = that.opts;
+
+            if(value === undefined){
+                return opts.value;
+            }
+
+            if((value = int(value)) < opts.min){
+                value = opts.min;
+            }else if(value > opts.max){
+                value = opts.max;
+            }
+
+            that.updateValue(value);
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        var doms = that.D = {};
+
+        dom.addClass("_" + that._direction).append([
+            doms.client = newDiv("_client").append(
+                doms.progress = newDiv("_progress")
+            ),
+            doms.handle = newDiv("_handle").attr("tabindex",1)
+        ]);
+    }
+});
+
+/**
+ *  horizontal slider widget module
+*/
+Std.ui.module("HSlider",{
+    /*[#module option:model]*/
+    model:"ui.Slider",
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        height:22
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * direction
+        */
+        direction:"horizontal"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * height
+        */
+        height:function(n){
+            var that         = this;
+            var opts         = that.opts;
+            var doms         = that.D;
+            var sliderHeight = that.height();
+
+            if(that.handleBoxSize){
+                var handleHeight = opts.handleHeight - that.handleBoxSize.height;
+                doms.handle.css({
+                    top:(sliderHeight - handleHeight) / 2
+                });
+            }
+            doms.client.css("top",Math.round((sliderHeight - doms.client.height()) / 2));
+        }
+    }
+});
+
+/**
+ *  vertical slider widget module
+*/
+Std.ui.module("VSlider",{
+    /*[#module option:model]*/
+    model:"ui.Slider",
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        width:22,
+        height:200
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * direction
+        */
+        direction:"vertical"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * width
+        */
+        width:function(n){
+            var that        = this;
+            var opts        = that.opts;
+            var doms        = that.D;
+            var sliderWidth = that.width();
+
+            if(that.handleBoxSize){
+                var handleWidth = opts.handleWidth - that.handleBoxSize.width;
+
+                doms.handle.css({
+                    left:(sliderWidth - handleWidth) / 2
+                });
+            }
+            doms.client.css("left",Math.round((sliderWidth - doms.client.width()) / 2));
+        }
+    }
+});

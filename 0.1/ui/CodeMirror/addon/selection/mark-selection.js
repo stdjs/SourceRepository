@@ -1,1 +1,118 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function t(e){e.operation(function(){l(e)})}function n(e){e.state.markedSelection.length&&e.operation(function(){r(e)})}function o(e,t,n,o){if(0!=a(t,n))for(var r=e.state.markedSelection,i=e.state.markedSelectionStyle,l=t.line;;){var s=l==t.line?t:c(l,0),d=l+f,u=d>=n.line,m=u?n:c(d,0),S=e.markText(s,m,{className:i});if(null==o?r.push(S):r.splice(o++,0,S),u)break;l=d}}function r(e){for(var t=e.state.markedSelection,n=0;n<t.length;++n)t[n].clear();t.length=0}function i(e){r(e);for(var t=e.listSelections(),n=0;n<t.length;n++)o(e,t[n].from(),t[n].to())}function l(e){if(!e.somethingSelected())return r(e);if(e.listSelections().length>1)return i(e);var t=e.getCursor("start"),n=e.getCursor("end"),l=e.state.markedSelection;if(!l.length)return o(e,t,n);var c=l[0].find(),s=l[l.length-1].find();if(!c||!s||n.line-t.line<f||a(t,s.to)>=0||a(n,c.from)<=0)return i(e);for(;a(t,c.from)>0;)l.shift().clear(),c=l[0].find();for(a(t,c.from)<0&&(c.to.line-t.line<f?(l.shift().clear(),o(e,t,c.to,0)):o(e,t,c.from,0));a(n,s.to)<0;)l.pop().clear(),s=l[l.length-1].find();a(n,s.to)>0&&(n.line-s.from.line<f?(l.pop().clear(),o(e,s.from,n)):o(e,s.to,n))}e.defineOption("styleSelectedText",!1,function(o,l,f){var c=f&&f!=e.Init;l&&!c?(o.state.markedSelection=[],o.state.markedSelectionStyle="string"==typeof l?l:"CodeMirror-selectedtext",i(o),o.on("cursorActivity",t),o.on("change",n)):!l&&c&&(o.off("cursorActivity",t),o.off("change",n),r(o),o.state.markedSelection=o.state.markedSelectionStyle=null)});var f=8,c=e.Pos,a=e.cmpPos});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Because sometimes you need to mark the selected *text*.
+//
+// Adds an option 'styleSelectedText' which, when enabled, gives
+// selected text the CSS class given as option value, or
+// "CodeMirror-selectedtext" when the value is not a string.
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineOption("styleSelectedText", false, function(cm, val, old) {
+    var prev = old && old != CodeMirror.Init;
+    if (val && !prev) {
+      cm.state.markedSelection = [];
+      cm.state.markedSelectionStyle = typeof val == "string" ? val : "CodeMirror-selectedtext";
+      reset(cm);
+      cm.on("cursorActivity", onCursorActivity);
+      cm.on("change", onChange);
+    } else if (!val && prev) {
+      cm.off("cursorActivity", onCursorActivity);
+      cm.off("change", onChange);
+      clear(cm);
+      cm.state.markedSelection = cm.state.markedSelectionStyle = null;
+    }
+  });
+
+  function onCursorActivity(cm) {
+    cm.operation(function() { update(cm); });
+  }
+
+  function onChange(cm) {
+    if (cm.state.markedSelection.length)
+      cm.operation(function() { clear(cm); });
+  }
+
+  var CHUNK_SIZE = 8;
+  var Pos = CodeMirror.Pos;
+  var cmp = CodeMirror.cmpPos;
+
+  function coverRange(cm, from, to, addAt) {
+    if (cmp(from, to) == 0) return;
+    var array = cm.state.markedSelection;
+    var cls = cm.state.markedSelectionStyle;
+    for (var line = from.line;;) {
+      var start = line == from.line ? from : Pos(line, 0);
+      var endLine = line + CHUNK_SIZE, atEnd = endLine >= to.line;
+      var end = atEnd ? to : Pos(endLine, 0);
+      var mark = cm.markText(start, end, {className: cls});
+      if (addAt == null) array.push(mark);
+      else array.splice(addAt++, 0, mark);
+      if (atEnd) break;
+      line = endLine;
+    }
+  }
+
+  function clear(cm) {
+    var array = cm.state.markedSelection;
+    for (var i = 0; i < array.length; ++i) array[i].clear();
+    array.length = 0;
+  }
+
+  function reset(cm) {
+    clear(cm);
+    var ranges = cm.listSelections();
+    for (var i = 0; i < ranges.length; i++)
+      coverRange(cm, ranges[i].from(), ranges[i].to());
+  }
+
+  function update(cm) {
+    if (!cm.somethingSelected()) return clear(cm);
+    if (cm.listSelections().length > 1) return reset(cm);
+
+    var from = cm.getCursor("start"), to = cm.getCursor("end");
+
+    var array = cm.state.markedSelection;
+    if (!array.length) return coverRange(cm, from, to);
+
+    var coverStart = array[0].find(), coverEnd = array[array.length - 1].find();
+    if (!coverStart || !coverEnd || to.line - from.line < CHUNK_SIZE ||
+        cmp(from, coverEnd.to) >= 0 || cmp(to, coverStart.from) <= 0)
+      return reset(cm);
+
+    while (cmp(from, coverStart.from) > 0) {
+      array.shift().clear();
+      coverStart = array[0].find();
+    }
+    if (cmp(from, coverStart.from) < 0) {
+      if (coverStart.to.line - from.line < CHUNK_SIZE) {
+        array.shift().clear();
+        coverRange(cm, from, coverStart.to, 0);
+      } else {
+        coverRange(cm, from, coverStart.from, 0);
+      }
+    }
+
+    while (cmp(to, coverEnd.to) < 0) {
+      array.pop().clear();
+      coverEnd = array[array.length - 1].find();
+    }
+    if (cmp(to, coverEnd.to) > 0) {
+      if (to.line - coverEnd.from.line < CHUNK_SIZE) {
+        array.pop().clear();
+        coverRange(cm, coverEnd.from, to);
+      } else {
+        coverRange(cm, coverEnd.to, to);
+      }
+    }
+  }
+});

@@ -1,1 +1,68 @@
-Std.ui.module("CodeEdit",{nodeName:"pre",parent:"widget",action:{content:"value"},option:{level:4,minWidth:12,minHeight:12,defaultClass:"StdUI_CodeEdit",boxSizing:"border-box",value:""},extend:{render:function(){this.initEvents()}},"protected":{initEvents:function(){var t=this;return t[0].mouse({down:function(){}}),t}},"public":{value:function(t){var e=this;return void 0===t?e[0].html():(e[0].html(t),e)}},main:function(t,e,n){e.value&&t.value(e.value),n.contentEditable(!0)}});
+/**
+ * CodeEdit widget module
+*/
+Std.ui.module("CodeEdit",{
+    nodeName:"pre",
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        level:4,
+        minWidth:12,
+        minHeight:12,
+        defaultClass:"StdUI_CodeEdit",
+        boxSizing:"border-box",
+        value:""
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            this.initEvents();
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+
+            that[0].mouse({
+                down:function(){
+
+                }
+            });
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+
+            if(value === undefined){
+                return that[0].html();
+            }
+            that[0].html(value);
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        if(opts.value){
+            that.value(opts.value);
+        }
+        dom.contentEditable(true);
+    }
+});

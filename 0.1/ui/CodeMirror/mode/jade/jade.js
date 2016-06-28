@@ -1,1 +1,590 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror"),require("../javascript/javascript"),require("../css/css"),require("../htmlmixed/htmlmixed")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","../javascript/javascript","../css/css","../htmlmixed/htmlmixed"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("jade",function(e){function n(){this.javaScriptLine=!1,this.javaScriptLineExcludesColon=!1,this.javaScriptArguments=!1,this.javaScriptArgumentsDepth=0,this.isInterpolating=!1,this.interpolationNesting=0,this.jsState=X.startState(),this.restOfLine="",this.isIncludeFiltered=!1,this.isEach=!1,this.lastTag="",this.scriptType="",this.isAttrs=!1,this.attrsNest=[],this.inAttributeName=!0,this.attributeIsType=!1,this.attrValue="",this.indentOf=1/0,this.indentToken="",this.innerMode=null,this.innerState=null,this.innerModeForLine=!1}function i(t,e){if(t.sol()&&(e.javaScriptLine=!1,e.javaScriptLineExcludesColon=!1),e.javaScriptLine){if(e.javaScriptLineExcludesColon&&":"===t.peek())return e.javaScriptLine=!1,void(e.javaScriptLineExcludesColon=!1);var n=X.token(t,e.jsState);return t.eol()&&(e.javaScriptLine=!1),n||!0}}function r(t,e){if(e.javaScriptArguments){if(0===e.javaScriptArgumentsDepth&&"("!==t.peek())return void(e.javaScriptArguments=!1);if("("===t.peek()?e.javaScriptArgumentsDepth++:")"===t.peek()&&e.javaScriptArgumentsDepth--,0===e.javaScriptArgumentsDepth)return void(e.javaScriptArguments=!1);var n=X.token(t,e.jsState);return n||!0}}function a(t){return t.match(/^yield\b/)?"keyword":void 0}function s(t){return t.match(/^(?:doctype) *([^\n]+)?/)?P:void 0}function o(t,e){return t.match("#{")?(e.isInterpolating=!0,e.interpolationNesting=0,"punctuation"):void 0}function c(t,e){if(e.isInterpolating){if("}"===t.peek()){if(e.interpolationNesting--,e.interpolationNesting<0)return t.next(),e.isInterpolating=!1,"puncutation"}else"{"===t.peek()&&e.interpolationNesting++;return X.token(t,e.jsState)||!0}}function u(t,e){return t.match(/^case\b/)?(e.javaScriptLine=!0,K):void 0}function p(t,e){return t.match(/^when\b/)?(e.javaScriptLine=!0,e.javaScriptLineExcludesColon=!0,K):void 0}function d(t){return t.match(/^default\b/)?K:void 0}function l(t,e){return t.match(/^extends?\b/)?(e.restOfLine="string",K):void 0}function h(t,e){return t.match(/^append\b/)?(e.restOfLine="variable",K):void 0}function f(t,e){return t.match(/^prepend\b/)?(e.restOfLine="variable",K):void 0}function v(t,e){return t.match(/^block\b *(?:(prepend|append)\b)?/)?(e.restOfLine="variable",K):void 0}function m(t,e){return t.match(/^include\b/)?(e.restOfLine="string",K):void 0}function S(t,e){return t.match(/^include:([a-zA-Z0-9\-]+)/,!1)&&t.match("include")?(e.isIncludeFiltered=!0,K):void 0}function j(t,e){if(e.isIncludeFiltered){var n=x(t,e);return e.isIncludeFiltered=!1,e.restOfLine="string",n}}function g(t,e){return t.match(/^mixin\b/)?(e.javaScriptLine=!0,K):void 0}function b(t,e){return t.match(/^\+([-\w]+)/)?(t.match(/^\( *[-\w]+ *=/,!1)||(e.javaScriptArguments=!0,e.javaScriptArgumentsDepth=0),"variable"):t.match(/^\+#{/,!1)?(t.next(),e.mixinCallAfter=!0,o(t,e)):void 0}function L(t,e){return e.mixinCallAfter?(e.mixinCallAfter=!1,t.match(/^\( *[-\w]+ *=/,!1)||(e.javaScriptArguments=!0,e.javaScriptArgumentsDepth=0),!0):void 0}function A(t,e){return t.match(/^(if|unless|else if|else)\b/)?(e.javaScriptLine=!0,K):void 0}function k(t,e){return t.match(/^(- *)?(each|for)\b/)?(e.isEach=!0,K):void 0}function y(t,e){if(e.isEach){if(t.match(/^ in\b/))return e.javaScriptLine=!0,e.isEach=!1,K;if(t.sol()||t.eol())e.isEach=!1;else if(t.next()){for(;!t.match(/^ in\b/,!1)&&t.next(););return"variable"}}}function T(t,e){return t.match(/^while\b/)?(e.javaScriptLine=!0,K):void 0}function M(t,e){var n;return(n=t.match(/^(\w(?:[-:\w]*\w)?)\/?/))?(e.lastTag=n[1].toLowerCase(),"script"===e.lastTag&&(e.scriptType="application/javascript"),"tag"):void 0}function x(n,i){if(n.match(/^:([\w\-]+)/)){var r;return e&&e.innerModes&&(r=e.innerModes(n.current().substring(1))),r||(r=n.current().substring(1)),"string"==typeof r&&(r=t.getMode(e,r)),Z(n,i,r),"atom"}}function N(t,e){return t.match(/^(!?=|-)/)?(e.javaScriptLine=!0,"punctuation"):void 0}function O(t){return t.match(/^#([\w-]+)/)?Q:void 0}function w(t){return t.match(/^\.([\w-]+)/)?R:void 0}function I(t,e){return"("==t.peek()?(t.next(),e.isAttrs=!0,e.attrsNest=[],e.inAttributeName=!0,e.attrValue="",e.attributeIsType=!1,"punctuation"):void 0}function E(t,e){if(e.isAttrs){if(W[t.peek()]&&e.attrsNest.push(W[t.peek()]),e.attrsNest[e.attrsNest.length-1]===t.peek())e.attrsNest.pop();else if(t.eat(")"))return e.isAttrs=!1,"punctuation";if(e.inAttributeName&&t.match(/^[^=,\)!]+/))return("="===t.peek()||"!"===t.peek())&&(e.inAttributeName=!1,e.jsState=X.startState(),e.attributeIsType="script"===e.lastTag&&"type"===t.current().trim().toLowerCase()?!0:!1),"attribute";var n=X.token(t,e.jsState);if(e.attributeIsType&&"string"===n&&(e.scriptType=t.current().toString()),0===e.attrsNest.length&&("string"===n||"variable"===n||"keyword"===n))try{return Function("","var x "+e.attrValue.replace(/,\s*$/,"").replace(/^!/,"")),e.inAttributeName=!0,e.attrValue="",t.backUp(t.current().length),E(t,e)}catch(i){}return e.attrValue+=t.current(),n||!0}}function C(t,e){return t.match(/^&attributes\b/)?(e.javaScriptArguments=!0,e.javaScriptArgumentsDepth=0,"keyword"):void 0}function F(t){return t.sol()&&t.eatSpace()?"indent":void 0}function D(t,e){return t.match(/^ *\/\/(-)?([^\n]*)/)?(e.indentOf=t.indentation(),e.indentToken="comment","comment"):void 0}function V(t){return t.match(/^: */)?"colon":void 0}function q(t,e){return t.match(/^(?:\| ?| )([^\n]+)/)?"string":t.match(/^(<[^\n]*)/,!1)?(Z(t,e,"htmlmixed"),e.innerModeForLine=!0,$(t,e,!0)):void 0}function z(t,e){if(t.eat(".")){var n=null;return"script"===e.lastTag&&-1!=e.scriptType.toLowerCase().indexOf("javascript")?n=e.scriptType.toLowerCase().replace(/"|'/g,""):"style"===e.lastTag&&(n="css"),Z(t,e,n),"dot"}}function U(t){return t.next(),null}function Z(n,i,r){r=t.mimeModes[r]||r,r=e.innerModes?e.innerModes(r)||r:r,r=t.mimeModes[r]||r,r=t.getMode(e,r),i.indentOf=n.indentation(),r&&"null"!==r.name?i.innerMode=r:i.indentToken="string"}function $(t,e,n){return t.indentation()>e.indentOf||e.innerModeForLine&&!t.sol()||n?e.innerMode?(e.innerState||(e.innerState=e.innerMode.startState?e.innerMode.startState(t.indentation()):{}),t.hideFirstChars(e.indentOf+2,function(){return e.innerMode.token(t,e.innerState)||!0})):(t.skipToEnd(),e.indentToken):void(t.sol()&&(e.indentOf=1/0,e.indentToken=null,e.innerMode=null,e.innerState=null))}function B(t,e){if(t.sol()&&(e.restOfLine=""),e.restOfLine){t.skipToEnd();var n=e.restOfLine;return e.restOfLine="",n}}function G(){return new n}function H(t){return t.copy()}function J(t,e){var n=$(t,e)||B(t,e)||c(t,e)||j(t,e)||y(t,e)||E(t,e)||i(t,e)||r(t,e)||L(t,e)||a(t,e)||s(t,e)||o(t,e)||u(t,e)||p(t,e)||d(t,e)||l(t,e)||h(t,e)||f(t,e)||v(t,e)||m(t,e)||S(t,e)||g(t,e)||b(t,e)||A(t,e)||k(t,e)||T(t,e)||M(t,e)||x(t,e)||N(t,e)||O(t,e)||w(t,e)||I(t,e)||C(t,e)||F(t,e)||q(t,e)||D(t,e)||V(t,e)||z(t,e)||U(t,e);return n===!0?null:n}var K="keyword",P="meta",Q="builtin",R="qualifier",W={"{":"}","(":")","[":"]"},X=t.getMode(e,"javascript");return n.prototype.copy=function(){var e=new n;return e.javaScriptLine=this.javaScriptLine,e.javaScriptLineExcludesColon=this.javaScriptLineExcludesColon,e.javaScriptArguments=this.javaScriptArguments,e.javaScriptArgumentsDepth=this.javaScriptArgumentsDepth,e.isInterpolating=this.isInterpolating,e.interpolationNesting=this.intpolationNesting,e.jsState=t.copyState(X,this.jsState),e.innerMode=this.innerMode,this.innerMode&&this.innerState&&(e.innerState=t.copyState(this.innerMode,this.innerState)),e.restOfLine=this.restOfLine,e.isIncludeFiltered=this.isIncludeFiltered,e.isEach=this.isEach,e.lastTag=this.lastTag,e.scriptType=this.scriptType,e.isAttrs=this.isAttrs,e.attrsNest=this.attrsNest.slice(),e.inAttributeName=this.inAttributeName,e.attributeIsType=this.attributeIsType,e.attrValue=this.attrValue,e.indentOf=this.indentOf,e.indentToken=this.indentToken,e.innerModeForLine=this.innerModeForLine,e},{startState:G,copyState:H,token:J}}),t.defineMIME("text/x-jade","jade")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../javascript/javascript"), require("../css/css"), require("../htmlmixed/htmlmixed"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../javascript/javascript", "../css/css", "../htmlmixed/htmlmixed"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode('jade', function (config) {
+  // token types
+  var KEYWORD = 'keyword';
+  var DOCTYPE = 'meta';
+  var ID = 'builtin';
+  var CLASS = 'qualifier';
+
+  var ATTRS_NEST = {
+    '{': '}',
+    '(': ')',
+    '[': ']'
+  };
+
+  var jsMode = CodeMirror.getMode(config, 'javascript');
+
+  function State() {
+    this.javaScriptLine = false;
+    this.javaScriptLineExcludesColon = false;
+
+    this.javaScriptArguments = false;
+    this.javaScriptArgumentsDepth = 0;
+
+    this.isInterpolating = false;
+    this.interpolationNesting = 0;
+
+    this.jsState = jsMode.startState();
+
+    this.restOfLine = '';
+
+    this.isIncludeFiltered = false;
+    this.isEach = false;
+
+    this.lastTag = '';
+    this.scriptType = '';
+
+    // Attributes Mode
+    this.isAttrs = false;
+    this.attrsNest = [];
+    this.inAttributeName = true;
+    this.attributeIsType = false;
+    this.attrValue = '';
+
+    // Indented Mode
+    this.indentOf = Infinity;
+    this.indentToken = '';
+
+    this.innerMode = null;
+    this.innerState = null;
+
+    this.innerModeForLine = false;
+  }
+  /**
+   * Safely copy a state
+   *
+   * @return {State}
+   */
+  State.prototype.copy = function () {
+    var res = new State();
+    res.javaScriptLine = this.javaScriptLine;
+    res.javaScriptLineExcludesColon = this.javaScriptLineExcludesColon;
+    res.javaScriptArguments = this.javaScriptArguments;
+    res.javaScriptArgumentsDepth = this.javaScriptArgumentsDepth;
+    res.isInterpolating = this.isInterpolating;
+    res.interpolationNesting = this.intpolationNesting;
+
+    res.jsState = CodeMirror.copyState(jsMode, this.jsState);
+
+    res.innerMode = this.innerMode;
+    if (this.innerMode && this.innerState) {
+      res.innerState = CodeMirror.copyState(this.innerMode, this.innerState);
+    }
+
+    res.restOfLine = this.restOfLine;
+
+    res.isIncludeFiltered = this.isIncludeFiltered;
+    res.isEach = this.isEach;
+    res.lastTag = this.lastTag;
+    res.scriptType = this.scriptType;
+    res.isAttrs = this.isAttrs;
+    res.attrsNest = this.attrsNest.slice();
+    res.inAttributeName = this.inAttributeName;
+    res.attributeIsType = this.attributeIsType;
+    res.attrValue = this.attrValue;
+    res.indentOf = this.indentOf;
+    res.indentToken = this.indentToken;
+
+    res.innerModeForLine = this.innerModeForLine;
+
+    return res;
+  };
+
+  function javaScript(stream, state) {
+    if (stream.sol()) {
+      // if javaScriptLine was set at end of line, ignore it
+      state.javaScriptLine = false;
+      state.javaScriptLineExcludesColon = false;
+    }
+    if (state.javaScriptLine) {
+      if (state.javaScriptLineExcludesColon && stream.peek() === ':') {
+        state.javaScriptLine = false;
+        state.javaScriptLineExcludesColon = false;
+        return;
+      }
+      var tok = jsMode.token(stream, state.jsState);
+      if (stream.eol()) state.javaScriptLine = false;
+      return tok || true;
+    }
+  }
+  function javaScriptArguments(stream, state) {
+    if (state.javaScriptArguments) {
+      if (state.javaScriptArgumentsDepth === 0 && stream.peek() !== '(') {
+        state.javaScriptArguments = false;
+        return;
+      }
+      if (stream.peek() === '(') {
+        state.javaScriptArgumentsDepth++;
+      } else if (stream.peek() === ')') {
+        state.javaScriptArgumentsDepth--;
+      }
+      if (state.javaScriptArgumentsDepth === 0) {
+        state.javaScriptArguments = false;
+        return;
+      }
+
+      var tok = jsMode.token(stream, state.jsState);
+      return tok || true;
+    }
+  }
+
+  function yieldStatement(stream) {
+    if (stream.match(/^yield\b/)) {
+        return 'keyword';
+    }
+  }
+
+  function doctype(stream) {
+    if (stream.match(/^(?:doctype) *([^\n]+)?/)) {
+        return DOCTYPE;
+    }
+  }
+
+  function interpolation(stream, state) {
+    if (stream.match('#{')) {
+      state.isInterpolating = true;
+      state.interpolationNesting = 0;
+      return 'punctuation';
+    }
+  }
+
+  function interpolationContinued(stream, state) {
+    if (state.isInterpolating) {
+      if (stream.peek() === '}') {
+        state.interpolationNesting--;
+        if (state.interpolationNesting < 0) {
+          stream.next();
+          state.isInterpolating = false;
+          return 'puncutation';
+        }
+      } else if (stream.peek() === '{') {
+        state.interpolationNesting++;
+      }
+      return jsMode.token(stream, state.jsState) || true;
+    }
+  }
+
+  function caseStatement(stream, state) {
+    if (stream.match(/^case\b/)) {
+      state.javaScriptLine = true;
+      return KEYWORD;
+    }
+  }
+
+  function when(stream, state) {
+    if (stream.match(/^when\b/)) {
+      state.javaScriptLine = true;
+      state.javaScriptLineExcludesColon = true;
+      return KEYWORD;
+    }
+  }
+
+  function defaultStatement(stream) {
+    if (stream.match(/^default\b/)) {
+      return KEYWORD;
+    }
+  }
+
+  function extendsStatement(stream, state) {
+    if (stream.match(/^extends?\b/)) {
+      state.restOfLine = 'string';
+      return KEYWORD;
+    }
+  }
+
+  function append(stream, state) {
+    if (stream.match(/^append\b/)) {
+      state.restOfLine = 'variable';
+      return KEYWORD;
+    }
+  }
+  function prepend(stream, state) {
+    if (stream.match(/^prepend\b/)) {
+      state.restOfLine = 'variable';
+      return KEYWORD;
+    }
+  }
+  function block(stream, state) {
+    if (stream.match(/^block\b *(?:(prepend|append)\b)?/)) {
+      state.restOfLine = 'variable';
+      return KEYWORD;
+    }
+  }
+
+  function include(stream, state) {
+    if (stream.match(/^include\b/)) {
+      state.restOfLine = 'string';
+      return KEYWORD;
+    }
+  }
+
+  function includeFiltered(stream, state) {
+    if (stream.match(/^include:([a-zA-Z0-9\-]+)/, false) && stream.match('include')) {
+      state.isIncludeFiltered = true;
+      return KEYWORD;
+    }
+  }
+
+  function includeFilteredContinued(stream, state) {
+    if (state.isIncludeFiltered) {
+      var tok = filter(stream, state);
+      state.isIncludeFiltered = false;
+      state.restOfLine = 'string';
+      return tok;
+    }
+  }
+
+  function mixin(stream, state) {
+    if (stream.match(/^mixin\b/)) {
+      state.javaScriptLine = true;
+      return KEYWORD;
+    }
+  }
+
+  function call(stream, state) {
+    if (stream.match(/^\+([-\w]+)/)) {
+      if (!stream.match(/^\( *[-\w]+ *=/, false)) {
+        state.javaScriptArguments = true;
+        state.javaScriptArgumentsDepth = 0;
+      }
+      return 'variable';
+    }
+    if (stream.match(/^\+#{/, false)) {
+      stream.next();
+      state.mixinCallAfter = true;
+      return interpolation(stream, state);
+    }
+  }
+  function callArguments(stream, state) {
+    if (state.mixinCallAfter) {
+      state.mixinCallAfter = false;
+      if (!stream.match(/^\( *[-\w]+ *=/, false)) {
+        state.javaScriptArguments = true;
+        state.javaScriptArgumentsDepth = 0;
+      }
+      return true;
+    }
+  }
+
+  function conditional(stream, state) {
+    if (stream.match(/^(if|unless|else if|else)\b/)) {
+      state.javaScriptLine = true;
+      return KEYWORD;
+    }
+  }
+
+  function each(stream, state) {
+    if (stream.match(/^(- *)?(each|for)\b/)) {
+      state.isEach = true;
+      return KEYWORD;
+    }
+  }
+  function eachContinued(stream, state) {
+    if (state.isEach) {
+      if (stream.match(/^ in\b/)) {
+        state.javaScriptLine = true;
+        state.isEach = false;
+        return KEYWORD;
+      } else if (stream.sol() || stream.eol()) {
+        state.isEach = false;
+      } else if (stream.next()) {
+        while (!stream.match(/^ in\b/, false) && stream.next());
+        return 'variable';
+      }
+    }
+  }
+
+  function whileStatement(stream, state) {
+    if (stream.match(/^while\b/)) {
+      state.javaScriptLine = true;
+      return KEYWORD;
+    }
+  }
+
+  function tag(stream, state) {
+    var captures;
+    if (captures = stream.match(/^(\w(?:[-:\w]*\w)?)\/?/)) {
+      state.lastTag = captures[1].toLowerCase();
+      if (state.lastTag === 'script') {
+        state.scriptType = 'application/javascript';
+      }
+      return 'tag';
+    }
+  }
+
+  function filter(stream, state) {
+    if (stream.match(/^:([\w\-]+)/)) {
+      var innerMode;
+      if (config && config.innerModes) {
+        innerMode = config.innerModes(stream.current().substring(1));
+      }
+      if (!innerMode) {
+        innerMode = stream.current().substring(1);
+      }
+      if (typeof innerMode === 'string') {
+        innerMode = CodeMirror.getMode(config, innerMode);
+      }
+      setInnerMode(stream, state, innerMode);
+      return 'atom';
+    }
+  }
+
+  function code(stream, state) {
+    if (stream.match(/^(!?=|-)/)) {
+      state.javaScriptLine = true;
+      return 'punctuation';
+    }
+  }
+
+  function id(stream) {
+    if (stream.match(/^#([\w-]+)/)) {
+      return ID;
+    }
+  }
+
+  function className(stream) {
+    if (stream.match(/^\.([\w-]+)/)) {
+      return CLASS;
+    }
+  }
+
+  function attrs(stream, state) {
+    if (stream.peek() == '(') {
+      stream.next();
+      state.isAttrs = true;
+      state.attrsNest = [];
+      state.inAttributeName = true;
+      state.attrValue = '';
+      state.attributeIsType = false;
+      return 'punctuation';
+    }
+  }
+
+  function attrsContinued(stream, state) {
+    if (state.isAttrs) {
+      if (ATTRS_NEST[stream.peek()]) {
+        state.attrsNest.push(ATTRS_NEST[stream.peek()]);
+      }
+      if (state.attrsNest[state.attrsNest.length - 1] === stream.peek()) {
+        state.attrsNest.pop();
+      } else  if (stream.eat(')')) {
+        state.isAttrs = false;
+        return 'punctuation';
+      }
+      if (state.inAttributeName && stream.match(/^[^=,\)!]+/)) {
+        if (stream.peek() === '=' || stream.peek() === '!') {
+          state.inAttributeName = false;
+          state.jsState = jsMode.startState();
+          if (state.lastTag === 'script' && stream.current().trim().toLowerCase() === 'type') {
+            state.attributeIsType = true;
+          } else {
+            state.attributeIsType = false;
+          }
+        }
+        return 'attribute';
+      }
+
+      var tok = jsMode.token(stream, state.jsState);
+      if (state.attributeIsType && tok === 'string') {
+        state.scriptType = stream.current().toString();
+      }
+      if (state.attrsNest.length === 0 && (tok === 'string' || tok === 'variable' || tok === 'keyword')) {
+        try {
+          Function('', 'var x ' + state.attrValue.replace(/,\s*$/, '').replace(/^!/, ''));
+          state.inAttributeName = true;
+          state.attrValue = '';
+          stream.backUp(stream.current().length);
+          return attrsContinued(stream, state);
+        } catch (ex) {
+          //not the end of an attribute
+        }
+      }
+      state.attrValue += stream.current();
+      return tok || true;
+    }
+  }
+
+  function attributesBlock(stream, state) {
+    if (stream.match(/^&attributes\b/)) {
+      state.javaScriptArguments = true;
+      state.javaScriptArgumentsDepth = 0;
+      return 'keyword';
+    }
+  }
+
+  function indent(stream) {
+    if (stream.sol() && stream.eatSpace()) {
+      return 'indent';
+    }
+  }
+
+  function comment(stream, state) {
+    if (stream.match(/^ *\/\/(-)?([^\n]*)/)) {
+      state.indentOf = stream.indentation();
+      state.indentToken = 'comment';
+      return 'comment';
+    }
+  }
+
+  function colon(stream) {
+    if (stream.match(/^: */)) {
+      return 'colon';
+    }
+  }
+
+  function text(stream, state) {
+    if (stream.match(/^(?:\| ?| )([^\n]+)/)) {
+      return 'string';
+    }
+    if (stream.match(/^(<[^\n]*)/, false)) {
+      // html string
+      setInnerMode(stream, state, 'htmlmixed');
+      state.innerModeForLine = true;
+      return innerMode(stream, state, true);
+    }
+  }
+
+  function dot(stream, state) {
+    if (stream.eat('.')) {
+      var innerMode = null;
+      if (state.lastTag === 'script' && state.scriptType.toLowerCase().indexOf('javascript') != -1) {
+        innerMode = state.scriptType.toLowerCase().replace(/"|'/g, '');
+      } else if (state.lastTag === 'style') {
+        innerMode = 'css';
+      }
+      setInnerMode(stream, state, innerMode);
+      return 'dot';
+    }
+  }
+
+  function fail(stream) {
+    stream.next();
+    return null;
+  }
+
+
+  function setInnerMode(stream, state, mode) {
+    mode = CodeMirror.mimeModes[mode] || mode;
+    mode = config.innerModes ? config.innerModes(mode) || mode : mode;
+    mode = CodeMirror.mimeModes[mode] || mode;
+    mode = CodeMirror.getMode(config, mode);
+    state.indentOf = stream.indentation();
+
+    if (mode && mode.name !== 'null') {
+      state.innerMode = mode;
+    } else {
+      state.indentToken = 'string';
+    }
+  }
+  function innerMode(stream, state, force) {
+    if (stream.indentation() > state.indentOf || (state.innerModeForLine && !stream.sol()) || force) {
+      if (state.innerMode) {
+        if (!state.innerState) {
+          state.innerState = state.innerMode.startState ? state.innerMode.startState(stream.indentation()) : {};
+        }
+        return stream.hideFirstChars(state.indentOf + 2, function () {
+          return state.innerMode.token(stream, state.innerState) || true;
+        });
+      } else {
+        stream.skipToEnd();
+        return state.indentToken;
+      }
+    } else if (stream.sol()) {
+      state.indentOf = Infinity;
+      state.indentToken = null;
+      state.innerMode = null;
+      state.innerState = null;
+    }
+  }
+  function restOfLine(stream, state) {
+    if (stream.sol()) {
+      // if restOfLine was set at end of line, ignore it
+      state.restOfLine = '';
+    }
+    if (state.restOfLine) {
+      stream.skipToEnd();
+      var tok = state.restOfLine;
+      state.restOfLine = '';
+      return tok;
+    }
+  }
+
+
+  function startState() {
+    return new State();
+  }
+  function copyState(state) {
+    return state.copy();
+  }
+  /**
+   * Get the next token in the stream
+   *
+   * @param {Stream} stream
+   * @param {State} state
+   */
+  function nextToken(stream, state) {
+    var tok = innerMode(stream, state)
+      || restOfLine(stream, state)
+      || interpolationContinued(stream, state)
+      || includeFilteredContinued(stream, state)
+      || eachContinued(stream, state)
+      || attrsContinued(stream, state)
+      || javaScript(stream, state)
+      || javaScriptArguments(stream, state)
+      || callArguments(stream, state)
+
+      || yieldStatement(stream, state)
+      || doctype(stream, state)
+      || interpolation(stream, state)
+      || caseStatement(stream, state)
+      || when(stream, state)
+      || defaultStatement(stream, state)
+      || extendsStatement(stream, state)
+      || append(stream, state)
+      || prepend(stream, state)
+      || block(stream, state)
+      || include(stream, state)
+      || includeFiltered(stream, state)
+      || mixin(stream, state)
+      || call(stream, state)
+      || conditional(stream, state)
+      || each(stream, state)
+      || whileStatement(stream, state)
+      || tag(stream, state)
+      || filter(stream, state)
+      || code(stream, state)
+      || id(stream, state)
+      || className(stream, state)
+      || attrs(stream, state)
+      || attributesBlock(stream, state)
+      || indent(stream, state)
+      || text(stream, state)
+      || comment(stream, state)
+      || colon(stream, state)
+      || dot(stream, state)
+      || fail(stream, state);
+
+    return tok === true ? null : tok;
+  }
+  return {
+    startState: startState,
+    copyState: copyState,
+    token: nextToken
+  };
+});
+
+CodeMirror.defineMIME('text/x-jade', 'jade');
+
+});

@@ -1,1 +1,183 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function n(e){var n=e.search(i);return-1==n?0:n}var t={},i=/[^\s\u00a0]/,l=e.Pos;e.commands.toggleComment=function(e){for(var n=1/0,t=e.listSelections(),i=null,o=t.length-1;o>=0;o--){var r=t[o].from(),a=t[o].to();r.line>=n||(a.line>=n&&(a=l(n,0)),n=r.line,null==i?e.uncomment(r,a)?i="un":(e.lineComment(r,a),i="line"):"un"==i?e.uncomment(r,a):e.lineComment(r,a))}},e.defineExtension("lineComment",function(e,o,r){r||(r=t);var a=this,m=a.getModeAt(e),c=r.lineComment||m.lineComment;if(!c)return void((r.blockCommentStart||m.blockCommentStart)&&(r.fullLines=!0,a.blockComment(e,o,r)));var f=a.getLine(e.line);if(null!=f){var g=Math.min(0!=o.ch||o.line==e.line?o.line+1:o.line,a.lastLine()+1),s=null==r.padding?" ":r.padding,d=r.commentBlankLines||e.line==o.line;a.operation(function(){if(r.indent)for(var t=f.slice(0,n(f)),o=e.line;g>o;++o){var m=a.getLine(o),u=t.length;(d||i.test(m))&&(m.slice(0,u)!=t&&(u=n(m)),a.replaceRange(t+c+s,l(o,0),l(o,u)))}else for(var o=e.line;g>o;++o)(d||i.test(a.getLine(o)))&&a.replaceRange(c+s,l(o,0))})}}),e.defineExtension("blockComment",function(e,n,o){o||(o=t);var r=this,a=r.getModeAt(e),m=o.blockCommentStart||a.blockCommentStart,c=o.blockCommentEnd||a.blockCommentEnd;if(!m||!c)return void((o.lineComment||a.lineComment)&&0!=o.fullLines&&r.lineComment(e,n,o));var f=Math.min(n.line,r.lastLine());f!=e.line&&0==n.ch&&i.test(r.getLine(f))&&--f;var g=null==o.padding?" ":o.padding;e.line>f||r.operation(function(){if(0!=o.fullLines){var t=i.test(r.getLine(f));r.replaceRange(g+c,l(f)),r.replaceRange(m+g,l(e.line,0));var s=o.blockCommentLead||a.blockCommentLead;if(null!=s)for(var d=e.line+1;f>=d;++d)(d!=f||t)&&r.replaceRange(s+g,l(d,0))}else r.replaceRange(c,n),r.replaceRange(m,e)})}),e.defineExtension("uncomment",function(e,n,o){o||(o=t);var r,a=this,m=a.getModeAt(e),c=Math.min(0!=n.ch||n.line==e.line?n.line:n.line-1,a.lastLine()),f=Math.min(e.line,c),g=o.lineComment||m.lineComment,s=[],d=null==o.padding?" ":o.padding;e:if(g){for(var u=f;c>=u;++u){var h=a.getLine(u),v=h.indexOf(g);if(v>-1&&!/comment/.test(a.getTokenTypeAt(l(u,v+1)))&&(v=-1),-1==v&&(u!=c||u==f)&&i.test(h))break e;if(v>-1&&i.test(h.slice(0,v)))break e;s.push(h)}if(a.operation(function(){for(var e=f;c>=e;++e){var n=s[e-f],t=n.indexOf(g),i=t+g.length;0>t||(n.slice(i,i+d.length)==d&&(i+=d.length),r=!0,a.replaceRange("",l(e,t),l(e,i)))}}),r)return!0}var p=o.blockCommentStart||m.blockCommentStart,C=o.blockCommentEnd||m.blockCommentEnd;if(!p||!C)return!1;var b=o.blockCommentLead||m.blockCommentLead,k=a.getLine(f),L=c==f?k:a.getLine(c),x=k.indexOf(p),R=L.lastIndexOf(C);if(-1==R&&f!=c&&(L=a.getLine(--c),R=L.lastIndexOf(C)),-1==x||-1==R||!/comment/.test(a.getTokenTypeAt(l(f,x+1)))||!/comment/.test(a.getTokenTypeAt(l(c,R+1))))return!1;var O=k.lastIndexOf(p,e.ch),M=-1==O?-1:k.slice(0,e.ch).indexOf(C,O+p.length);if(-1!=O&&-1!=M&&M+C.length!=e.ch)return!1;M=L.indexOf(C,n.ch);var E=L.slice(n.ch).lastIndexOf(p,M-n.ch);return O=-1==M||-1==E?-1:n.ch+E,-1!=M&&-1!=O&&O!=n.ch?!1:(a.operation(function(){a.replaceRange("",l(c,R-(d&&L.slice(R-d.length,R)==d?d.length:0)),l(c,R+C.length));var e=x+p.length;if(d&&k.slice(e,e+d.length)==d&&(e+=d.length),a.replaceRange("",l(f,x),l(f,e)),b)for(var n=f+1;c>=n;++n){var t=a.getLine(n),o=t.indexOf(b);if(-1!=o&&!i.test(t.slice(0,o))){var r=o+b.length;d&&t.slice(r,r+d.length)==d&&(r+=d.length),a.replaceRange("",l(n,o),l(n,r))}}}),!0)})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var noOptions = {};
+  var nonWS = /[^\s\u00a0]/;
+  var Pos = CodeMirror.Pos;
+
+  function firstNonWS(str) {
+    var found = str.search(nonWS);
+    return found == -1 ? 0 : found;
+  }
+
+  CodeMirror.commands.toggleComment = function(cm) {
+    var minLine = Infinity, ranges = cm.listSelections(), mode = null;
+    for (var i = ranges.length - 1; i >= 0; i--) {
+      var from = ranges[i].from(), to = ranges[i].to();
+      if (from.line >= minLine) continue;
+      if (to.line >= minLine) to = Pos(minLine, 0);
+      minLine = from.line;
+      if (mode == null) {
+        if (cm.uncomment(from, to)) mode = "un";
+        else { cm.lineComment(from, to); mode = "line"; }
+      } else if (mode == "un") {
+        cm.uncomment(from, to);
+      } else {
+        cm.lineComment(from, to);
+      }
+    }
+  };
+
+  CodeMirror.defineExtension("lineComment", function(from, to, options) {
+    if (!options) options = noOptions;
+    var self = this, mode = self.getModeAt(from);
+    var commentString = options.lineComment || mode.lineComment;
+    if (!commentString) {
+      if (options.blockCommentStart || mode.blockCommentStart) {
+        options.fullLines = true;
+        self.blockComment(from, to, options);
+      }
+      return;
+    }
+    var firstLine = self.getLine(from.line);
+    if (firstLine == null) return;
+    var end = Math.min(to.ch != 0 || to.line == from.line ? to.line + 1 : to.line, self.lastLine() + 1);
+    var pad = options.padding == null ? " " : options.padding;
+    var blankLines = options.commentBlankLines || from.line == to.line;
+
+    self.operation(function() {
+      if (options.indent) {
+        var baseString = firstLine.slice(0, firstNonWS(firstLine));
+        for (var i = from.line; i < end; ++i) {
+          var line = self.getLine(i), cut = baseString.length;
+          if (!blankLines && !nonWS.test(line)) continue;
+          if (line.slice(0, cut) != baseString) cut = firstNonWS(line);
+          self.replaceRange(baseString + commentString + pad, Pos(i, 0), Pos(i, cut));
+        }
+      } else {
+        for (var i = from.line; i < end; ++i) {
+          if (blankLines || nonWS.test(self.getLine(i)))
+            self.replaceRange(commentString + pad, Pos(i, 0));
+        }
+      }
+    });
+  });
+
+  CodeMirror.defineExtension("blockComment", function(from, to, options) {
+    if (!options) options = noOptions;
+    var self = this, mode = self.getModeAt(from);
+    var startString = options.blockCommentStart || mode.blockCommentStart;
+    var endString = options.blockCommentEnd || mode.blockCommentEnd;
+    if (!startString || !endString) {
+      if ((options.lineComment || mode.lineComment) && options.fullLines != false)
+        self.lineComment(from, to, options);
+      return;
+    }
+
+    var end = Math.min(to.line, self.lastLine());
+    if (end != from.line && to.ch == 0 && nonWS.test(self.getLine(end))) --end;
+
+    var pad = options.padding == null ? " " : options.padding;
+    if (from.line > end) return;
+
+    self.operation(function() {
+      if (options.fullLines != false) {
+        var lastLineHasText = nonWS.test(self.getLine(end));
+        self.replaceRange(pad + endString, Pos(end));
+        self.replaceRange(startString + pad, Pos(from.line, 0));
+        var lead = options.blockCommentLead || mode.blockCommentLead;
+        if (lead != null) for (var i = from.line + 1; i <= end; ++i)
+          if (i != end || lastLineHasText)
+            self.replaceRange(lead + pad, Pos(i, 0));
+      } else {
+        self.replaceRange(endString, to);
+        self.replaceRange(startString, from);
+      }
+    });
+  });
+
+  CodeMirror.defineExtension("uncomment", function(from, to, options) {
+    if (!options) options = noOptions;
+    var self = this, mode = self.getModeAt(from);
+    var end = Math.min(to.ch != 0 || to.line == from.line ? to.line : to.line - 1, self.lastLine()), start = Math.min(from.line, end);
+
+    // Try finding line comments
+    var lineString = options.lineComment || mode.lineComment, lines = [];
+    var pad = options.padding == null ? " " : options.padding, didSomething;
+    lineComment: {
+      if (!lineString) break lineComment;
+      for (var i = start; i <= end; ++i) {
+        var line = self.getLine(i);
+        var found = line.indexOf(lineString);
+        if (found > -1 && !/comment/.test(self.getTokenTypeAt(Pos(i, found + 1)))) found = -1;
+        if (found == -1 && (i != end || i == start) && nonWS.test(line)) break lineComment;
+        if (found > -1 && nonWS.test(line.slice(0, found))) break lineComment;
+        lines.push(line);
+      }
+      self.operation(function() {
+        for (var i = start; i <= end; ++i) {
+          var line = lines[i - start];
+          var pos = line.indexOf(lineString), endPos = pos + lineString.length;
+          if (pos < 0) continue;
+          if (line.slice(endPos, endPos + pad.length) == pad) endPos += pad.length;
+          didSomething = true;
+          self.replaceRange("", Pos(i, pos), Pos(i, endPos));
+        }
+      });
+      if (didSomething) return true;
+    }
+
+    // Try block comments
+    var startString = options.blockCommentStart || mode.blockCommentStart;
+    var endString = options.blockCommentEnd || mode.blockCommentEnd;
+    if (!startString || !endString) return false;
+    var lead = options.blockCommentLead || mode.blockCommentLead;
+    var startLine = self.getLine(start), endLine = end == start ? startLine : self.getLine(end);
+    var open = startLine.indexOf(startString), close = endLine.lastIndexOf(endString);
+    if (close == -1 && start != end) {
+      endLine = self.getLine(--end);
+      close = endLine.lastIndexOf(endString);
+    }
+    if (open == -1 || close == -1 ||
+        !/comment/.test(self.getTokenTypeAt(Pos(start, open + 1))) ||
+        !/comment/.test(self.getTokenTypeAt(Pos(end, close + 1))))
+      return false;
+
+    // Avoid killing block comments completely outside the selection.
+    // Positions of the last startString before the start of the selection, and the first endString after it.
+    var lastStart = startLine.lastIndexOf(startString, from.ch);
+    var firstEnd = lastStart == -1 ? -1 : startLine.slice(0, from.ch).indexOf(endString, lastStart + startString.length);
+    if (lastStart != -1 && firstEnd != -1 && firstEnd + endString.length != from.ch) return false;
+    // Positions of the first endString after the end of the selection, and the last startString before it.
+    firstEnd = endLine.indexOf(endString, to.ch);
+    var almostLastStart = endLine.slice(to.ch).lastIndexOf(startString, firstEnd - to.ch);
+    lastStart = (firstEnd == -1 || almostLastStart == -1) ? -1 : to.ch + almostLastStart;
+    if (firstEnd != -1 && lastStart != -1 && lastStart != to.ch) return false;
+
+    self.operation(function() {
+      self.replaceRange("", Pos(end, close - (pad && endLine.slice(close - pad.length, close) == pad ? pad.length : 0)),
+                        Pos(end, close + endString.length));
+      var openEnd = open + startString.length;
+      if (pad && startLine.slice(openEnd, openEnd + pad.length) == pad) openEnd += pad.length;
+      self.replaceRange("", Pos(start, open), Pos(start, openEnd));
+      if (lead) for (var i = start + 1; i <= end; ++i) {
+        var line = self.getLine(i), found = line.indexOf(lead);
+        if (found == -1 || nonWS.test(line.slice(0, found))) continue;
+        var foundEnd = found + lead.length;
+        if (pad && line.slice(foundEnd, foundEnd + pad.length) == pad) foundEnd += pad.length;
+        self.replaceRange("", Pos(i, found), Pos(i, foundEnd));
+      }
+    });
+    return true;
+  });
+});

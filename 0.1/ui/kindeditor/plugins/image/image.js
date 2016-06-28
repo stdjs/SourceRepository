@@ -1,1 +1,328 @@
-KindEditor.plugin("image",function(e){var t=this,a="image",i=e.undef(t.allowImageUpload,!0),l=e.undef(t.allowImageRemote,!0),n=e.undef(t.formatUploadUrl,!0),o=e.undef(t.allowFileManager,!1),d=e.undef(t.uploadJson,t.basePath+"php/upload_json.php"),r=e.undef(t.imageTabIndex,0),s=t.pluginsPath+"image/images/",g=e.undef(t.extraFileUploadParams,{}),u=e.undef(t.filePostName,"imgFile"),c=e.undef(t.fillDescAfterUploadImage,!1),m=t.lang(a+".");t.plugin.imageDialog=function(i){function l(e,t){L.val(e),W.val(t),H=e,R=t}var r=(i.imageUrl,e.undef(i.imageWidth,""),e.undef(i.imageHeight,""),e.undef(i.imageTitle,""),e.undef(i.imageAlign,""),e.undef(i.showRemote,!0)),h=e.undef(i.showLocal,!0),p=e.undef(i.tabIndex,0),f=i.clickFn,v="kindeditor_upload_iframe_"+(new Date).getTime(),b=[];for(var k in g)b.push('<input type="hidden" name="'+k+'" value="'+g[k]+'" />');var w,y=['<div style="padding:20px;">','<div class="tabs"></div>','<div class="tab1" style="display:none;">','<div class="ke-dialog-row">','<label for="remoteUrl" style="width:60px;">'+m.remoteUrl+"</label>",'<input type="text" id="remoteUrl" class="ke-input-text" name="url" value="" style="width:200px;" /> &nbsp;','<span class="ke-button-common ke-button-outer">','<input type="button" class="ke-button-common ke-button" name="viewServer" value="'+m.viewServer+'" />',"</span>","</div>",'<div class="ke-dialog-row">','<label for="remoteWidth" style="width:60px;">'+m.size+"</label>",m.width+' <input type="text" id="remoteWidth" class="ke-input-text ke-input-number" name="width" value="" maxlength="4" /> ',m.height+' <input type="text" class="ke-input-text ke-input-number" name="height" value="" maxlength="4" /> ','<img class="ke-refresh-btn" src="'+s+'refresh.png" width="16" height="16" alt="" style="cursor:pointer;" title="'+m.resetSize+'" />',"</div>",'<div class="ke-dialog-row">','<label style="width:60px;">'+m.align+"</label>",'<input type="radio" name="align" class="ke-inline-block" value="" checked="checked" /> <img name="defaultImg" src="'+s+'align_top.gif" width="23" height="25" alt="" />',' <input type="radio" name="align" class="ke-inline-block" value="left" /> <img name="leftImg" src="'+s+'align_left.gif" width="23" height="25" alt="" />',' <input type="radio" name="align" class="ke-inline-block" value="right" /> <img name="rightImg" src="'+s+'align_right.gif" width="23" height="25" alt="" />',"</div>",'<div class="ke-dialog-row">','<label for="remoteTitle" style="width:60px;">'+m.imgTitle+"</label>",'<input type="text" id="remoteTitle" class="ke-input-text" name="title" value="" style="width:200px;" />',"</div>","</div>",'<div class="tab2" style="display:none;">','<iframe name="'+v+'" style="display:none;"></iframe>','<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="'+v+'" action="'+e.addParam(d,"dir=image")+'">','<div class="ke-dialog-row">',b.join(""),'<label style="width:60px;">'+m.localUrl+"</label>",'<input type="text" name="localUrl" class="ke-input-text" tabindex="-1" style="width:200px;" readonly="true" /> &nbsp;','<input type="button" class="ke-upload-button" value="'+m.upload+'" />',"</div>","</form>","</div>","</div>"].join(""),x=h||o?450:400,U=h&&r?300:250,I=t.createDialog({name:a,width:x,height:U,title:t.lang(a),body:y,yesBtn:{name:t.lang("yes"),click:function(){if(!I.isLoading){if(h&&r&&w&&1===w.selectedIndex||!r)return""==A.fileBox.val()?void alert(t.lang("pleaseSelectFile")):(I.showLoading(t.lang("uploadLoading")),A.submit(),void D.val(""));var a=e.trim(S.val()),i=L.val(),l=W.val(),n=P.val(),o="";return B.each(function(){return this.checked?(o=this.value,!1):void 0}),"http://"==a||e.invalidUrl(a)?(alert(t.lang("invalidUrl")),void S[0].focus()):/^\d*$/.test(i)?/^\d*$/.test(l)?void f.call(t,a,n,i,l,0,o):(alert(t.lang("invalidHeight")),void W[0].focus()):(alert(t.lang("invalidWidth")),void L[0].focus())}}},beforeRemove:function(){F.unbind(),L.unbind(),W.unbind(),_.unbind()}}),T=I.div,S=e('[name="url"]',T),D=e('[name="localUrl"]',T),F=e('[name="viewServer"]',T),L=e('.tab1 [name="width"]',T),W=e('.tab1 [name="height"]',T),_=e(".ke-refresh-btn",T),P=e('.tab1 [name="title"]',T),B=e('.tab1 [name="align"]',T);r&&h?(w=e.tabs({src:e(".tabs",T),afterSelect:function(){}}),w.add({title:m.remoteImage,panel:e(".tab1",T)}),w.add({title:m.localImage,panel:e(".tab2",T)}),w.select(p)):r?e(".tab1",T).show():h&&e(".tab2",T).show();var A=e.uploadbutton({button:e(".ke-upload-button",T)[0],fieldName:u,form:e(".ke-form",T),target:v,width:60,afterUpload:function(i){if(I.hideLoading(),0===i.error){var l=i.url;n&&(l=e.formatUrl(l,"absolute")),t.afterUpload&&t.afterUpload.call(t,l,i,a),c?(e(".ke-dialog-row #remoteUrl",T).val(l),e(".ke-tabs-li",T)[0].click(),e(".ke-refresh-btn",T).click()):f.call(t,l,i.title,i.width,i.height,i.border,i.align)}else alert(i.message)},afterError:function(e){I.hideLoading(),t.errorDialog(e)}});A.fileBox.change(function(){D.val(A.fileBox.val())}),o?F.click(function(){t.loadPlugin("filemanager",function(){t.plugin.filemanagerDialog({viewType:"VIEW",dirName:"image",clickFn:function(a){t.dialogs.length>1&&(e('[name="url"]',T).val(a),t.afterSelectFile&&t.afterSelectFile.call(t,a),t.hideDialog())}})})}):F.hide();var H=0,R=0;return _.click(function(){var t=e('<img src="'+S.val()+'" />',document).css({position:"absolute",visibility:"hidden",top:0,left:"-1000px"});t.bind("load",function(){l(t.width(),t.height()),t.remove()}),e(document.body).append(t)}),L.change(function(){H>0&&W.val(Math.round(R/H*parseInt(this.value,10)))}),W.change(function(){R>0&&L.val(Math.round(H/R*parseInt(this.value,10)))}),S.val(i.imageUrl),l(i.imageWidth,i.imageHeight),P.val(i.imageTitle),B.each(function(){return this.value===i.imageAlign?(this.checked=!0,!1):void 0}),r&&0===p&&(S[0].focus(),S[0].select()),I},t.plugin.image={edit:function(){var e=t.plugin.getSelectedImage();t.plugin.imageDialog({imageUrl:e?e.attr("data-ke-src"):"http://",imageWidth:e?e.width():"",imageHeight:e?e.height():"",imageTitle:e?e.attr("title"):"",imageAlign:e?e.attr("align"):"",showRemote:l,showLocal:i,tabIndex:e?0:r,clickFn:function(a,i,l,n,o,d){e?(e.attr("src",a),e.attr("data-ke-src",a),e.attr("width",l),e.attr("height",n),e.attr("title",i),e.attr("align",d),e.attr("alt",i)):t.exec("insertimage",a,i,l,n,o,d),setTimeout(function(){t.hideDialog().focus()},0)}})},"delete":function(){var e=t.plugin.getSelectedImage();"a"==e.parent().name&&(e=e.parent()),e.remove(),t.addBookmark()}},t.clickToolbar(a,t.plugin.image.edit)});
+/*******************************************************************************
+* KindEditor - WYSIWYG HTML Editor for Internet
+* Copyright (C) 2006-2011 kindsoft.net
+*
+* @author Roddy <luolonghao@gmail.com>
+* @site http://www.kindsoft.net/
+* @licence http://www.kindsoft.net/license.php
+*******************************************************************************/
+
+KindEditor.plugin('image', function(K) {
+	var self = this, name = 'image',
+		allowImageUpload = K.undef(self.allowImageUpload, true),
+		allowImageRemote = K.undef(self.allowImageRemote, true),
+		formatUploadUrl = K.undef(self.formatUploadUrl, true),
+		allowFileManager = K.undef(self.allowFileManager, false),
+		uploadJson = K.undef(self.uploadJson, self.basePath + 'php/upload_json.php'),
+		imageTabIndex = K.undef(self.imageTabIndex, 0),
+		imgPath = self.pluginsPath + 'image/images/',
+		extraParams = K.undef(self.extraFileUploadParams, {}),
+		filePostName = K.undef(self.filePostName, 'imgFile'),
+		fillDescAfterUploadImage = K.undef(self.fillDescAfterUploadImage, false),
+		lang = self.lang(name + '.');
+
+	self.plugin.imageDialog = function(options) {
+		var imageUrl = options.imageUrl,
+			imageWidth = K.undef(options.imageWidth, ''),
+			imageHeight = K.undef(options.imageHeight, ''),
+			imageTitle = K.undef(options.imageTitle, ''),
+			imageAlign = K.undef(options.imageAlign, ''),
+			showRemote = K.undef(options.showRemote, true),
+			showLocal = K.undef(options.showLocal, true),
+			tabIndex = K.undef(options.tabIndex, 0),
+			clickFn = options.clickFn;
+		var target = 'kindeditor_upload_iframe_' + new Date().getTime();
+		var hiddenElements = [];
+		for(var k in extraParams){
+			hiddenElements.push('<input type="hidden" name="' + k + '" value="' + extraParams[k] + '" />');
+		}
+		var html = [
+			'<div style="padding:20px;">',
+			//tabs
+			'<div class="tabs"></div>',
+			//remote image - start
+			'<div class="tab1" style="display:none;">',
+			//url
+			'<div class="ke-dialog-row">',
+			'<label for="remoteUrl" style="width:60px;">' + lang.remoteUrl + '</label>',
+			'<input type="text" id="remoteUrl" class="ke-input-text" name="url" value="" style="width:200px;" /> &nbsp;',
+			'<span class="ke-button-common ke-button-outer">',
+			'<input type="button" class="ke-button-common ke-button" name="viewServer" value="' + lang.viewServer + '" />',
+			'</span>',
+			'</div>',
+			//size
+			'<div class="ke-dialog-row">',
+			'<label for="remoteWidth" style="width:60px;">' + lang.size + '</label>',
+			lang.width + ' <input type="text" id="remoteWidth" class="ke-input-text ke-input-number" name="width" value="" maxlength="4" /> ',
+			lang.height + ' <input type="text" class="ke-input-text ke-input-number" name="height" value="" maxlength="4" /> ',
+			'<img class="ke-refresh-btn" src="' + imgPath + 'refresh.png" width="16" height="16" alt="" style="cursor:pointer;" title="' + lang.resetSize + '" />',
+			'</div>',
+			//align
+			'<div class="ke-dialog-row">',
+			'<label style="width:60px;">' + lang.align + '</label>',
+			'<input type="radio" name="align" class="ke-inline-block" value="" checked="checked" /> <img name="defaultImg" src="' + imgPath + 'align_top.gif" width="23" height="25" alt="" />',
+			' <input type="radio" name="align" class="ke-inline-block" value="left" /> <img name="leftImg" src="' + imgPath + 'align_left.gif" width="23" height="25" alt="" />',
+			' <input type="radio" name="align" class="ke-inline-block" value="right" /> <img name="rightImg" src="' + imgPath + 'align_right.gif" width="23" height="25" alt="" />',
+			'</div>',
+			//title
+			'<div class="ke-dialog-row">',
+			'<label for="remoteTitle" style="width:60px;">' + lang.imgTitle + '</label>',
+			'<input type="text" id="remoteTitle" class="ke-input-text" name="title" value="" style="width:200px;" />',
+			'</div>',
+			'</div>',
+			//remote image - end
+			//local upload - start
+			'<div class="tab2" style="display:none;">',
+			'<iframe name="' + target + '" style="display:none;"></iframe>',
+			'<form class="ke-upload-area ke-form" method="post" enctype="multipart/form-data" target="' + target + '" action="' + K.addParam(uploadJson, 'dir=image') + '">',
+			//file
+			'<div class="ke-dialog-row">',
+			hiddenElements.join(''),
+			'<label style="width:60px;">' + lang.localUrl + '</label>',
+			'<input type="text" name="localUrl" class="ke-input-text" tabindex="-1" style="width:200px;" readonly="true" /> &nbsp;',
+			'<input type="button" class="ke-upload-button" value="' + lang.upload + '" />',
+			'</div>',
+			'</form>',
+			'</div>',
+			//local upload - end
+			'</div>'
+		].join('');
+		var dialogWidth = showLocal || allowFileManager ? 450 : 400,
+			dialogHeight = showLocal && showRemote ? 300 : 250;
+		var dialog = self.createDialog({
+			name : name,
+			width : dialogWidth,
+			height : dialogHeight,
+			title : self.lang(name),
+			body : html,
+			yesBtn : {
+				name : self.lang('yes'),
+				click : function(e) {
+					// Bugfix: http://code.google.com/p/kindeditor/issues/detail?id=319
+					if (dialog.isLoading) {
+						return;
+					}
+					// insert local image
+					if (showLocal && showRemote && tabs && tabs.selectedIndex === 1 || !showRemote) {
+						if (uploadbutton.fileBox.val() == '') {
+							alert(self.lang('pleaseSelectFile'));
+							return;
+						}
+						dialog.showLoading(self.lang('uploadLoading'));
+						uploadbutton.submit();
+						localUrlBox.val('');
+						return;
+					}
+					// insert remote image
+					var url = K.trim(urlBox.val()),
+						width = widthBox.val(),
+						height = heightBox.val(),
+						title = titleBox.val(),
+						align = '';
+					alignBox.each(function() {
+						if (this.checked) {
+							align = this.value;
+							return false;
+						}
+					});
+					if (url == 'http://' || K.invalidUrl(url)) {
+						alert(self.lang('invalidUrl'));
+						urlBox[0].focus();
+						return;
+					}
+					if (!/^\d*$/.test(width)) {
+						alert(self.lang('invalidWidth'));
+						widthBox[0].focus();
+						return;
+					}
+					if (!/^\d*$/.test(height)) {
+						alert(self.lang('invalidHeight'));
+						heightBox[0].focus();
+						return;
+					}
+					clickFn.call(self, url, title, width, height, 0, align);
+				}
+			},
+			beforeRemove : function() {
+				viewServerBtn.unbind();
+				widthBox.unbind();
+				heightBox.unbind();
+				refreshBtn.unbind();
+			}
+		}),
+		div = dialog.div;
+
+		var urlBox = K('[name="url"]', div),
+			localUrlBox = K('[name="localUrl"]', div),
+			viewServerBtn = K('[name="viewServer"]', div),
+			widthBox = K('.tab1 [name="width"]', div),
+			heightBox = K('.tab1 [name="height"]', div),
+			refreshBtn = K('.ke-refresh-btn', div),
+			titleBox = K('.tab1 [name="title"]', div),
+			alignBox = K('.tab1 [name="align"]', div);
+
+		var tabs;
+		if (showRemote && showLocal) {
+			tabs = K.tabs({
+				src : K('.tabs', div),
+				afterSelect : function(i) {}
+			});
+			tabs.add({
+				title : lang.remoteImage,
+				panel : K('.tab1', div)
+			});
+			tabs.add({
+				title : lang.localImage,
+				panel : K('.tab2', div)
+			});
+			tabs.select(tabIndex);
+		} else if (showRemote) {
+			K('.tab1', div).show();
+		} else if (showLocal) {
+			K('.tab2', div).show();
+		}
+
+		var uploadbutton = K.uploadbutton({
+			button : K('.ke-upload-button', div)[0],
+			fieldName : filePostName,
+			form : K('.ke-form', div),
+			target : target,
+			width: 60,
+			afterUpload : function(data) {
+				dialog.hideLoading();
+				if (data.error === 0) {
+					var url = data.url;
+					if (formatUploadUrl) {
+						url = K.formatUrl(url, 'absolute');
+					}
+					if (self.afterUpload) {
+						self.afterUpload.call(self, url, data, name);
+					}
+					if (!fillDescAfterUploadImage) {
+						clickFn.call(self, url, data.title, data.width, data.height, data.border, data.align);
+					} else {
+						K(".ke-dialog-row #remoteUrl", div).val(url);
+						K(".ke-tabs-li", div)[0].click();
+						K(".ke-refresh-btn", div).click();
+					}
+				} else {
+					alert(data.message);
+				}
+			},
+			afterError : function(html) {
+				dialog.hideLoading();
+				self.errorDialog(html);
+			}
+		});
+		uploadbutton.fileBox.change(function(e) {
+			localUrlBox.val(uploadbutton.fileBox.val());
+		});
+		if (allowFileManager) {
+			viewServerBtn.click(function(e) {
+				self.loadPlugin('filemanager', function() {
+					self.plugin.filemanagerDialog({
+						viewType : 'VIEW',
+						dirName : 'image',
+						clickFn : function(url, title) {
+							if (self.dialogs.length > 1) {
+								K('[name="url"]', div).val(url);
+								if (self.afterSelectFile) {
+									self.afterSelectFile.call(self, url);
+								}
+								self.hideDialog();
+							}
+						}
+					});
+				});
+			});
+		} else {
+			viewServerBtn.hide();
+		}
+		var originalWidth = 0, originalHeight = 0;
+		function setSize(width, height) {
+			widthBox.val(width);
+			heightBox.val(height);
+			originalWidth = width;
+			originalHeight = height;
+		}
+		refreshBtn.click(function(e) {
+			var tempImg = K('<img src="' + urlBox.val() + '" />', document).css({
+				position : 'absolute',
+				visibility : 'hidden',
+				top : 0,
+				left : '-1000px'
+			});
+			tempImg.bind('load', function() {
+				setSize(tempImg.width(), tempImg.height());
+				tempImg.remove();
+			});
+			K(document.body).append(tempImg);
+		});
+		widthBox.change(function(e) {
+			if (originalWidth > 0) {
+				heightBox.val(Math.round(originalHeight / originalWidth * parseInt(this.value, 10)));
+			}
+		});
+		heightBox.change(function(e) {
+			if (originalHeight > 0) {
+				widthBox.val(Math.round(originalWidth / originalHeight * parseInt(this.value, 10)));
+			}
+		});
+		urlBox.val(options.imageUrl);
+		setSize(options.imageWidth, options.imageHeight);
+		titleBox.val(options.imageTitle);
+		alignBox.each(function() {
+			if (this.value === options.imageAlign) {
+				this.checked = true;
+				return false;
+			}
+		});
+		if (showRemote && tabIndex === 0) {
+			urlBox[0].focus();
+			urlBox[0].select();
+		}
+		return dialog;
+	};
+	self.plugin.image = {
+		edit : function() {
+			var img = self.plugin.getSelectedImage();
+			self.plugin.imageDialog({
+				imageUrl : img ? img.attr('data-ke-src') : 'http://',
+				imageWidth : img ? img.width() : '',
+				imageHeight : img ? img.height() : '',
+				imageTitle : img ? img.attr('title') : '',
+				imageAlign : img ? img.attr('align') : '',
+				showRemote : allowImageRemote,
+				showLocal : allowImageUpload,
+				tabIndex: img ? 0 : imageTabIndex,
+				clickFn : function(url, title, width, height, border, align) {
+					if (img) {
+						img.attr('src', url);
+						img.attr('data-ke-src', url);
+						img.attr('width', width);
+						img.attr('height', height);
+						img.attr('title', title);
+						img.attr('align', align);
+						img.attr('alt', title);
+					} else {
+						self.exec('insertimage', url, title, width, height, border, align);
+					}
+					// Bugfix: [Firefox] 上传图片后，总是出现正在加载的样式，需要延迟执行hideDialog
+					setTimeout(function() {
+						self.hideDialog().focus();
+					}, 0);
+				}
+			});
+		},
+		'delete' : function() {
+			var target = self.plugin.getSelectedImage();
+			if (target.parent().name == 'a') {
+				target = target.parent();
+			}
+			target.remove();
+			// [IE] 删除图片后立即点击图片按钮出错
+			self.addBookmark();
+		}
+	};
+	self.clickToolbar(name, self.plugin.image.edit);
+});

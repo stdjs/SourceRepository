@@ -1,1 +1,121 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror"),require("../xml/xml"),require("../javascript/javascript"),require("../css/css")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","../xml/xml","../javascript/javascript","../css/css"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("htmlmixed",function(e,a){function o(t,e){var a=e.htmlState.tagName;a&&(a=a.toLowerCase());var o=r.token(t,e.htmlState);if("script"==a&&/\btag\b/.test(o)&&">"==t.current()){var l=t.string.slice(Math.max(0,t.pos-100),t.pos).match(/\btype\s*=\s*("[^"]+"|'[^']+'|\S+)[^<]*$/i);l=l?l[1]:"",l&&/[\"\']/.test(l.charAt(0))&&(l=l.slice(1,l.length-1));for(var m=0;m<i.length;++m){var d=i[m];if("string"==typeof d.matches?l==d.matches:d.matches.test(l)){d.mode&&(e.token=n,e.localMode=d.mode,e.localState=d.mode.startState&&d.mode.startState(r.indent(e.htmlState,"")));break}}}else"style"==a&&/\btag\b/.test(o)&&">"==t.current()&&(e.token=c,e.localMode=s,e.localState=s.startState(r.indent(e.htmlState,"")));return o}function l(t,e,a){var o=t.current(),l=o.search(e);return l>-1?t.backUp(o.length-l):o.match(/<\/?$/)&&(t.backUp(o.length),t.match(e,!1)||t.match(o)),a}function n(t,e){return t.match(/^<\/\s*script\s*>/i,!1)?(e.token=o,e.localState=e.localMode=null,null):l(t,/<\/\s*script\s*>/,e.localMode.token(t,e.localState))}function c(t,e){return t.match(/^<\/\s*style\s*>/i,!1)?(e.token=o,e.localState=e.localMode=null,null):l(t,/<\/\s*style\s*>/,s.token(t,e.localState))}var r=t.getMode(e,{name:"xml",htmlMode:!0,multilineTagIndentFactor:a.multilineTagIndentFactor,multilineTagIndentPastTag:a.multilineTagIndentPastTag}),s=t.getMode(e,"css"),i=[],m=a&&a.scriptTypes;if(i.push({matches:/^(?:text|application)\/(?:x-)?(?:java|ecma)script$|^$/i,mode:t.getMode(e,"javascript")}),m)for(var d=0;d<m.length;++d){var u=m[d];i.push({matches:u.matches,mode:u.mode&&t.getMode(e,u.mode)})}return i.push({matches:/./,mode:t.getMode(e,"text/plain")}),{startState:function(){var t=r.startState();return{token:o,localMode:null,localState:null,htmlState:t}},copyState:function(e){if(e.localState)var a=t.copyState(e.localMode,e.localState);return{token:e.token,localMode:e.localMode,localState:a,htmlState:t.copyState(r,e.htmlState)}},token:function(t,e){return e.token(t,e)},indent:function(e,a){return!e.localMode||/^\s*<\//.test(a)?r.indent(e.htmlState,a):e.localMode.indent?e.localMode.indent(e.localState,a):t.Pass},innerMode:function(t){return{state:t.localState||t.htmlState,mode:t.localMode||r}}}},"xml","javascript","css"),t.defineMIME("text/html","htmlmixed")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../xml/xml"), require("../javascript/javascript"), require("../css/css"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../xml/xml", "../javascript/javascript", "../css/css"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
+  var htmlMode = CodeMirror.getMode(config, {name: "xml",
+                                             htmlMode: true,
+                                             multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
+                                             multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag});
+  var cssMode = CodeMirror.getMode(config, "css");
+
+  var scriptTypes = [], scriptTypesConf = parserConfig && parserConfig.scriptTypes;
+  scriptTypes.push({matches: /^(?:text|application)\/(?:x-)?(?:java|ecma)script$|^$/i,
+                    mode: CodeMirror.getMode(config, "javascript")});
+  if (scriptTypesConf) for (var i = 0; i < scriptTypesConf.length; ++i) {
+    var conf = scriptTypesConf[i];
+    scriptTypes.push({matches: conf.matches, mode: conf.mode && CodeMirror.getMode(config, conf.mode)});
+  }
+  scriptTypes.push({matches: /./,
+                    mode: CodeMirror.getMode(config, "text/plain")});
+
+  function html(stream, state) {
+    var tagName = state.htmlState.tagName;
+    if (tagName) tagName = tagName.toLowerCase();
+    var style = htmlMode.token(stream, state.htmlState);
+    if (tagName == "script" && /\btag\b/.test(style) && stream.current() == ">") {
+      // Script block: mode to change to depends on type attribute
+      var scriptType = stream.string.slice(Math.max(0, stream.pos - 100), stream.pos).match(/\btype\s*=\s*("[^"]+"|'[^']+'|\S+)[^<]*$/i);
+      scriptType = scriptType ? scriptType[1] : "";
+      if (scriptType && /[\"\']/.test(scriptType.charAt(0))) scriptType = scriptType.slice(1, scriptType.length - 1);
+      for (var i = 0; i < scriptTypes.length; ++i) {
+        var tp = scriptTypes[i];
+        if (typeof tp.matches == "string" ? scriptType == tp.matches : tp.matches.test(scriptType)) {
+          if (tp.mode) {
+            state.token = script;
+            state.localMode = tp.mode;
+            state.localState = tp.mode.startState && tp.mode.startState(htmlMode.indent(state.htmlState, ""));
+          }
+          break;
+        }
+      }
+    } else if (tagName == "style" && /\btag\b/.test(style) && stream.current() == ">") {
+      state.token = css;
+      state.localMode = cssMode;
+      state.localState = cssMode.startState(htmlMode.indent(state.htmlState, ""));
+    }
+    return style;
+  }
+  function maybeBackup(stream, pat, style) {
+    var cur = stream.current();
+    var close = cur.search(pat);
+    if (close > -1) stream.backUp(cur.length - close);
+    else if (cur.match(/<\/?$/)) {
+      stream.backUp(cur.length);
+      if (!stream.match(pat, false)) stream.match(cur);
+    }
+    return style;
+  }
+  function script(stream, state) {
+    if (stream.match(/^<\/\s*script\s*>/i, false)) {
+      state.token = html;
+      state.localState = state.localMode = null;
+      return null;
+    }
+    return maybeBackup(stream, /<\/\s*script\s*>/,
+                       state.localMode.token(stream, state.localState));
+  }
+  function css(stream, state) {
+    if (stream.match(/^<\/\s*style\s*>/i, false)) {
+      state.token = html;
+      state.localState = state.localMode = null;
+      return null;
+    }
+    return maybeBackup(stream, /<\/\s*style\s*>/,
+                       cssMode.token(stream, state.localState));
+  }
+
+  return {
+    startState: function() {
+      var state = htmlMode.startState();
+      return {token: html, localMode: null, localState: null, htmlState: state};
+    },
+
+    copyState: function(state) {
+      if (state.localState)
+        var local = CodeMirror.copyState(state.localMode, state.localState);
+      return {token: state.token, localMode: state.localMode, localState: local,
+              htmlState: CodeMirror.copyState(htmlMode, state.htmlState)};
+    },
+
+    token: function(stream, state) {
+      return state.token(stream, state);
+    },
+
+    indent: function(state, textAfter) {
+      if (!state.localMode || /^\s*<\//.test(textAfter))
+        return htmlMode.indent(state.htmlState, textAfter);
+      else if (state.localMode.indent)
+        return state.localMode.indent(state.localState, textAfter);
+      else
+        return CodeMirror.Pass;
+    },
+
+    innerMode: function(state) {
+      return {state: state.localState || state.htmlState, mode: state.localMode || htmlMode};
+    }
+  };
+}, "xml", "javascript", "css");
+
+CodeMirror.defineMIME("text/html", "htmlmixed");
+
+});

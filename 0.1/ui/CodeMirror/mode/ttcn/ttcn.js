@@ -1,1 +1,283 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function t(e){for(var t={},n=e.split(" "),r=0;r<n.length;++r)t[n[r]]=!0;return t}function n(t,n){function r(e){if(e)for(var t in e)e.hasOwnProperty(t)&&i.push(t)}"string"==typeof t&&(t=[t]);var i=[];r(n.keywords),r(n.builtin),r(n.timerOps),r(n.portOps),i.length&&(n.helperType=t[0],e.registerHelper("hintWords",t[0],i));for(var o=0;o<t.length;++o)e.defineMIME(t[o],n)}e.defineMode("ttcn",function(e,t){function n(e,t){var n=e.next();if('"'==n||"'"==n)return t.tokenize=r(n),t.tokenize(e,t);if(/[\[\]{}\(\),;\\:\?\.]/.test(n))return c=n,"punctuation";if("#"==n)return e.skipToEnd(),"atom preprocessor";if("%"==n)return e.eatWhile(/\b/),"atom ttcn3Macros";if(/\d/.test(n))return e.eatWhile(/[\w\.]/),"number";if("/"==n){if(e.eat("*"))return t.tokenize=i,i(e,t);if(e.eat("/"))return e.skipToEnd(),"comment"}if(I.test(n))return"@"==n&&(e.match("try")||e.match("catch")||e.match("lazy"))?"keyword":(e.eatWhile(I),"operator");e.eatWhile(/[\w\$_\xa1-\uffff]/);var o=e.current();return p.propertyIsEnumerable(o)?"keyword":u.propertyIsEnumerable(o)?"builtin":f.propertyIsEnumerable(o)?"def timerOps":m.propertyIsEnumerable(o)?"def configOps":b.propertyIsEnumerable(o)?"def verdictOps":d.propertyIsEnumerable(o)?"def portOps":h.propertyIsEnumerable(o)?"def sutOps":y.propertyIsEnumerable(o)?"def functionOps":v.propertyIsEnumerable(o)?"string verdictConsts":x.propertyIsEnumerable(o)?"string booleanConsts":g.propertyIsEnumerable(o)?"string otherConsts":k.propertyIsEnumerable(o)?"builtin types":O.propertyIsEnumerable(o)?"builtin visibilityModifiers":E.propertyIsEnumerable(o)?"atom templateMatch":"variable"}function r(e){return function(t,n){for(var r,i=!1,o=!1;null!=(r=t.next());){if(r==e&&!i){var s=t.peek();s&&(s=s.toLowerCase(),("b"==s||"h"==s||"o"==s)&&t.next()),o=!0;break}i=!i&&"\\"==r}return(o||!i&&!w)&&(n.tokenize=null),"string"}}function i(e,t){for(var n,r=!1;n=e.next();){if("/"==n&&r){t.tokenize=null;break}r="*"==n}return"comment"}function o(e,t,n,r,i){this.indented=e,this.column=t,this.type=n,this.align=r,this.prev=i}function s(e,t,n){var r=e.indented;return e.context&&"statement"==e.context.type&&(r=e.context.indented),e.context=new o(r,t,n,null,e.context)}function a(e){var t=e.context.type;return(")"==t||"]"==t||"}"==t)&&(e.indented=e.context.indented),e.context=e.context.prev}var c,l=e.indentUnit,p=t.keywords||{},u=t.builtin||{},f=t.timerOps||{},d=t.portOps||{},m=t.configOps||{},b=t.verdictOps||{},h=t.sutOps||{},y=t.functionOps||{},v=t.verdictConsts||{},x=t.booleanConsts||{},g=t.otherConsts||{},k=t.types||{},O=t.visibilityModifiers||{},E=t.templateMatch||{},w=t.multiLineStrings,C=t.indentStatements!==!1,I=/[+\-*&@=<>!\/]/;return{startState:function(e){return{tokenize:null,context:new o((e||0)-l,0,"top",!1),indented:0,startOfLine:!0}},token:function(e,t){var r=t.context;if(e.sol()&&(null==r.align&&(r.align=!1),t.indented=e.indentation(),t.startOfLine=!0),e.eatSpace())return null;c=null;var i=(t.tokenize||n)(e,t);if("comment"==i)return i;if(null==r.align&&(r.align=!0),";"!=c&&":"!=c&&","!=c||"statement"!=r.type)if("{"==c)s(t,e.column(),"}");else if("["==c)s(t,e.column(),"]");else if("("==c)s(t,e.column(),")");else if("}"==c){for(;"statement"==r.type;)r=a(t);for("}"==r.type&&(r=a(t));"statement"==r.type;)r=a(t)}else c==r.type?a(t):C&&(("}"==r.type||"top"==r.type)&&";"!=c||"statement"==r.type&&"newstatement"==c)&&s(t,e.column(),"statement");else a(t);return t.startOfLine=!1,i},electricChars:"{}",blockCommentStart:"/*",blockCommentEnd:"*/",lineComment:"//",fold:"brace"}}),n(["text/x-ttcn","text/x-ttcn3","text/x-ttcnpp"],{name:"ttcn",keywords:t("activate address alive all alt altstep and and4b any break case component const continue control deactivate display do else encode enumerated except exception execute extends extension external for from function goto group if import in infinity inout interleave label language length log match message mixed mod modifies module modulepar mtc noblock not not4b nowait of on optional or or4b out override param pattern port procedure record recursive rem repeat return runs select self sender set signature system template testcase to type union value valueof var variant while with xor xor4b"),builtin:t("bit2hex bit2int bit2oct bit2str char2int char2oct encvalue decomp decvalue float2int float2str hex2bit hex2int hex2oct hex2str int2bit int2char int2float int2hex int2oct int2str int2unichar isbound ischosen ispresent isvalue lengthof log2str oct2bit oct2char oct2hex oct2int oct2str regexp replace rnd sizeof str2bit str2float str2hex str2int str2oct substr unichar2int unichar2char enum2int"),types:t("anytype bitstring boolean char charstring default float hexstring integer objid octetstring universal verdicttype timer"),timerOps:t("read running start stop timeout"),portOps:t("call catch check clear getcall getreply halt raise receive reply send trigger"),configOps:t("create connect disconnect done kill killed map unmap"),verdictOps:t("getverdict setverdict"),sutOps:t("action"),functionOps:t("apply derefers refers"),verdictConsts:t("error fail inconc none pass"),booleanConsts:t("true false"),otherConsts:t("null NULL omit"),visibilityModifiers:t("private public friend"),templateMatch:t("complement ifpresent subset superset permutation"),multiLineStrings:!0})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineMode("ttcn", function(config, parserConfig) {
+    var indentUnit = config.indentUnit,
+        keywords = parserConfig.keywords || {},
+        builtin = parserConfig.builtin || {},
+        timerOps = parserConfig.timerOps || {},
+        portOps  = parserConfig.portOps || {},
+        configOps = parserConfig.configOps || {},
+        verdictOps = parserConfig.verdictOps || {},
+        sutOps = parserConfig.sutOps || {},
+        functionOps = parserConfig.functionOps || {},
+
+        verdictConsts = parserConfig.verdictConsts || {},
+        booleanConsts = parserConfig.booleanConsts || {},
+        otherConsts   = parserConfig.otherConsts || {},
+
+        types = parserConfig.types || {},
+        visibilityModifiers = parserConfig.visibilityModifiers || {},
+        templateMatch = parserConfig.templateMatch || {},
+        multiLineStrings = parserConfig.multiLineStrings,
+        indentStatements = parserConfig.indentStatements !== false;
+    var isOperatorChar = /[+\-*&@=<>!\/]/;
+    var curPunc;
+
+    function tokenBase(stream, state) {
+      var ch = stream.next();
+
+      if (ch == '"' || ch == "'") {
+        state.tokenize = tokenString(ch);
+        return state.tokenize(stream, state);
+      }
+      if (/[\[\]{}\(\),;\\:\?\.]/.test(ch)) {
+        curPunc = ch;
+        return "punctuation";
+      }
+      if (ch == "#"){
+        stream.skipToEnd();
+        return "atom preprocessor";
+      }
+      if (ch == "%"){
+        stream.eatWhile(/\b/);
+        return "atom ttcn3Macros";
+      }
+      if (/\d/.test(ch)) {
+        stream.eatWhile(/[\w\.]/);
+        return "number";
+      }
+      if (ch == "/") {
+        if (stream.eat("*")) {
+          state.tokenize = tokenComment;
+          return tokenComment(stream, state);
+        }
+        if (stream.eat("/")) {
+          stream.skipToEnd();
+          return "comment";
+        }
+      }
+      if (isOperatorChar.test(ch)) {
+        if(ch == "@"){
+          if(stream.match("try") || stream.match("catch")
+              || stream.match("lazy")){
+            return "keyword";
+          }
+        }
+        stream.eatWhile(isOperatorChar);
+        return "operator";
+      }
+      stream.eatWhile(/[\w\$_\xa1-\uffff]/);
+      var cur = stream.current();
+
+      if (keywords.propertyIsEnumerable(cur)) return "keyword";
+      if (builtin.propertyIsEnumerable(cur)) return "builtin";
+
+      if (timerOps.propertyIsEnumerable(cur)) return "def timerOps";
+      if (configOps.propertyIsEnumerable(cur)) return "def configOps";
+      if (verdictOps.propertyIsEnumerable(cur)) return "def verdictOps";
+      if (portOps.propertyIsEnumerable(cur)) return "def portOps";
+      if (sutOps.propertyIsEnumerable(cur)) return "def sutOps";
+      if (functionOps.propertyIsEnumerable(cur)) return "def functionOps";
+
+      if (verdictConsts.propertyIsEnumerable(cur)) return "string verdictConsts";
+      if (booleanConsts.propertyIsEnumerable(cur)) return "string booleanConsts";
+      if (otherConsts.propertyIsEnumerable(cur)) return "string otherConsts";
+
+      if (types.propertyIsEnumerable(cur)) return "builtin types";
+      if (visibilityModifiers.propertyIsEnumerable(cur))
+        return "builtin visibilityModifiers";
+      if (templateMatch.propertyIsEnumerable(cur)) return "atom templateMatch";
+
+      return "variable";
+    }
+
+    function tokenString(quote) {
+      return function(stream, state) {
+        var escaped = false, next, end = false;
+        while ((next = stream.next()) != null) {
+          if (next == quote && !escaped){
+            var afterQuote = stream.peek();
+            //look if the character after the quote is like the B in '10100010'B
+            if (afterQuote){
+              afterQuote = afterQuote.toLowerCase();
+              if(afterQuote == "b" || afterQuote == "h" || afterQuote == "o")
+                stream.next();
+            }
+            end = true; break;
+          }
+          escaped = !escaped && next == "\\";
+        }
+        if (end || !(escaped || multiLineStrings))
+          state.tokenize = null;
+        return "string";
+      };
+    }
+
+    function tokenComment(stream, state) {
+      var maybeEnd = false, ch;
+      while (ch = stream.next()) {
+        if (ch == "/" && maybeEnd) {
+          state.tokenize = null;
+          break;
+        }
+        maybeEnd = (ch == "*");
+      }
+      return "comment";
+    }
+
+    function Context(indented, column, type, align, prev) {
+      this.indented = indented;
+      this.column = column;
+      this.type = type;
+      this.align = align;
+      this.prev = prev;
+    }
+
+    function pushContext(state, col, type) {
+      var indent = state.indented;
+      if (state.context && state.context.type == "statement")
+        indent = state.context.indented;
+      return state.context = new Context(indent, col, type, null, state.context);
+    }
+
+    function popContext(state) {
+      var t = state.context.type;
+      if (t == ")" || t == "]" || t == "}")
+        state.indented = state.context.indented;
+      return state.context = state.context.prev;
+    }
+
+    //Interface
+    return {
+      startState: function(basecolumn) {
+        return {
+          tokenize: null,
+          context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
+          indented: 0,
+          startOfLine: true
+        };
+      },
+
+      token: function(stream, state) {
+        var ctx = state.context;
+        if (stream.sol()) {
+          if (ctx.align == null) ctx.align = false;
+          state.indented = stream.indentation();
+          state.startOfLine = true;
+        }
+        if (stream.eatSpace()) return null;
+        curPunc = null;
+        var style = (state.tokenize || tokenBase)(stream, state);
+        if (style == "comment") return style;
+        if (ctx.align == null) ctx.align = true;
+
+        if ((curPunc == ";" || curPunc == ":" || curPunc == ",")
+            && ctx.type == "statement"){
+          popContext(state);
+        }
+        else if (curPunc == "{") pushContext(state, stream.column(), "}");
+        else if (curPunc == "[") pushContext(state, stream.column(), "]");
+        else if (curPunc == "(") pushContext(state, stream.column(), ")");
+        else if (curPunc == "}") {
+          while (ctx.type == "statement") ctx = popContext(state);
+          if (ctx.type == "}") ctx = popContext(state);
+          while (ctx.type == "statement") ctx = popContext(state);
+        }
+        else if (curPunc == ctx.type) popContext(state);
+        else if (indentStatements &&
+            (((ctx.type == "}" || ctx.type == "top") && curPunc != ';') ||
+            (ctx.type == "statement" && curPunc == "newstatement")))
+          pushContext(state, stream.column(), "statement");
+
+        state.startOfLine = false;
+
+        return style;
+      },
+
+      electricChars: "{}",
+      blockCommentStart: "/*",
+      blockCommentEnd: "*/",
+      lineComment: "//",
+      fold: "brace"
+    };
+  });
+
+  function words(str) {
+    var obj = {}, words = str.split(" ");
+    for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+    return obj;
+  }
+
+  function def(mimes, mode) {
+    if (typeof mimes == "string") mimes = [mimes];
+    var words = [];
+    function add(obj) {
+      if (obj) for (var prop in obj) if (obj.hasOwnProperty(prop))
+        words.push(prop);
+    }
+
+    add(mode.keywords);
+    add(mode.builtin);
+    add(mode.timerOps);
+    add(mode.portOps);
+
+    if (words.length) {
+      mode.helperType = mimes[0];
+      CodeMirror.registerHelper("hintWords", mimes[0], words);
+    }
+
+    for (var i = 0; i < mimes.length; ++i)
+      CodeMirror.defineMIME(mimes[i], mode);
+  }
+
+  def(["text/x-ttcn", "text/x-ttcn3", "text/x-ttcnpp"], {
+    name: "ttcn",
+    keywords: words("activate address alive all alt altstep and and4b any" +
+    " break case component const continue control deactivate" +
+    " display do else encode enumerated except exception" +
+    " execute extends extension external for from function" +
+    " goto group if import in infinity inout interleave" +
+    " label language length log match message mixed mod" +
+    " modifies module modulepar mtc noblock not not4b nowait" +
+    " of on optional or or4b out override param pattern port" +
+    " procedure record recursive rem repeat return runs select" +
+    " self sender set signature system template testcase to" +
+    " type union value valueof var variant while with xor xor4b"),
+    builtin: words("bit2hex bit2int bit2oct bit2str char2int char2oct encvalue" +
+    " decomp decvalue float2int float2str hex2bit hex2int" +
+    " hex2oct hex2str int2bit int2char int2float int2hex" +
+    " int2oct int2str int2unichar isbound ischosen ispresent" +
+    " isvalue lengthof log2str oct2bit oct2char oct2hex oct2int" +
+    " oct2str regexp replace rnd sizeof str2bit str2float" +
+    " str2hex str2int str2oct substr unichar2int unichar2char" +
+    " enum2int"),
+    types: words("anytype bitstring boolean char charstring default float" +
+    " hexstring integer objid octetstring universal verdicttype timer"),
+    timerOps: words("read running start stop timeout"),
+    portOps: words("call catch check clear getcall getreply halt raise receive" +
+    " reply send trigger"),
+    configOps: words("create connect disconnect done kill killed map unmap"),
+    verdictOps: words("getverdict setverdict"),
+    sutOps: words("action"),
+    functionOps: words("apply derefers refers"),
+
+    verdictConsts: words("error fail inconc none pass"),
+    booleanConsts: words("true false"),
+    otherConsts: words("null NULL omit"),
+
+    visibilityModifiers: words("private public friend"),
+    templateMatch: words("complement ifpresent subset superset permutation"),
+    multiLineStrings: true
+  });
+});

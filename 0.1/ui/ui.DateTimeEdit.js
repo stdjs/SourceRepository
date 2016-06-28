@@ -1,1 +1,163 @@
-Std.ui.module("DateTimeEdit",{parent:"LineEdit",option:{minWidth:32,minHeight:12,defaultClass:"StdUI_DateTimeEdit",format:"yyyy-MM-dd h:m:s"},"private":{picker:null,pickerState:!1},extend:{initEvents:function(){{var e=this;e.opts}},remove:function(){var e=this;e._picker&&e._picker.remove(),e.removeDocumentEvents()}},"protected":{initHandle:function(){var e=this;return e[0].append(e.D.handle=newDiv("_handle").mouse({click:function(){e._pickerState?e.hidePicker():e.showPicker()}})),e},initPicker:function(){var e=this,t=e.opts,i=e._picker=Std.ui("DatePicker",{footer:t.footer,format:t.format,renderTo:"body"});return isEmpty(e.value())||i.value(e.value()),i.on("dateClick",function(){e.hidePicker(),e.value(i.value())}),i[0].css("position","absolute"),e},addDocumentEvents:function(){var e=this;return Std.dom(document).on("mousedown",e._documentEvents||(e._documentEvents=function(t){e[0].contains(t.target)||e._picker[0].contains(t.target)||(e.hidePicker(),e.removeDocumentEvents())})),e},removeDocumentEvents:function(){var e=this;return e._documentEvents&&Std.dom(document).off("mousedown",e._documentEvents),e}},"public":{showPicker:function(){var e=this;e._picker||e.initPicker();var t=e._picker,i=e[0].offset(),n=i.y+e.height();return t[0].removeClass("StdUI_DateTimeEdit_Animate2").addClass("StdUI_DateTimeEdit_Animate1").css({top:n+t.height()>=Std.dom(document).height()?i.y-t.height():n,left:i.x,zIndex:Std.ui.status.zIndex++}),e.addDocumentEvents(),e._pickerState=!0,e},hidePicker:function(){var e=this,t=e._picker;return t[0].removeClass("StdUI_DateTimeEdit_Animate1").addClass("StdUI_DateTimeEdit_Animate2"),e.removeDocumentEvents(),e._pickerState=!1,e}},main:function(e){e.initHandle()}});
+/**
+ *  DateTime Edit
+*/
+Std.ui.module("DateTimeEdit",{
+    /*[#module option:parent]*/
+    parent:"LineEdit",
+    /*[#module option:option]*/
+    option:{
+        minWidth:32,
+        minHeight:12,
+        defaultClass:"StdUI_DateTimeEdit",
+        format:"yyyy-MM-dd h:m:s"
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * date time picker
+        */
+        picker:null,
+        /*
+         * picker state
+        */
+        pickerState:false
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var opts = that.opts;
+
+        },
+        /*
+         * remove
+        */
+        remove:function(){
+            var that = this;
+
+            if(that._picker){
+                that._picker.remove();
+            }
+            that.removeDocumentEvents();
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init handle
+        */
+        initHandle:function(){
+            var that = this;
+
+            that[0].append(
+                that.D.handle = newDiv("_handle").mouse({
+                    click:function(){
+                        if(!that._pickerState){
+                            that.showPicker();
+                        }else{
+                            that.hidePicker();
+                        }
+                    }
+                })
+            );
+            return that;
+        },
+        /*
+         * init picker
+        */
+        initPicker:function(){
+            var that   = this;
+            var opts   = that.opts;
+            var picker = that._picker = Std.ui("DatePicker",{
+                footer:opts.footer,
+                format:opts.format,
+                renderTo:"body"
+            });
+            if(!isEmpty(that.value())){
+                picker.value(that.value())
+            }
+            picker.on("dateClick",function(){
+                that.hidePicker();
+                that.value(picker.value());
+            });
+            picker[0].css("position","absolute");
+
+            return that;
+        },
+        /*
+         * addDocumentEvents
+        */
+        addDocumentEvents:function(){
+            var that = this;
+
+            Std.dom(document).on("mousedown",that._documentEvents || (that._documentEvents = function(e){
+                if(that[0].contains(e.target) || that._picker[0].contains(e.target)){
+                    return;
+                }
+                that.hidePicker();
+                that.removeDocumentEvents();
+            }));
+            return that;
+        },
+        /*
+         * delDocumentEvents
+        */
+        removeDocumentEvents:function(){
+            var that = this;
+
+            if(that._documentEvents){
+                Std.dom(document).off("mousedown",that._documentEvents);
+            }
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * show picker
+        */
+        showPicker:function(){
+            var that = this;
+
+            if(!that._picker){
+                that.initPicker();
+            }
+
+            var picker   = that._picker;
+            var position = that[0].offset();
+            var top      = position.y + that.height();
+
+            picker[0].removeClass("StdUI_DateTimeEdit_Animate2").addClass("StdUI_DateTimeEdit_Animate1").css({
+                top    : top + picker.height() >= Std.dom(document).height() ? position.y - picker.height() : top,
+                left   : position.x,
+                zIndex : Std.ui.status.zIndex++
+            });
+
+            that.addDocumentEvents();
+            that._pickerState = true;
+            return that;
+        },
+        /*
+         * hide picker
+        */
+        hidePicker:function(){
+            var that   = this;
+            var picker = that._picker;
+
+            picker[0].removeClass("StdUI_DateTimeEdit_Animate1").addClass("StdUI_DateTimeEdit_Animate2");
+
+            that.removeDocumentEvents();
+            that._pickerState = false;
+
+            return that;
+        }
+    },
+    /*[#module option:private]*/
+    main:function(that){
+        that.initHandle();
+    }
+});
+

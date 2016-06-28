@@ -1,1 +1,235 @@
-Std.ui.module("SwitchBox",{parent:"widget",events:"change",option:{level:1,defaultClass:"StdUI_SwitchBox",height:26,value:null,items:null,styleType:"default"},action:{content:"value"},"private":{selected:null},extend:{render:function(){var e=this;e.call_opts(["styleType","value"]),e.repaint()},height:function(e){var t=this;isNumber(e)||(e=t.height()),t[0].lineHeight(e-=t.boxSize.height),t[1]&&t[1].height(e-2).lineHeight(e-2)}},"protected":{length:0,initHandle:function(){var e=this;if(void 0==e[1]){var t=e.height()-e.boxSize.height-2;e[1]=newDiv("_handle").appendTo(e[0]),e[1].height(t).lineHeight(t)}return e},initEvents:function(){var e=this;return e[0].unselect(!0).delegate("click","._item",function(){if(e.enable()){var t=this.index("._item"),i=e.items[t];i!==e._selected&&(e._selected=i,e.emit("change",e.opts.value=i.value)),e.initHandle()[1].html(i.dom.html()).animate("stop").animate({to:{width:i.dom.width()-2,left:i.dom.offsetLeft()}},100)}}),e},add:function(e,t){var i=this,n=newDiv("_item");return isObject(e)&&(t=e.value,e=e.text),isString(e)&&n.append(newDiv("_name").html(e)),i.length++>0&&i[0].append(newDiv("_sep")),i.items.push({text:e,value:t,dom:n}),i[0].append(n),i}},"public":{styleType:function(e){return this.opt("styleType",e,function(){this.addClass("_"+e)})},refresh:function(){var e=this,t=e.opts.width,i=e._selected;return null===i?e:(e[1]||e.initHandle(),t="auto"===t?i.dom.outerWidth():t/e.length-e.boxSize.width,e[1].dom.innerHTML=i.dom.html(),e[1].css({left:i.dom.offsetLeft(),width:t-2}),e)},repaint:function(){for(var e=this,t=e.items,i=e.opts.width,n=e.boxSize.width,a=0;a<e.length;a++){var h=0;h="auto"===i?t[a].dom.outerWidth()+18:i/e.length-n,t[a].dom.width(0!==a?h+1:h)}return e.refresh()},value:function(e){var t=this;return t.opt("value",e,function(){for(var i=0;i<t.length;i++)if(t.items[i].value===e){t._selected=t.items[i];break}t.renderState&&t.refresh(),t.emit("change",e)})},insert:function(){},append:function(e,t){var i=this;return isArray(e)?Std.each(e,function(e,t){i.add(t)}):i.add(e,t),i.renderState&&i.repaint(),i}},main:function(e,t){e.items=[],e.initEvents(),t.items&&e.append(t.items)}});
+/**
+ * SwitchBox module
+*/
+Std.ui.module("SwitchBox",{
+    /*#module option:parent]*/
+    parent:"widget",
+    /*#module option:events]*/
+    events:"change",
+    /*#module option:option]*/
+    option:{
+        level:1,
+        defaultClass:"StdUI_SwitchBox",
+        height:26,
+        value:null,
+        items:null,
+        styleType:"default"
+    },
+    /*#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*#module option:private]*/
+    private:{
+        /*
+         * selected
+        */
+        selected:null
+    },
+    /*#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that.call_opts(["styleType","value"]);
+            that.repaint();
+        },
+        /*
+         * extend height
+        */
+        height:function(height){
+            var that = this;
+
+            if(!isNumber(height)){
+                height = that.height();
+            }
+            that[0].lineHeight(height -= that.boxSize.height);
+            that[1] && that[1].height(height - 2).lineHeight(height - 2);
+        }
+    },
+    /*#module option:protected]*/
+    protected:{
+        /*
+         * length
+        */
+        length:0,
+        /*
+         * init handle
+        */
+        initHandle:function(){
+            var that = this;
+
+            if(that[1] == undefined){
+                var height = that.height() - that.boxSize.height - 2;
+
+                that[1] = newDiv("_handle").appendTo(that[0]);
+                that[1].height(height).lineHeight(height);
+            }
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+
+            that[0].unselect(true).delegate("click","._item",function(e){
+                if(!that.enable()){
+                    return;
+                }
+                var index = this.index("._item");
+                var item  = that.items[index];
+
+                if(item !== that._selected){
+                    that._selected = item;
+                    that.emit("change",that.opts.value = item.value);
+                }
+                that.initHandle()[1].html(item.dom.html()).animate("stop").animate({
+                    to:{
+                        width:item.dom.width() - 2,
+                        left:item.dom.offsetLeft()
+                    }
+                },100);
+            });
+            return that;
+        },
+        /*
+         * add item
+        */
+        add:function(text,value){
+            var that = this;
+            var item = newDiv("_item");
+
+            if(isObject(text)){
+                value = text.value;
+                text  = text.text;
+            }
+            if(isString(text)){
+                item.append(newDiv("_name").html(text));
+            }
+            if(that.length++ > 0){
+                that[0].append(newDiv("_sep"));
+            }
+            that.items.push({
+                text:text,
+                value:value,
+                dom:item
+            });
+            that[0].append(item);
+
+            return that;
+        }
+    },
+    /*#module option:public]*/
+    public:{
+        /*
+         * style type
+        */
+        styleType:function(styleType){
+            return this.opt("styleType",styleType,function(){
+                this.addClass("_" + styleType);
+            });
+        },
+        /*
+         * refresh
+        */
+        refresh:function(){
+            var that     = this;
+            var width    = that.opts.width;
+            var selected = that._selected;
+
+            if(selected === null){
+                return that;
+            }
+            if(!that[1]){
+                that.initHandle();
+            }
+            if(width === "auto"){
+                width = selected.dom.outerWidth();
+            }else{
+                width = width / that.length - that.boxSize.width;
+            }
+            that[1].dom.innerHTML = selected.dom.html();
+            that[1].css({
+                left  : selected.dom.offsetLeft(),
+                width : width - 2
+            });
+            return that;
+        },
+        /*
+         * repaint
+        */
+        repaint:function(){
+            var that     = this;
+            var items    = that.items;
+            var width    = that.opts.width;
+            var boxWidth = that.boxSize.width;
+
+            for(var i=0;i<that.length;i++){
+                var itemWidth = 0;
+
+                if(width === "auto"){
+                    itemWidth = items[i].dom.outerWidth() + 18;
+                }else{
+                    itemWidth = width / that.length - boxWidth;
+                }
+                items[i].dom.width(i !== 0 ? itemWidth + 1 : itemWidth);
+            }
+            return that.refresh();
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+
+            return that.opt("value",value,function(){
+                for(var i=0;i<that.length;i++){
+                    if(that.items[i].value === value){
+                        that._selected = that.items[i];
+                        break;
+                    }
+                }
+                that.renderState && that.refresh();
+                that.emit("change",value);
+            });
+        },
+        /*
+         * insert
+        */
+        insert:function(text,value,index){
+
+        },
+        /*
+         * append
+        */
+        append:function(text,value){
+            var that = this;
+
+            if(isArray(text)){
+                Std.each(text,function(i,data){
+                    that.add(data);
+                });
+            }else{
+                that.add(text,value);
+            }
+
+            if(that.renderState){
+                that.repaint();
+            }
+            return that;
+        }
+    },
+    /*#module option:main]*/
+    main:function(that,opts){
+        that.items = [];
+        that.initEvents();
+
+        if(opts.items){
+            that.append(opts.items);
+        }
+    }
+});

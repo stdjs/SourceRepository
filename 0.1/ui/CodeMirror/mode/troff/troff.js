@@ -1,1 +1,82 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("troff",function(){function t(t){if(t.eatSpace())return null;var e=t.sol(),n=t.next();if("\\"===n)return t.match("fB")||t.match("fR")||t.match("fI")||t.match("u")||t.match("d")||t.match("%")||t.match("&")?"string":t.match("m[")?(t.skipTo("]"),t.next(),"string"):t.match("s+")||t.match("s-")?(t.eatWhile(/[\d-]/),"string"):t.match("(")||t.match("*(")?(t.eatWhile(/[\w-]/),"string"):"string";if(e&&("."===n||"'"===n)&&t.eat("\\")&&t.eat('"'))return t.skipToEnd(),"comment";if(e&&"."===n){if(t.match("B ")||t.match("I ")||t.match("R "))return"attribute";if(t.match("TH ")||t.match("SH ")||t.match("SS ")||t.match("HP "))return t.skipToEnd(),"quote";if(t.match(/[A-Z]/)&&t.match(/[A-Z]/)||t.match(/[a-z]/)&&t.match(/[a-z]/))return"attribute"}t.eatWhile(/[\w-]/);var a=t.current();return r.hasOwnProperty(a)?r[a]:null}function e(e,r){return(r.tokens[0]||t)(e,r)}var r={};return{startState:function(){return{tokens:[]}},token:function(t,r){return e(t,r)}}}),t.defineMIME("troff","troff")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object")
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd)
+    define(["../../lib/codemirror"], mod);
+  else
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode('troff', function() {
+
+  var words = {};
+
+  function tokenBase(stream) {
+    if (stream.eatSpace()) return null;
+
+    var sol = stream.sol();
+    var ch = stream.next();
+
+    if (ch === '\\') {
+      if (stream.match('fB') || stream.match('fR') || stream.match('fI') ||
+          stream.match('u')  || stream.match('d')  ||
+          stream.match('%')  || stream.match('&')) {
+        return 'string';
+      }
+      if (stream.match('m[')) {
+        stream.skipTo(']');
+        stream.next();
+        return 'string';
+      }
+      if (stream.match('s+') || stream.match('s-')) {
+        stream.eatWhile(/[\d-]/);
+        return 'string';
+      }
+      if (stream.match('\(') || stream.match('*\(')) {
+        stream.eatWhile(/[\w-]/);
+        return 'string';
+      }
+      return 'string';
+    }
+    if (sol && (ch === '.' || ch === '\'')) {
+      if (stream.eat('\\') && stream.eat('\"')) {
+        stream.skipToEnd();
+        return 'comment';
+      }
+    }
+    if (sol && ch === '.') {
+      if (stream.match('B ') || stream.match('I ') || stream.match('R ')) {
+        return 'attribute';
+      }
+      if (stream.match('TH ') || stream.match('SH ') || stream.match('SS ') || stream.match('HP ')) {
+        stream.skipToEnd();
+        return 'quote';
+      }
+      if ((stream.match(/[A-Z]/) && stream.match(/[A-Z]/)) || (stream.match(/[a-z]/) && stream.match(/[a-z]/))) {
+        return 'attribute';
+      }
+    }
+    stream.eatWhile(/[\w-]/);
+    var cur = stream.current();
+    return words.hasOwnProperty(cur) ? words[cur] : null;
+  }
+
+  function tokenize(stream, state) {
+    return (state.tokens[0] || tokenBase) (stream, state);
+  };
+
+  return {
+    startState: function() {return {tokens:[]};},
+    token: function(stream, state) {
+      return tokenize(stream, state);
+    }
+  };
+});
+
+CodeMirror.defineMIME('troff', 'troff');
+
+});

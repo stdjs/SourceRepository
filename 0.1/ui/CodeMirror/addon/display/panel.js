@@ -1,1 +1,112 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){function t(e,t,i,r){this.cm=e,this.node=t,this.options=i,this.height=r,this.cleared=!1}function i(e){var t=e.getWrapperElement(),i=window.getComputedStyle?window.getComputedStyle(t):t.currentStyle,r=parseInt(i.height),n=e.state.panels={setHeight:t.style.height,heightLeft:r,panels:0,wrapper:document.createElement("div")};t.parentNode.insertBefore(n.wrapper,t);var s=e.hasFocus();n.wrapper.appendChild(t),s&&e.focus(),e._setSize=e.setSize,null!=r&&(e.setSize=function(t,i){if(null==i)return this._setSize(t,i);if(n.setHeight=i,"number"!=typeof i){var s=/^(\d+\.?\d*)px$/.exec(i);s?i=Number(s[1]):(n.wrapper.style.height=i,i=n.wrapper.offsetHeight,n.wrapper.style.height="")}e._setSize(t,n.heightLeft+=i-r),r=i})}function r(e){var t=e.state.panels;e.state.panels=null;var i=e.getWrapperElement();t.wrapper.parentNode.replaceChild(i,t.wrapper),i.style.height=t.setHeight,e.setSize=e._setSize,e.setSize()}e.defineExtension("addPanel",function(e,r){r=r||{},this.state.panels||i(this);var n=this.state.panels,s=n.wrapper,o=this.getWrapperElement();r.after instanceof t&&!r.after.cleared?s.insertBefore(e,r.before.node.nextSibling):r.before instanceof t&&!r.before.cleared?s.insertBefore(e,r.before.node):r.replace instanceof t&&!r.replace.cleared?(s.insertBefore(e,r.replace.node),r.replace.clear()):"bottom"==r.position?s.appendChild(e):"before-bottom"==r.position?s.insertBefore(e,o.nextSibling):"after-top"==r.position?s.insertBefore(e,o):s.insertBefore(e,s.firstChild);var a=r&&r.height||e.offsetHeight;return this._setSize(null,n.heightLeft-=a),n.panels++,new t(this,e,r,a)}),t.prototype.clear=function(){if(!this.cleared){this.cleared=!0;var e=this.cm.state.panels;this.cm._setSize(null,e.heightLeft+=this.height),e.wrapper.removeChild(this.node),0==--e.panels&&r(this.cm)}},t.prototype.changed=function(e){var t=null==e?this.node.offsetHeight:e,i=this.cm.state.panels;this.cm._setSize(null,i.height+=t-this.height),this.height=t}});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  CodeMirror.defineExtension("addPanel", function(node, options) {
+    options = options || {};
+
+    if (!this.state.panels) initPanels(this);
+
+    var info = this.state.panels;
+    var wrapper = info.wrapper;
+    var cmWrapper = this.getWrapperElement();
+
+    if (options.after instanceof Panel && !options.after.cleared) {
+      wrapper.insertBefore(node, options.before.node.nextSibling);
+    } else if (options.before instanceof Panel && !options.before.cleared) {
+      wrapper.insertBefore(node, options.before.node);
+    } else if (options.replace instanceof Panel && !options.replace.cleared) {
+      wrapper.insertBefore(node, options.replace.node);
+      options.replace.clear();
+    } else if (options.position == "bottom") {
+      wrapper.appendChild(node);
+    } else if (options.position == "before-bottom") {
+      wrapper.insertBefore(node, cmWrapper.nextSibling);
+    } else if (options.position == "after-top") {
+      wrapper.insertBefore(node, cmWrapper);
+    } else {
+      wrapper.insertBefore(node, wrapper.firstChild);
+    }
+
+    var height = (options && options.height) || node.offsetHeight;
+    this._setSize(null, info.heightLeft -= height);
+    info.panels++;
+    return new Panel(this, node, options, height);
+  });
+
+  function Panel(cm, node, options, height) {
+    this.cm = cm;
+    this.node = node;
+    this.options = options;
+    this.height = height;
+    this.cleared = false;
+  }
+
+  Panel.prototype.clear = function() {
+    if (this.cleared) return;
+    this.cleared = true;
+    var info = this.cm.state.panels;
+    this.cm._setSize(null, info.heightLeft += this.height);
+    info.wrapper.removeChild(this.node);
+    if (--info.panels == 0) removePanels(this.cm);
+  };
+
+  Panel.prototype.changed = function(height) {
+    var newHeight = height == null ? this.node.offsetHeight : height;
+    var info = this.cm.state.panels;
+    this.cm._setSize(null, info.height += (newHeight - this.height));
+    this.height = newHeight;
+  };
+
+  function initPanels(cm) {
+    var wrap = cm.getWrapperElement();
+    var style = window.getComputedStyle ? window.getComputedStyle(wrap) : wrap.currentStyle;
+    var height = parseInt(style.height);
+    var info = cm.state.panels = {
+      setHeight: wrap.style.height,
+      heightLeft: height,
+      panels: 0,
+      wrapper: document.createElement("div")
+    };
+    wrap.parentNode.insertBefore(info.wrapper, wrap);
+    var hasFocus = cm.hasFocus();
+    info.wrapper.appendChild(wrap);
+    if (hasFocus) cm.focus();
+
+    cm._setSize = cm.setSize;
+    if (height != null) cm.setSize = function(width, newHeight) {
+      if (newHeight == null) return this._setSize(width, newHeight);
+      info.setHeight = newHeight;
+      if (typeof newHeight != "number") {
+        var px = /^(\d+\.?\d*)px$/.exec(newHeight);
+        if (px) {
+          newHeight = Number(px[1]);
+        } else {
+          info.wrapper.style.height = newHeight;
+          newHeight = info.wrapper.offsetHeight;
+          info.wrapper.style.height = "";
+        }
+      }
+      cm._setSize(width, info.heightLeft += (newHeight - height));
+      height = newHeight;
+    };
+  }
+
+  function removePanels(cm) {
+    var info = cm.state.panels;
+    cm.state.panels = null;
+
+    var wrap = cm.getWrapperElement();
+    info.wrapper.parentNode.replaceChild(wrap, info.wrapper);
+    wrap.style.height = info.setHeight;
+    cm.setSize = cm._setSize;
+    cm.setSize();
+  }
+});

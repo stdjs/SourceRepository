@@ -7,5 +7,5 @@ StdJS
 http://www.stdjs.com
 
 ###load source
-Std.source("StdJS","http://source.stdjs.com/0.1/");
+Std.source("StdJS","http://source.stdjs.com/0.2/");
 

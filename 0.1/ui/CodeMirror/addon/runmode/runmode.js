@@ -1,1 +1,72 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.runMode=function(t,n,r,o){var a=e.getMode(e.defaults,n),d=/MSIE \d/.test(navigator.userAgent),i=d&&(null==document.documentMode||document.documentMode<9);if(1==r.nodeType){var c=o&&o.tabSize||e.defaults.tabSize,l=r,u=0;l.innerHTML="",r=function(e,t){if("\n"==e)return l.appendChild(document.createTextNode(i?"\r":e)),void(u=0);for(var n="",r=0;;){var o=e.indexOf("	",r);if(-1==o){n+=e.slice(r),u+=e.length-r;break}u+=o-r,n+=e.slice(r,o);var a=c-u%c;u+=a;for(var d=0;a>d;++d)n+=" ";r=o+1}if(t){var f=l.appendChild(document.createElement("span"));f.className="cm-"+t.replace(/ +/g," cm-"),f.appendChild(document.createTextNode(n))}else l.appendChild(document.createTextNode(n))}}for(var f=e.splitLines(t),s=o&&o.state||e.startState(a),m=0,p=f.length;p>m;++m){m&&r("\n");var v=new e.StringStream(f[m]);for(!v.string&&a.blankLine&&a.blankLine(s);!v.eol();){var b=a.token(v,s);r(v.current(),b,m,v.start,s),v.start=v.pos}}}});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.runMode = function(string, modespec, callback, options) {
+  var mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
+  var ie = /MSIE \d/.test(navigator.userAgent);
+  var ie_lt9 = ie && (document.documentMode == null || document.documentMode < 9);
+
+  if (callback.nodeType == 1) {
+    var tabSize = (options && options.tabSize) || CodeMirror.defaults.tabSize;
+    var node = callback, col = 0;
+    node.innerHTML = "";
+    callback = function(text, style) {
+      if (text == "\n") {
+        // Emitting LF or CRLF on IE8 or earlier results in an incorrect display.
+        // Emitting a carriage return makes everything ok.
+        node.appendChild(document.createTextNode(ie_lt9 ? '\r' : text));
+        col = 0;
+        return;
+      }
+      var content = "";
+      // replace tabs
+      for (var pos = 0;;) {
+        var idx = text.indexOf("\t", pos);
+        if (idx == -1) {
+          content += text.slice(pos);
+          col += text.length - pos;
+          break;
+        } else {
+          col += idx - pos;
+          content += text.slice(pos, idx);
+          var size = tabSize - col % tabSize;
+          col += size;
+          for (var i = 0; i < size; ++i) content += " ";
+          pos = idx + 1;
+        }
+      }
+
+      if (style) {
+        var sp = node.appendChild(document.createElement("span"));
+        sp.className = "cm-" + style.replace(/ +/g, " cm-");
+        sp.appendChild(document.createTextNode(content));
+      } else {
+        node.appendChild(document.createTextNode(content));
+      }
+    };
+  }
+
+  var lines = CodeMirror.splitLines(string), state = (options && options.state) || CodeMirror.startState(mode);
+  for (var i = 0, e = lines.length; i < e; ++i) {
+    if (i) callback("\n");
+    var stream = new CodeMirror.StringStream(lines[i]);
+    if (!stream.string && mode.blankLine) mode.blankLine(state);
+    while (!stream.eol()) {
+      var style = mode.token(stream, state);
+      callback(stream.current(), style, i, stream.start, state);
+      stream.start = stream.pos;
+    }
+  }
+};
+
+});

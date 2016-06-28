@@ -1,1 +1,203 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function n(e){return/^\s*(.*?)\s*$/.exec(e)[1]}function t(e,n){for(var t=-1,r=1,u=e.split(i),f=0;f<u.length;f++){for(var o=1;o<=u[f].length;o++)r==n&&(t=f),r++;r++}var a=["",""];return 0==n?(a[1]=u[0],a[0]=null):(a[1]=u[t],a[0]=u[t-1]),a}var r=[" ","\\+","\\-","\\(","\\)","\\*","/",":","\\?","\\<","\\>"," ","\\."],i=new RegExp(r.join("|"),"g");e.defineMode("swift",function(){var e=["var","let","class","deinit","enum","extension","func","import","init","let","protocol","static","struct","subscript","typealias","var","as","dynamicType","is","new","super","self","Self","Type","__COLUMN__","__FILE__","__FUNCTION__","__LINE__","break","case","continue","default","do","else","fallthrough","if","in","for","return","switch","where","while","associativity","didSet","get","infix","inout","left","mutating","none","nonmutating","operator","override","postfix","precedence","prefix","right","set","unowned","unowned(safe)","unowned(unsafe)","weak","willSet"],r=["Infinity","NaN","undefined","null","true","false","on","off","yes","no","nil","null","this","super"],u=["String","bool","int","string","double","Double","Int","Float","float","public","private","extension"],f=["0","1","2","3","4","5","6","7","8","9"],o=["+","-","/","*","%","=","|","&","<",">"],a=[";",",",".","(",")","{","}","[","]"],s=/^(?:[()\[\]{},:`=;]|\.\.?\.?)/,l=/^[_A-Za-z$][_A-Za-z$0-9]*/,c=/^(@|this\.)[_A-Za-z$][_A-Za-z$0-9]*/,d=/^(\/{3}|\/)/;return{startState:function(){return{prev:!1,string:!1,escape:!1,inner:!1,comment:!1,num_left:0,num_right:0,doubleString:!1,singleString:!1}},token:function(m,g){if(m.eatSpace())return null;var p=m.next();if(g.string)return g.escape?(g.escape=!1,"string"):('"'==p&&g.doubleString&&!g.singleString||"'"==p&&!g.doubleString&&g.singleString)&&!g.escape?(g.string=!1,g.doubleString=!1,g.singleString=!1,"string"):"\\"==p&&"("==m.peek()?(g.inner=!0,g.string=!1,"keyword"):"\\"==p&&"("!=m.peek()?(g.escape=!0,g.string=!0,"string"):"string";if(g.comment)return"*"==p&&"/"==m.peek()?(g.prev="*","comment"):"/"==p&&"*"==g.prev?(g.prev=!1,g.comment=!1,"comment"):"comment";if("/"==p){if("/"==m.peek())return m.skipToEnd(),"comment";if("*"==m.peek())return g.comment=!0,"comment"}if("("==p&&g.inner)return g.num_left++,null;if(")"==p&&g.inner)return g.num_right++,g.num_left==g.num_right&&(g.inner=!1,g.string=!0),null;var h=t(m.string,m.pos),_=h[1],b=h[0];if(o.indexOf(p+"")>-1)return"operator";if(a.indexOf(p)>-1)return"punctuation";if("undefined"!=typeof _){if(_=n(_),"undefined"!=typeof b&&(b=n(b)),"#"==_.charAt(0))return null;if(u.indexOf(_)>-1)return"def";if(r.indexOf(_)>-1)return"atom";if(f.indexOf(_)>-1)return"number";if((f.indexOf(_.charAt(0)+"")>-1||o.indexOf(_.charAt(0)+"")>-1)&&f.indexOf(p)>-1)return"number";if(e.indexOf(_)>-1||e.indexOf(_.split(i)[0])>-1)return"keyword";if(e.indexOf(b)>-1)return"def"}if('"'==p&&!g.doubleString)return g.string=!0,g.doubleString=!0,"string";if("'"==p&&!g.singleString)return g.string=!0,g.singleString=!0,"string";if("("==p&&g.inner&&g.num_left++,")"==p&&g.inner)return g.num_right++,g.num_left==g.num_right&&(g.inner=!1,g.string=!0),null;if(m.match(/^-?[0-9\.]/,!1)){if(m.match(/^-?\d*\.\d+(e[\+\-]?\d+)?/i)||m.match(/^-?\d+\.\d*/)||m.match(/^-?\.\d+/))return"."==m.peek()&&m.backUp(1),"number";if(m.match(/^-?0x[0-9a-f]+/i)||m.match(/^-?[1-9]\d*(e[\+\-]?\d+)?/)||m.match(/^-?0(?![\dx])/i))return"number"}if(m.match(d)){if("/"!=m.current()||m.match(/^.*\//,!1))return"string";m.backUp(1)}return m.match(s)?"punctuation":m.match(l)?"variable":m.match(c)?"property":"variable"}}}),e.defineMIME("text/x-swift","swift")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Swift mode created by Michael Kaminsky https://github.com/mkaminsky11
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object")
+    mod(require("../../lib/codemirror"))
+  else if (typeof define == "function" && define.amd)
+    define(["../../lib/codemirror"], mod)
+  else
+    mod(CodeMirror)
+})(function(CodeMirror) {
+  "use strict"
+
+  function trim(str) { return /^\s*(.*?)\s*$/.exec(str)[1] }
+
+  var separators = [" ","\\\+","\\\-","\\\(","\\\)","\\\*","/",":","\\\?","\\\<","\\\>"," ","\\\."]
+  var tokens = new RegExp(separators.join("|"),"g")
+
+  function getWord(string, pos) {
+    var index = -1, count = 1
+    var words = string.split(tokens)
+    for (var i = 0; i < words.length; i++) {
+      for(var j = 1; j <= words[i].length; j++) {
+        if (count==pos) index = i
+        count++
+      }
+      count++
+    }
+    var ret = ["", ""]
+    if (pos == 0) {
+      ret[1] = words[0]
+      ret[0] = null
+    } else {
+      ret[1] = words[index]
+      ret[0] = words[index-1]
+    }
+    return ret
+  }
+
+  CodeMirror.defineMode("swift", function() {
+    var keywords=["var","let","class","deinit","enum","extension","func","import","init","let","protocol","static","struct","subscript","typealias","var","as","dynamicType","is","new","super","self","Self","Type","__COLUMN__","__FILE__","__FUNCTION__","__LINE__","break","case","continue","default","do","else","fallthrough","if","in","for","return","switch","where","while","associativity","didSet","get","infix","inout","left","mutating","none","nonmutating","operator","override","postfix","precedence","prefix","right","set","unowned","unowned(safe)","unowned(unsafe)","weak","willSet"]
+    var commonConstants=["Infinity","NaN","undefined","null","true","false","on","off","yes","no","nil","null","this","super"]
+    var types=["String","bool","int","string","double","Double","Int","Float","float","public","private","extension"]
+    var numbers=["0","1","2","3","4","5","6","7","8","9"]
+    var operators=["+","-","/","*","%","=","|","&","<",">"]
+    var punc=[";",",",".","(",")","{","}","[","]"]
+    var delimiters=/^(?:[()\[\]{},:`=;]|\.\.?\.?)/
+    var identifiers=/^[_A-Za-z$][_A-Za-z$0-9]*/
+    var properties=/^(@|this\.)[_A-Za-z$][_A-Za-z$0-9]*/
+    var regexPrefixes=/^(\/{3}|\/)/
+
+    return {
+      startState: function() {
+        return {
+          prev: false,
+          string: false,
+          escape: false,
+          inner: false,
+          comment: false,
+          num_left: 0,
+          num_right: 0,
+          doubleString: false,
+          singleString: false
+        }
+      },
+      token: function(stream, state) {
+        if (stream.eatSpace()) return null
+
+        var ch = stream.next()
+        if (state.string) {
+          if (state.escape) {
+            state.escape = false
+            return "string"
+          } else {
+            if ((ch == "\"" && (state.doubleString && !state.singleString) ||
+                 (ch == "'" && (!state.doubleString && state.singleString))) &&
+                !state.escape) {
+              state.string = false
+              state.doubleString = false
+              state.singleString = false
+              return "string"
+            } else if (ch == "\\" && stream.peek() == "(") {
+              state.inner = true
+              state.string = false
+              return "keyword"
+            } else if (ch == "\\" && stream.peek() != "(") {
+              state.escape = true
+              state.string = true
+              return "string"
+            } else {
+              return "string"
+            }
+          }
+        } else if (state.comment) {
+          if (ch == "*" && stream.peek() == "/") {
+            state.prev = "*"
+            return "comment"
+          } else if (ch == "/" && state.prev == "*") {
+            state.prev = false
+            state.comment = false
+            return "comment"
+          }
+          return "comment"
+        } else {
+          if (ch == "/") {
+            if (stream.peek() == "/") {
+              stream.skipToEnd()
+              return "comment"
+            }
+            if (stream.peek() == "*") {
+              state.comment = true
+              return "comment"
+            }
+          }
+          if (ch == "(" && state.inner) {
+            state.num_left++
+            return null
+          }
+          if (ch == ")" && state.inner) {
+            state.num_right++
+            if (state.num_left == state.num_right) {
+              state.inner=false
+              state.string=true
+            }
+            return null
+          }
+
+          var ret = getWord(stream.string, stream.pos)
+          var the_word = ret[1]
+          var prev_word = ret[0]
+
+          if (operators.indexOf(ch + "") > -1) return "operator"
+          if (punc.indexOf(ch) > -1) return "punctuation"
+
+          if (typeof the_word != "undefined") {
+            the_word = trim(the_word)
+            if (typeof prev_word != "undefined") prev_word = trim(prev_word)
+            if (the_word.charAt(0) == "#") return null
+
+            if (types.indexOf(the_word) > -1) return "def"
+            if (commonConstants.indexOf(the_word) > -1) return "atom"
+            if (numbers.indexOf(the_word) > -1) return "number"
+
+            if ((numbers.indexOf(the_word.charAt(0) + "") > -1 ||
+                 operators.indexOf(the_word.charAt(0) + "") > -1) &&
+                numbers.indexOf(ch) > -1) {
+              return "number"
+            }
+
+            if (keywords.indexOf(the_word) > -1 ||
+                keywords.indexOf(the_word.split(tokens)[0]) > -1)
+              return "keyword"
+            if (keywords.indexOf(prev_word) > -1) return "def"
+          }
+          if (ch == '"' && !state.doubleString) {
+            state.string = true
+            state.doubleString = true
+            return "string"
+          }
+          if (ch == "'" && !state.singleString) {
+            state.string = true
+            state.singleString = true
+            return "string"
+          }
+          if (ch == "(" && state.inner)
+            state.num_left++
+          if (ch == ")" && state.inner) {
+            state.num_right++
+            if (state.num_left == state.num_right) {
+              state.inner = false
+              state.string = true
+            }
+            return null
+          }
+          if (stream.match(/^-?[0-9\.]/, false)) {
+            if (stream.match(/^-?\d*\.\d+(e[\+\-]?\d+)?/i) ||
+                stream.match(/^-?\d+\.\d*/) ||
+                stream.match(/^-?\.\d+/)) {
+              if (stream.peek() == ".") stream.backUp(1)
+              return "number"
+            }
+            if (stream.match(/^-?0x[0-9a-f]+/i) ||
+                stream.match(/^-?[1-9]\d*(e[\+\-]?\d+)?/) ||
+                stream.match(/^-?0(?![\dx])/i))
+              return "number"
+          }
+          if (stream.match(regexPrefixes)) {
+            if (stream.current()!="/" || stream.match(/^.*\//,false)) return "string"
+            else stream.backUp(1)
+          }
+          if (stream.match(delimiters)) return "punctuation"
+          if (stream.match(identifiers)) return "variable"
+          if (stream.match(properties)) return "property"
+          return "variable"
+        }
+      }
+    }
+  })
+
+  CodeMirror.defineMIME("text/x-swift","swift")
+})

@@ -1,1 +1,385 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("xml",function(e,n){function r(t,e){function n(n){return e.tokenize=n,n(t,e)}var r=t.next();if("<"==r)return t.eat("!")?t.eat("[")?t.match("CDATA[")?n(i("atom","]]>")):null:t.match("--")?n(i("comment","-->")):t.match("DOCTYPE",!0,!0)?(t.eatWhile(/[\w\._\-]/),n(l(1))):null:t.eat("?")?(t.eatWhile(/[\w\._\-]/),e.tokenize=i("meta","?>"),"meta"):(z=t.eat("/")?"closeTag":"openTag",e.tokenize=o,"tag bracket");if("&"==r){var a;return a=t.eat("#")?t.eat("x")?t.eatWhile(/[a-fA-F\d]/)&&t.eat(";"):t.eatWhile(/[\d]/)&&t.eat(";"):t.eatWhile(/[\w\.\-:]/)&&t.eat(";"),a?"atom":"error"}return t.eatWhile(/[^&<]/),null}function o(t,e){var n=t.next();if(">"==n||"/"==n&&t.eat(">"))return e.tokenize=r,z=">"==n?"endTag":"selfcloseTag","tag bracket";if("="==n)return z="equals",null;if("<"==n){e.tokenize=r,e.state=f,e.tagName=e.tagStart=null;var o=e.tokenize(t,e);return o?o+" tag error":"tag error"}return/[\'\"]/.test(n)?(e.tokenize=a(n),e.stringStartCol=t.column(),e.tokenize(t,e)):(t.match(/^[^\s\u00a0=<>\"\']*[^\s\u00a0=<>\"\'\/]/),"word")}function a(t){var e=function(e,n){for(;!e.eol();)if(e.next()==t){n.tokenize=o;break}return"string"};return e.isInAttribute=!0,e}function i(t,e){return function(n,o){for(;!n.eol();){if(n.match(e)){o.tokenize=r;break}n.next()}return t}}function l(t){return function(e,n){for(var o;null!=(o=e.next());){if("<"==o)return n.tokenize=l(t+1),n.tokenize(e,n);if(">"==o){if(1==t){n.tokenize=r;break}return n.tokenize=l(t-1),n.tokenize(e,n)}}return"meta"}}function u(t,e,n){this.prev=t.context,this.tagName=e,this.indent=t.indented,this.startOfLine=n,(T.doNotIndent.hasOwnProperty(e)||t.context&&t.context.noIndent)&&(this.noIndent=!0)}function d(t){t.context&&(t.context=t.context.prev)}function c(t,e){for(var n;;){if(!t.context)return;if(n=t.context.tagName,!T.contextGrabbers.hasOwnProperty(n)||!T.contextGrabbers[n].hasOwnProperty(e))return;d(t)}}function f(t,e,n){return"openTag"==t?(n.tagStart=e.column(),s):"closeTag"==t?m:f}function s(t,e,n){return"word"==t?(n.tagName=e.current(),N="tag",h):(N="error",s)}function m(t,e,n){if("word"==t){var r=e.current();return n.context&&n.context.tagName!=r&&T.implicitlyClosed.hasOwnProperty(n.context.tagName)&&d(n),n.context&&n.context.tagName==r?(N="tag",g):(N="tag error",p)}return N="error",p}function g(t,e,n){return"endTag"!=t?(N="error",g):(d(n),f)}function p(t,e,n){return N="error",g(t,e,n)}function h(t,e,n){if("word"==t)return N="attribute",x;if("endTag"==t||"selfcloseTag"==t){var r=n.tagName,o=n.tagStart;return n.tagName=n.tagStart=null,"selfcloseTag"==t||T.autoSelfClosers.hasOwnProperty(r)?c(n,r):(c(n,r),n.context=new u(n,r,o==n.indented)),f}return N="error",h}function x(t,e,n){return"equals"==t?b:(T.allowMissing||(N="error"),h(t,e,n))}function b(t,e,n){return"string"==t?k:"word"==t&&T.allowUnquoted?(N="string",h):(N="error",h(t,e,n))}function k(t,e,n){return"string"==t?k:h(t,e,n)}var w=e.indentUnit,v=n.multilineTagIndentFactor||1,y=n.multilineTagIndentPastTag;null==y&&(y=!0);var z,N,T=n.htmlMode?{autoSelfClosers:{area:!0,base:!0,br:!0,col:!0,command:!0,embed:!0,frame:!0,hr:!0,img:!0,input:!0,keygen:!0,link:!0,meta:!0,param:!0,source:!0,track:!0,wbr:!0,menuitem:!0},implicitlyClosed:{dd:!0,li:!0,optgroup:!0,option:!0,p:!0,rp:!0,rt:!0,tbody:!0,td:!0,tfoot:!0,th:!0,tr:!0},contextGrabbers:{dd:{dd:!0,dt:!0},dt:{dd:!0,dt:!0},li:{li:!0},option:{option:!0,optgroup:!0},optgroup:{optgroup:!0},p:{address:!0,article:!0,aside:!0,blockquote:!0,dir:!0,div:!0,dl:!0,fieldset:!0,footer:!0,form:!0,h1:!0,h2:!0,h3:!0,h4:!0,h5:!0,h6:!0,header:!0,hgroup:!0,hr:!0,menu:!0,nav:!0,ol:!0,p:!0,pre:!0,section:!0,table:!0,ul:!0},rp:{rp:!0,rt:!0},rt:{rp:!0,rt:!0},tbody:{tbody:!0,tfoot:!0},td:{td:!0,th:!0},tfoot:{tbody:!0},th:{td:!0,th:!0},thead:{tbody:!0,tfoot:!0},tr:{tr:!0}},doNotIndent:{pre:!0},allowUnquoted:!0,allowMissing:!0,caseFold:!0}:{autoSelfClosers:{},implicitlyClosed:{},contextGrabbers:{},doNotIndent:{},allowUnquoted:!1,allowMissing:!1,caseFold:!1},C=n.alignCDATA;return r.isInText=!0,{startState:function(){return{tokenize:r,state:f,indented:0,tagName:null,tagStart:null,context:null}},token:function(t,e){if(!e.tagName&&t.sol()&&(e.indented=t.indentation()),t.eatSpace())return null;z=null;var n=e.tokenize(t,e);return(n||z)&&"comment"!=n&&(N=null,e.state=e.state(z||n,t,e),N&&(n="error"==N?n+" error":N)),n},indent:function(e,n,a){var i=e.context;if(e.tokenize.isInAttribute)return e.tagStart==e.indented?e.stringStartCol+1:e.indented+w;if(i&&i.noIndent)return t.Pass;if(e.tokenize!=o&&e.tokenize!=r)return a?a.match(/^(\s*)/)[0].length:0;if(e.tagName)return y?e.tagStart+e.tagName.length+2:e.tagStart+w*v;if(C&&/<!\[CDATA\[/.test(n))return 0;var l=n&&/^<(\/)?([\w_:\.-]*)/.exec(n);if(l&&l[1])for(;i;){if(i.tagName==l[2]){i=i.prev;break}if(!T.implicitlyClosed.hasOwnProperty(i.tagName))break;i=i.prev}else if(l)for(;i;){var u=T.contextGrabbers[i.tagName];if(!u||!u.hasOwnProperty(l[2]))break;i=i.prev}for(;i&&!i.startOfLine;)i=i.prev;return i?i.indent+w:0},electricInput:/<\/[\s\w:]+>$/,blockCommentStart:"<!--",blockCommentEnd:"-->",configuration:n.htmlMode?"html":"xml",helperType:n.htmlMode?"html":"xml"}}),t.defineMIME("text/xml","xml"),t.defineMIME("application/xml","xml"),t.mimeModes.hasOwnProperty("text/html")||t.defineMIME("text/html",{name:"xml",htmlMode:!0})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("xml", function(config, parserConfig) {
+  var indentUnit = config.indentUnit;
+  var multilineTagIndentFactor = parserConfig.multilineTagIndentFactor || 1;
+  var multilineTagIndentPastTag = parserConfig.multilineTagIndentPastTag;
+  if (multilineTagIndentPastTag == null) multilineTagIndentPastTag = true;
+
+  var Kludges = parserConfig.htmlMode ? {
+    autoSelfClosers: {'area': true, 'base': true, 'br': true, 'col': true, 'command': true,
+                      'embed': true, 'frame': true, 'hr': true, 'img': true, 'input': true,
+                      'keygen': true, 'link': true, 'meta': true, 'param': true, 'source': true,
+                      'track': true, 'wbr': true, 'menuitem': true},
+    implicitlyClosed: {'dd': true, 'li': true, 'optgroup': true, 'option': true, 'p': true,
+                       'rp': true, 'rt': true, 'tbody': true, 'td': true, 'tfoot': true,
+                       'th': true, 'tr': true},
+    contextGrabbers: {
+      'dd': {'dd': true, 'dt': true},
+      'dt': {'dd': true, 'dt': true},
+      'li': {'li': true},
+      'option': {'option': true, 'optgroup': true},
+      'optgroup': {'optgroup': true},
+      'p': {'address': true, 'article': true, 'aside': true, 'blockquote': true, 'dir': true,
+            'div': true, 'dl': true, 'fieldset': true, 'footer': true, 'form': true,
+            'h1': true, 'h2': true, 'h3': true, 'h4': true, 'h5': true, 'h6': true,
+            'header': true, 'hgroup': true, 'hr': true, 'menu': true, 'nav': true, 'ol': true,
+            'p': true, 'pre': true, 'section': true, 'table': true, 'ul': true},
+      'rp': {'rp': true, 'rt': true},
+      'rt': {'rp': true, 'rt': true},
+      'tbody': {'tbody': true, 'tfoot': true},
+      'td': {'td': true, 'th': true},
+      'tfoot': {'tbody': true},
+      'th': {'td': true, 'th': true},
+      'thead': {'tbody': true, 'tfoot': true},
+      'tr': {'tr': true}
+    },
+    doNotIndent: {"pre": true},
+    allowUnquoted: true,
+    allowMissing: true,
+    caseFold: true
+  } : {
+    autoSelfClosers: {},
+    implicitlyClosed: {},
+    contextGrabbers: {},
+    doNotIndent: {},
+    allowUnquoted: false,
+    allowMissing: false,
+    caseFold: false
+  };
+  var alignCDATA = parserConfig.alignCDATA;
+
+  // Return variables for tokenizers
+  var type, setStyle;
+
+  function inText(stream, state) {
+    function chain(parser) {
+      state.tokenize = parser;
+      return parser(stream, state);
+    }
+
+    var ch = stream.next();
+    if (ch == "<") {
+      if (stream.eat("!")) {
+        if (stream.eat("[")) {
+          if (stream.match("CDATA[")) return chain(inBlock("atom", "]]>"));
+          else return null;
+        } else if (stream.match("--")) {
+          return chain(inBlock("comment", "-->"));
+        } else if (stream.match("DOCTYPE", true, true)) {
+          stream.eatWhile(/[\w\._\-]/);
+          return chain(doctype(1));
+        } else {
+          return null;
+        }
+      } else if (stream.eat("?")) {
+        stream.eatWhile(/[\w\._\-]/);
+        state.tokenize = inBlock("meta", "?>");
+        return "meta";
+      } else {
+        type = stream.eat("/") ? "closeTag" : "openTag";
+        state.tokenize = inTag;
+        return "tag bracket";
+      }
+    } else if (ch == "&") {
+      var ok;
+      if (stream.eat("#")) {
+        if (stream.eat("x")) {
+          ok = stream.eatWhile(/[a-fA-F\d]/) && stream.eat(";");
+        } else {
+          ok = stream.eatWhile(/[\d]/) && stream.eat(";");
+        }
+      } else {
+        ok = stream.eatWhile(/[\w\.\-:]/) && stream.eat(";");
+      }
+      return ok ? "atom" : "error";
+    } else {
+      stream.eatWhile(/[^&<]/);
+      return null;
+    }
+  }
+  inText.isInText = true;
+
+  function inTag(stream, state) {
+    var ch = stream.next();
+    if (ch == ">" || (ch == "/" && stream.eat(">"))) {
+      state.tokenize = inText;
+      type = ch == ">" ? "endTag" : "selfcloseTag";
+      return "tag bracket";
+    } else if (ch == "=") {
+      type = "equals";
+      return null;
+    } else if (ch == "<") {
+      state.tokenize = inText;
+      state.state = baseState;
+      state.tagName = state.tagStart = null;
+      var next = state.tokenize(stream, state);
+      return next ? next + " tag error" : "tag error";
+    } else if (/[\'\"]/.test(ch)) {
+      state.tokenize = inAttribute(ch);
+      state.stringStartCol = stream.column();
+      return state.tokenize(stream, state);
+    } else {
+      stream.match(/^[^\s\u00a0=<>\"\']*[^\s\u00a0=<>\"\'\/]/);
+      return "word";
+    }
+  }
+
+  function inAttribute(quote) {
+    var closure = function(stream, state) {
+      while (!stream.eol()) {
+        if (stream.next() == quote) {
+          state.tokenize = inTag;
+          break;
+        }
+      }
+      return "string";
+    };
+    closure.isInAttribute = true;
+    return closure;
+  }
+
+  function inBlock(style, terminator) {
+    return function(stream, state) {
+      while (!stream.eol()) {
+        if (stream.match(terminator)) {
+          state.tokenize = inText;
+          break;
+        }
+        stream.next();
+      }
+      return style;
+    };
+  }
+  function doctype(depth) {
+    return function(stream, state) {
+      var ch;
+      while ((ch = stream.next()) != null) {
+        if (ch == "<") {
+          state.tokenize = doctype(depth + 1);
+          return state.tokenize(stream, state);
+        } else if (ch == ">") {
+          if (depth == 1) {
+            state.tokenize = inText;
+            break;
+          } else {
+            state.tokenize = doctype(depth - 1);
+            return state.tokenize(stream, state);
+          }
+        }
+      }
+      return "meta";
+    };
+  }
+
+  function Context(state, tagName, startOfLine) {
+    this.prev = state.context;
+    this.tagName = tagName;
+    this.indent = state.indented;
+    this.startOfLine = startOfLine;
+    if (Kludges.doNotIndent.hasOwnProperty(tagName) || (state.context && state.context.noIndent))
+      this.noIndent = true;
+  }
+  function popContext(state) {
+    if (state.context) state.context = state.context.prev;
+  }
+  function maybePopContext(state, nextTagName) {
+    var parentTagName;
+    while (true) {
+      if (!state.context) {
+        return;
+      }
+      parentTagName = state.context.tagName;
+      if (!Kludges.contextGrabbers.hasOwnProperty(parentTagName) ||
+          !Kludges.contextGrabbers[parentTagName].hasOwnProperty(nextTagName)) {
+        return;
+      }
+      popContext(state);
+    }
+  }
+
+  function baseState(type, stream, state) {
+    if (type == "openTag") {
+      state.tagStart = stream.column();
+      return tagNameState;
+    } else if (type == "closeTag") {
+      return closeTagNameState;
+    } else {
+      return baseState;
+    }
+  }
+  function tagNameState(type, stream, state) {
+    if (type == "word") {
+      state.tagName = stream.current();
+      setStyle = "tag";
+      return attrState;
+    } else {
+      setStyle = "error";
+      return tagNameState;
+    }
+  }
+  function closeTagNameState(type, stream, state) {
+    if (type == "word") {
+      var tagName = stream.current();
+      if (state.context && state.context.tagName != tagName &&
+          Kludges.implicitlyClosed.hasOwnProperty(state.context.tagName))
+        popContext(state);
+      if (state.context && state.context.tagName == tagName) {
+        setStyle = "tag";
+        return closeState;
+      } else {
+        setStyle = "tag error";
+        return closeStateErr;
+      }
+    } else {
+      setStyle = "error";
+      return closeStateErr;
+    }
+  }
+
+  function closeState(type, _stream, state) {
+    if (type != "endTag") {
+      setStyle = "error";
+      return closeState;
+    }
+    popContext(state);
+    return baseState;
+  }
+  function closeStateErr(type, stream, state) {
+    setStyle = "error";
+    return closeState(type, stream, state);
+  }
+
+  function attrState(type, _stream, state) {
+    if (type == "word") {
+      setStyle = "attribute";
+      return attrEqState;
+    } else if (type == "endTag" || type == "selfcloseTag") {
+      var tagName = state.tagName, tagStart = state.tagStart;
+      state.tagName = state.tagStart = null;
+      if (type == "selfcloseTag" ||
+          Kludges.autoSelfClosers.hasOwnProperty(tagName)) {
+        maybePopContext(state, tagName);
+      } else {
+        maybePopContext(state, tagName);
+        state.context = new Context(state, tagName, tagStart == state.indented);
+      }
+      return baseState;
+    }
+    setStyle = "error";
+    return attrState;
+  }
+  function attrEqState(type, stream, state) {
+    if (type == "equals") return attrValueState;
+    if (!Kludges.allowMissing) setStyle = "error";
+    return attrState(type, stream, state);
+  }
+  function attrValueState(type, stream, state) {
+    if (type == "string") return attrContinuedState;
+    if (type == "word" && Kludges.allowUnquoted) {setStyle = "string"; return attrState;}
+    setStyle = "error";
+    return attrState(type, stream, state);
+  }
+  function attrContinuedState(type, stream, state) {
+    if (type == "string") return attrContinuedState;
+    return attrState(type, stream, state);
+  }
+
+  return {
+    startState: function() {
+      return {tokenize: inText,
+              state: baseState,
+              indented: 0,
+              tagName: null, tagStart: null,
+              context: null};
+    },
+
+    token: function(stream, state) {
+      if (!state.tagName && stream.sol())
+        state.indented = stream.indentation();
+
+      if (stream.eatSpace()) return null;
+      type = null;
+      var style = state.tokenize(stream, state);
+      if ((style || type) && style != "comment") {
+        setStyle = null;
+        state.state = state.state(type || style, stream, state);
+        if (setStyle)
+          style = setStyle == "error" ? style + " error" : setStyle;
+      }
+      return style;
+    },
+
+    indent: function(state, textAfter, fullLine) {
+      var context = state.context;
+      // Indent multi-line strings (e.g. css).
+      if (state.tokenize.isInAttribute) {
+        if (state.tagStart == state.indented)
+          return state.stringStartCol + 1;
+        else
+          return state.indented + indentUnit;
+      }
+      if (context && context.noIndent) return CodeMirror.Pass;
+      if (state.tokenize != inTag && state.tokenize != inText)
+        return fullLine ? fullLine.match(/^(\s*)/)[0].length : 0;
+      // Indent the starts of attribute names.
+      if (state.tagName) {
+        if (multilineTagIndentPastTag)
+          return state.tagStart + state.tagName.length + 2;
+        else
+          return state.tagStart + indentUnit * multilineTagIndentFactor;
+      }
+      if (alignCDATA && /<!\[CDATA\[/.test(textAfter)) return 0;
+      var tagAfter = textAfter && /^<(\/)?([\w_:\.-]*)/.exec(textAfter);
+      if (tagAfter && tagAfter[1]) { // Closing tag spotted
+        while (context) {
+          if (context.tagName == tagAfter[2]) {
+            context = context.prev;
+            break;
+          } else if (Kludges.implicitlyClosed.hasOwnProperty(context.tagName)) {
+            context = context.prev;
+          } else {
+            break;
+          }
+        }
+      } else if (tagAfter) { // Opening tag spotted
+        while (context) {
+          var grabbers = Kludges.contextGrabbers[context.tagName];
+          if (grabbers && grabbers.hasOwnProperty(tagAfter[2]))
+            context = context.prev;
+          else
+            break;
+        }
+      }
+      while (context && !context.startOfLine)
+        context = context.prev;
+      if (context) return context.indent + indentUnit;
+      else return 0;
+    },
+
+    electricInput: /<\/[\s\w:]+>$/,
+    blockCommentStart: "<!--",
+    blockCommentEnd: "-->",
+
+    configuration: parserConfig.htmlMode ? "html" : "xml",
+    helperType: parserConfig.htmlMode ? "html" : "xml"
+  };
+});
+
+CodeMirror.defineMIME("text/xml", "xml");
+CodeMirror.defineMIME("application/xml", "xml");
+if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
+  CodeMirror.defineMIME("text/html", {name: "xml", htmlMode: true});
+
+});

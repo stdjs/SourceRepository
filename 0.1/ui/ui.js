@@ -1,1 +1,33 @@
-!function(){}(window,document);
+!function(window,document,undefined){
+    /*[#include]
+     ui.Image.js
+     ui.Button.js
+     ui.Label.js
+     ui.Edit.js
+     ui.CheckBox.js
+     ui.RadioBox.js
+     ui.SwitchBox.js
+     ui.Canvas.js
+     ui.ColorPicker.js
+     ui.DatePicker.js
+     ui.Item.js
+     ui.List.js
+     ui.Menu.js
+     ui.MenuBar.js
+     ui.ComboBox.js
+     ui.ToolBar.js
+     ui.Panel.js
+     ui.Window.js
+     ui.MessageBox.js
+     ui.Pagination.js
+     ui.Progress.js
+     ui.Accordion.js
+     ui.Tabs.js
+     ui.Slider.js
+     ui.RichEdit.js
+     ui.Tree.js
+     ui.GridView.js
+     ui.PropertyGird.js
+     ui.Video.js
+     [#include]*/
+}(window,document);

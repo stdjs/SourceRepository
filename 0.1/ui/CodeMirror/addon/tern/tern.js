@@ -1,1 +1,700 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function t(e,t,n){var o=e.docs[t];o?n(S(e,o)):e.options.getFile?e.options.getFile(t,n):n(null)}function n(e,t,n){for(var o in e.docs){var r=e.docs[o];if(r.doc==t)return r}if(!n)for(var i=0;;++i)if(o="[doc"+(i||"")+"]",!e.docs[o]){n=o;break}return e.addDoc(n,t)}function o(t,o){return"string"==typeof o?t.docs[o]:(o instanceof e&&(o=o.getDoc()),o instanceof e.Doc?n(t,o):void 0)}function r(e,t,o){var r=n(e,t),s=e.cachedArgHints;s&&s.doc==t&&R(s.start,o.to)<=0&&(e.cachedArgHints=null);var a=r.changed;null==a&&(r.changed=a={from:o.from.line,to:o.from.line});var c=o.from.line+(o.text.length-1);o.from.line<a.to&&(a.to=a.to-(o.to.line-c)),c>=a.to&&(a.to=c+1),a.from>o.from.line&&(a.from=o.from.line),t.lineCount()>L&&o.to-a.from>100&&setTimeout(function(){r.changed&&r.changed.to-r.changed.from>100&&i(e,r)},200)}function i(e,t){e.server.request({files:[{type:"full",name:t.name,text:S(e,t)}]},function(e){e?window.console.error(e):t.changed=null})}function s(t,n,o){t.request(n,{type:"completions",types:!0,docs:!0,urls:!0},function(r,i){if(r)return q(t,n,r);var s=[],c="",l=i.start,u=i.end;'["'==n.getRange(M(l.line,l.ch-2),l)&&'"]'!=n.getRange(u,M(u.line,u.ch+2))&&(c='"]');for(var f=0;f<i.completions.length;++f){var d=i.completions[f],p=a(d.type);i.guess&&(p+=" "+j+"guess"),s.push({text:d.name+c,displayText:d.displayName||d.name,className:p,data:d})}var h={from:l,to:u,list:s},g=null;e.on(h,"close",function(){A(g)}),e.on(h,"update",function(){A(g)}),e.on(h,"select",function(e,n){A(g);var o=t.options.completionTip?t.options.completionTip(e.data):e.data.doc;o&&(g=D(n.parentNode.getBoundingClientRect().right+window.pageXOffset,n.getBoundingClientRect().top+window.pageYOffset,o),g.className+=" "+j+"hint-doc")}),o(h)})}function a(e){var t;return t="?"==e?"unknown":"number"==e||"string"==e||"bool"==e?e:/^fn\(/.test(e)?"fn":/^\[/.test(e)?"array":"object",j+"completion "+j+"completion-"+t}function c(e,t,n,o,r){e.request(t,o,function(n,o){if(n)return q(e,t,n);if(e.options.typeTip)var i=e.options.typeTip(o);else{var i=w("span",null,w("strong",null,o.type||"not found"));if(o.doc&&i.appendChild(document.createTextNode(" — "+o.doc)),o.url){i.appendChild(document.createTextNode(" "));var s=i.appendChild(w("a",null,"[docs]"));s.href=o.url,s.target="_blank"}}k(t,i,e),r&&r()},n)}function l(t,n){if(H(t),!n.somethingSelected()){var o=n.getTokenAt(n.getCursor()).state,r=e.innerMode(n.getMode(),o);if("javascript"==r.mode.name){var i=r.state.lexical;if("call"==i.info){for(var s,a=i.pos||0,c=n.getOption("tabSize"),l=n.getCursor().line,d=Math.max(0,l-9),p=!1;l>=d;--l){for(var h=n.getLine(l),g=0,m=0;;){var v=h.indexOf("	",m);if(-1==v)break;g+=c-(v+g)%c-1,m=v+1}if(s=i.column-g,"("==h.charAt(s)){p=!0;break}}if(p){var y=M(l,s),C=t.cachedArgHints;return C&&C.doc==n.getDoc()&&0==R(y,C.start)?u(t,n,a):void t.request(n,{type:"type",preferFunction:!0,end:y},function(e,o){!e&&o.type&&/^fn\(/.test(o.type)&&(t.cachedArgHints={start:m,type:f(o.type),name:o.exprName||o.name||"fn",guess:o.guess,doc:n.getDoc()},u(t,n,a))})}}}}}function u(e,t,n){H(e);for(var o=e.cachedArgHints,r=o.type,i=w("span",o.guess?j+"fhint-guess":null,w("span",j+"fname",o.name),"("),s=0;s<r.args.length;++s){s&&i.appendChild(document.createTextNode(", "));var a=r.args[s];i.appendChild(w("span",j+"farg"+(s==n?" "+j+"farg-current":""),a.name||"?")),"?"!=a.type&&(i.appendChild(document.createTextNode(": ")),i.appendChild(w("span",j+"type",a.type)))}i.appendChild(document.createTextNode(r.rettype?") -> ":")")),r.rettype&&i.appendChild(w("span",j+"type",r.rettype));var c=t.cursorCoords(null,"page");e.activeArgHints=D(c.right+1,c.bottom,i)}function f(e){function t(t){for(var n=0,r=o;;){var i=e.charAt(o);if(t.test(i)&&!n)return e.slice(r,o);/[{\[\(]/.test(i)?++n:/[}\]\)]/.test(i)&&--n,++o}}var n=[],o=3;if(")"!=e.charAt(o))for(;;){var r=e.slice(o).match(/^([^, \(\[\{]+): /);if(r&&(o+=r[0].length,r=r[1]),n.push({name:r,type:t(/[\),]/)}),")"==e.charAt(o))break;o+=2}var i=e.slice(o).match(/^\) -> (.*)$/);return{args:n,rettype:i&&i[1]}}function d(e,t){function o(o){var r={type:"definition",variable:o||null},i=n(e,t.getDoc());e.server.request(x(e,i,r),function(n,o){if(n)return q(e,t,n);if(!o.file&&o.url)return void window.open(o.url);if(o.file){var r,s=e.docs[o.file];if(s&&(r=g(s.doc,o)))return e.jumpStack.push({file:i.name,start:t.getCursor("from"),end:t.getCursor("to")}),void h(e,i,s,r.start,r.end)}q(e,t,"Could not find a definition.")})}m(t)?o():T(t,"Jump to variable",function(e){e&&o(e)})}function p(e,t){var o=e.jumpStack.pop(),r=o&&e.docs[o.file];r&&h(e,n(e,t.getDoc()),r,o.start,o.end)}function h(e,t,n,o,r){n.doc.setSelection(o,r),t!=n&&e.options.switchToDoc&&(H(e),e.options.switchToDoc(n.name,n.doc))}function g(e,t){for(var n=t.context.slice(0,t.contextOffset).split("\n"),o=t.start.line-(n.length-1),r=M(o,(1==n.length?t.start.ch:e.getLine(o).length)-n[0].length),i=e.getLine(o).slice(r.ch),s=o+1;s<e.lineCount()&&i.length<t.context.length;++s)i+="\n"+e.getLine(s);if(i.slice(0,t.context.length)==t.context)return t;for(var a,c=e.getSearchCursor(t.context,0,!1),l=1/0;c.findNext();){var u=c.from(),f=1e4*Math.abs(u.line-r.line);f||(f=Math.abs(u.ch-r.ch)),l>f&&(a=u,l=f)}if(!a)return null;if(1==n.length?a.ch+=n[0].length:a=M(a.line+(n.length-1),n[n.length-1].length),t.start.line==t.end.line)var d=M(a.line,a.ch+(t.end.ch-t.start.ch));else var d=M(a.line+(t.end.line-t.start.line),t.end.ch);return{start:a,end:d}}function m(e){var t=e.getCursor("end"),n=e.getTokenAt(t);return n.start<t.ch&&"comment"==n.type?!1:/[\w)\]]/.test(e.getLine(t.line).slice(Math.max(t.ch-1,0),t.ch+1))}function v(e,t){var n=t.getTokenAt(t.getCursor());return/\w/.test(n.string)?void T(t,"New name for "+n.string,function(n){e.request(t,{type:"rename",newName:n,fullDocs:!0},function(n,o){return n?q(e,t,n):void C(e,o.changes)})}):q(e,t,"Not at a variable")}function y(e,t){var o=n(e,t.doc).name;e.request(t,{type:"refs"},function(n,r){if(n)return q(e,t,n);for(var i=[],s=0,a=t.getCursor(),c=0;c<r.refs.length;c++){var l=r.refs[c];l.file==o&&(i.push({anchor:l.start,head:l.end}),R(a,l.start)>=0&&R(a,l.end)<=0&&(s=i.length-1))}t.setSelections(i,s)})}function C(e,t){for(var n=Object.create(null),o=0;o<t.length;++o){var r=t[o];(n[r.file]||(n[r.file]=[])).push(r)}for(var i in n){var s=e.docs[i],a=n[i];if(s){a.sort(function(e,t){return R(t.start,e.start)});for(var c="*rename"+ ++O,o=0;o<a.length;++o){var r=a[o];s.doc.replaceRange(r.text,r.start,r.end,c)}}}}function x(e,t,n,o){var r=[],i=0,s=!n.fullDocs;s||delete n.fullDocs,"string"==typeof n&&(n={type:n}),n.lineCharPositions=!0,null==n.end&&(n.end=o||t.doc.getCursor("end"),t.doc.somethingSelected()&&(n.start=t.doc.getCursor("start")));var a=n.start||n.end;if(t.changed)if(t.doc.lineCount()>L&&s!==!1&&t.changed.to-t.changed.from<100&&t.changed.from<=a.line&&t.changed.to>n.end.line){r.push(b(t,a,n.end)),n.file="#0";var i=r[0].offsetLines;null!=n.start&&(n.start=M(n.start.line- -i,n.start.ch)),n.end=M(n.end.line-i,n.end.ch)}else r.push({type:"full",name:t.name,text:S(e,t)}),n.file=t.name,t.changed=null;else n.file=t.name;for(var c in e.docs){var l=e.docs[c];l.changed&&l!=t&&(r.push({type:"full",name:l.name,text:S(e,l)}),l.changed=null)}return{query:n,files:r}}function b(t,n,o){for(var r,i=t.doc,s=null,a=null,c=4,l=n.line-1,u=Math.max(0,l-50);l>=u;--l){var f=i.getLine(l),d=f.search(/\bfunction\b/);if(!(0>d)){var p=e.countColumn(f,null,c);null!=s&&p>=s||(s=p,a=l)}}null==a&&(a=u);var h=Math.min(i.lastLine(),o.line+20);if(null==s||s==e.countColumn(i.getLine(n.line),null,c))r=h;else for(r=o.line+1;h>r;++r){var p=e.countColumn(i.getLine(r),null,c);if(s>=p)break}var g=M(a,0);return{type:"part",name:t.name,offsetLines:g.line,text:i.getRange(g,M(r,0))}}function w(e,t){var n=document.createElement(e);t&&(n.className=t);for(var o=2;o<arguments.length;++o){var r=arguments[o];"string"==typeof r&&(r=document.createTextNode(r)),n.appendChild(r)}return n}function T(e,t,n){e.openDialog?e.openDialog(t+": <input type=text>",n):n(prompt(t,""))}function k(t,n,o){function r(){l=!0,c||i()}function i(){t.state.ternTooltip=null,a.parentNode&&(t.off("cursorActivity",i),t.off("blur",i),t.off("scroll",i),N(a))}t.state.ternTooltip&&A(t.state.ternTooltip);var s=t.cursorCoords(),a=t.state.ternTooltip=D(s.right+1,s.bottom,n),c=!1,l=!1;e.on(a,"mousemove",function(){c=!0}),e.on(a,"mouseout",function(t){e.contains(a,t.relatedTarget||t.toElement)||(l?i():c=!1)}),setTimeout(r,o.options.hintDelay?o.options.hintDelay:1700),t.on("cursorActivity",i),t.on("blur",i),t.on("scroll",i)}function D(e,t,n){var o=w("div",j+"tooltip",n);return o.style.left=e+"px",o.style.top=t+"px",document.body.appendChild(o),o}function A(e){var t=e&&e.parentNode;t&&t.removeChild(e)}function N(e){e.style.opacity="0",setTimeout(function(){A(e)},1100)}function q(e,t,n){e.options.showError?e.options.showError(t,n):k(t,String(n),e)}function H(e){e.activeArgHints&&(A(e.activeArgHints),e.activeArgHints=null)}function S(e,t){var n=t.doc.getValue();return e.options.fileFilter&&(n=e.options.fileFilter(n,t.name,t.doc)),n}function F(e){function n(e,t){t&&(e.id=++r,i[r]=t),o.postMessage(e)}var o=e.worker=new Worker(e.options.workerScript);o.postMessage({type:"init",defs:e.options.defs,plugins:e.options.plugins,scripts:e.options.workerDeps});var r=0,i={};o.onmessage=function(o){var r=o.data;"getFile"==r.type?t(e,r.name,function(e,t){n({type:"getFile",err:String(e),text:t,id:r.id})}):"debug"==r.type?window.console.log(r.message):r.id&&i[r.id]&&(i[r.id](r.err,r.body),delete i[r.id])},o.onerror=function(e){for(var t in i)i[t](e);i={}},this.addFile=function(e,t){n({type:"add",name:e,text:t})},this.delFile=function(e){n({type:"del",name:e})},this.request=function(e,t){n({type:"req",body:e},t)}}e.TernServer=function(e){var n=this;this.options=e||{};var o=this.options.plugins||(this.options.plugins={});o.doc_comment||(o.doc_comment=!0),this.docs=Object.create(null),this.server=this.options.useWorker?new F(this):new tern.Server({getFile:function(e,o){return t(n,e,o)},async:!0,defs:this.options.defs||[],plugins:o}),this.trackChange=function(e,t){r(n,e,t)},this.cachedArgHints=null,this.activeArgHints=null,this.jumpStack=[],this.getHint=function(e,t){return s(n,e,t)},this.getHint.async=!0},e.TernServer.prototype={addDoc:function(t,n){var o={doc:n,name:t,changed:null};return this.server.addFile(t,S(this,o)),e.on(n,"change",this.trackChange),this.docs[t]=o},delDoc:function(t){var n=o(this,t);n&&(e.off(n.doc,"change",this.trackChange),delete this.docs[n.name],this.server.delFile(n.name))},hideDoc:function(e){H(this);var t=o(this,e);t&&t.changed&&i(this,t)},complete:function(e){e.showHint({hint:this.getHint})},showType:function(e,t,n){c(this,e,t,"type",n)},showDocs:function(e,t,n){c(this,e,t,"documentation",n)},updateArgHints:function(e){l(this,e)},jumpToDef:function(e){d(this,e)},jumpBack:function(e){p(this,e)},rename:function(e){v(this,e)},selectName:function(e){y(this,e)},request:function(e,t,o,r){var i=this,s=n(this,e.getDoc()),a=x(this,s,t,r),c=a.query&&this.options.queryOptions&&this.options.queryOptions[a.query.type];if(c)for(var l in c)a.query[l]=c[l];this.server.request(a,function(e,n){!e&&i.options.responseFilter&&(n=i.options.responseFilter(s,t,a,e,n)),o(e,n)})},destroy:function(){this.worker&&(this.worker.terminate(),this.worker=null)}};var M=e.Pos,j="CodeMirror-Tern-",L=250,O=0,R=e.cmpPos});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Glue code between CodeMirror and Tern.
+//
+// Create a CodeMirror.TernServer to wrap an actual Tern server,
+// register open documents (CodeMirror.Doc instances) with it, and
+// call its methods to activate the assisting functions that Tern
+// provides.
+//
+// Options supported (all optional):
+// * defs: An array of JSON definition data structures.
+// * plugins: An object mapping plugin names to configuration
+//   options.
+// * getFile: A function(name, c) that can be used to access files in
+//   the project that haven't been loaded yet. Simply do c(null) to
+//   indicate that a file is not available.
+// * fileFilter: A function(value, docName, doc) that will be applied
+//   to documents before passing them on to Tern.
+// * switchToDoc: A function(name, doc) that should, when providing a
+//   multi-file view, switch the view or focus to the named file.
+// * showError: A function(editor, message) that can be used to
+//   override the way errors are displayed.
+// * completionTip: Customize the content in tooltips for completions.
+//   Is passed a single argument—the completion's data as returned by
+//   Tern—and may return a string, DOM node, or null to indicate that
+//   no tip should be shown. By default the docstring is shown.
+// * typeTip: Like completionTip, but for the tooltips shown for type
+//   queries.
+// * responseFilter: A function(doc, query, request, error, data) that
+//   will be applied to the Tern responses before treating them
+//
+//
+// It is possible to run the Tern server in a web worker by specifying
+// these additional options:
+// * useWorker: Set to true to enable web worker mode. You'll probably
+//   want to feature detect the actual value you use here, for example
+//   !!window.Worker.
+// * workerScript: The main script of the worker. Point this to
+//   wherever you are hosting worker.js from this directory.
+// * workerDeps: An array of paths pointing (relative to workerScript)
+//   to the Acorn and Tern libraries and any Tern plugins you want to
+//   load. Or, if you minified those into a single script and included
+//   them in the workerScript, simply leave this undefined.
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+  // declare global: tern
+
+  CodeMirror.TernServer = function(options) {
+    var self = this;
+    this.options = options || {};
+    var plugins = this.options.plugins || (this.options.plugins = {});
+    if (!plugins.doc_comment) plugins.doc_comment = true;
+    this.docs = Object.create(null);
+    if (this.options.useWorker) {
+      this.server = new WorkerServer(this);
+    } else {
+      this.server = new tern.Server({
+        getFile: function(name, c) { return getFile(self, name, c); },
+        async: true,
+        defs: this.options.defs || [],
+        plugins: plugins
+      });
+    }
+    this.trackChange = function(doc, change) { trackChange(self, doc, change); };
+
+    this.cachedArgHints = null;
+    this.activeArgHints = null;
+    this.jumpStack = [];
+
+    this.getHint = function(cm, c) { return hint(self, cm, c); };
+    this.getHint.async = true;
+  };
+
+  CodeMirror.TernServer.prototype = {
+    addDoc: function(name, doc) {
+      var data = {doc: doc, name: name, changed: null};
+      this.server.addFile(name, docValue(this, data));
+      CodeMirror.on(doc, "change", this.trackChange);
+      return this.docs[name] = data;
+    },
+
+    delDoc: function(id) {
+      var found = resolveDoc(this, id);
+      if (!found) return;
+      CodeMirror.off(found.doc, "change", this.trackChange);
+      delete this.docs[found.name];
+      this.server.delFile(found.name);
+    },
+
+    hideDoc: function(id) {
+      closeArgHints(this);
+      var found = resolveDoc(this, id);
+      if (found && found.changed) sendDoc(this, found);
+    },
+
+    complete: function(cm) {
+      cm.showHint({hint: this.getHint});
+    },
+
+    showType: function(cm, pos, c) { showContextInfo(this, cm, pos, "type", c); },
+
+    showDocs: function(cm, pos, c) { showContextInfo(this, cm, pos, "documentation", c); },
+
+    updateArgHints: function(cm) { updateArgHints(this, cm); },
+
+    jumpToDef: function(cm) { jumpToDef(this, cm); },
+
+    jumpBack: function(cm) { jumpBack(this, cm); },
+
+    rename: function(cm) { rename(this, cm); },
+
+    selectName: function(cm) { selectName(this, cm); },
+
+    request: function (cm, query, c, pos) {
+      var self = this;
+      var doc = findDoc(this, cm.getDoc());
+      var request = buildRequest(this, doc, query, pos);
+      var extraOptions = request.query && this.options.queryOptions && this.options.queryOptions[request.query.type]
+      if (extraOptions) for (var prop in extraOptions) request.query[prop] = extraOptions[prop];
+
+      this.server.request(request, function (error, data) {
+        if (!error && self.options.responseFilter)
+          data = self.options.responseFilter(doc, query, request, error, data);
+        c(error, data);
+      });
+    },
+
+    destroy: function () {
+      if (this.worker) {
+        this.worker.terminate();
+        this.worker = null;
+      }
+    }
+  };
+
+  var Pos = CodeMirror.Pos;
+  var cls = "CodeMirror-Tern-";
+  var bigDoc = 250;
+
+  function getFile(ts, name, c) {
+    var buf = ts.docs[name];
+    if (buf)
+      c(docValue(ts, buf));
+    else if (ts.options.getFile)
+      ts.options.getFile(name, c);
+    else
+      c(null);
+  }
+
+  function findDoc(ts, doc, name) {
+    for (var n in ts.docs) {
+      var cur = ts.docs[n];
+      if (cur.doc == doc) return cur;
+    }
+    if (!name) for (var i = 0;; ++i) {
+      n = "[doc" + (i || "") + "]";
+      if (!ts.docs[n]) { name = n; break; }
+    }
+    return ts.addDoc(name, doc);
+  }
+
+  function resolveDoc(ts, id) {
+    if (typeof id == "string") return ts.docs[id];
+    if (id instanceof CodeMirror) id = id.getDoc();
+    if (id instanceof CodeMirror.Doc) return findDoc(ts, id);
+  }
+
+  function trackChange(ts, doc, change) {
+    var data = findDoc(ts, doc);
+
+    var argHints = ts.cachedArgHints;
+    if (argHints && argHints.doc == doc && cmpPos(argHints.start, change.to) <= 0)
+      ts.cachedArgHints = null;
+
+    var changed = data.changed;
+    if (changed == null)
+      data.changed = changed = {from: change.from.line, to: change.from.line};
+    var end = change.from.line + (change.text.length - 1);
+    if (change.from.line < changed.to) changed.to = changed.to - (change.to.line - end);
+    if (end >= changed.to) changed.to = end + 1;
+    if (changed.from > change.from.line) changed.from = change.from.line;
+
+    if (doc.lineCount() > bigDoc && change.to - changed.from > 100) setTimeout(function() {
+      if (data.changed && data.changed.to - data.changed.from > 100) sendDoc(ts, data);
+    }, 200);
+  }
+
+  function sendDoc(ts, doc) {
+    ts.server.request({files: [{type: "full", name: doc.name, text: docValue(ts, doc)}]}, function(error) {
+      if (error) window.console.error(error);
+      else doc.changed = null;
+    });
+  }
+
+  // Completion
+
+  function hint(ts, cm, c) {
+    ts.request(cm, {type: "completions", types: true, docs: true, urls: true}, function(error, data) {
+      if (error) return showError(ts, cm, error);
+      var completions = [], after = "";
+      var from = data.start, to = data.end;
+      if (cm.getRange(Pos(from.line, from.ch - 2), from) == "[\"" &&
+          cm.getRange(to, Pos(to.line, to.ch + 2)) != "\"]")
+        after = "\"]";
+
+      for (var i = 0; i < data.completions.length; ++i) {
+        var completion = data.completions[i], className = typeToIcon(completion.type);
+        if (data.guess) className += " " + cls + "guess";
+        completions.push({text: completion.name + after,
+                          displayText: completion.displayName || completion.name,
+                          className: className,
+                          data: completion});
+      }
+
+      var obj = {from: from, to: to, list: completions};
+      var tooltip = null;
+      CodeMirror.on(obj, "close", function() { remove(tooltip); });
+      CodeMirror.on(obj, "update", function() { remove(tooltip); });
+      CodeMirror.on(obj, "select", function(cur, node) {
+        remove(tooltip);
+        var content = ts.options.completionTip ? ts.options.completionTip(cur.data) : cur.data.doc;
+        if (content) {
+          tooltip = makeTooltip(node.parentNode.getBoundingClientRect().right + window.pageXOffset,
+                                node.getBoundingClientRect().top + window.pageYOffset, content);
+          tooltip.className += " " + cls + "hint-doc";
+        }
+      });
+      c(obj);
+    });
+  }
+
+  function typeToIcon(type) {
+    var suffix;
+    if (type == "?") suffix = "unknown";
+    else if (type == "number" || type == "string" || type == "bool") suffix = type;
+    else if (/^fn\(/.test(type)) suffix = "fn";
+    else if (/^\[/.test(type)) suffix = "array";
+    else suffix = "object";
+    return cls + "completion " + cls + "completion-" + suffix;
+  }
+
+  // Type queries
+
+  function showContextInfo(ts, cm, pos, queryName, c) {
+    ts.request(cm, queryName, function(error, data) {
+      if (error) return showError(ts, cm, error);
+      if (ts.options.typeTip) {
+        var tip = ts.options.typeTip(data);
+      } else {
+        var tip = elt("span", null, elt("strong", null, data.type || "not found"));
+        if (data.doc)
+          tip.appendChild(document.createTextNode(" — " + data.doc));
+        if (data.url) {
+          tip.appendChild(document.createTextNode(" "));
+          var child = tip.appendChild(elt("a", null, "[docs]"));
+          child.href = data.url;
+          child.target = "_blank";
+        }
+      }
+      tempTooltip(cm, tip, ts);
+      if (c) c();
+    }, pos);
+  }
+
+  // Maintaining argument hints
+
+  function updateArgHints(ts, cm) {
+    closeArgHints(ts);
+
+    if (cm.somethingSelected()) return;
+    var state = cm.getTokenAt(cm.getCursor()).state;
+    var inner = CodeMirror.innerMode(cm.getMode(), state);
+    if (inner.mode.name != "javascript") return;
+    var lex = inner.state.lexical;
+    if (lex.info != "call") return;
+
+    var ch, argPos = lex.pos || 0, tabSize = cm.getOption("tabSize");
+    for (var line = cm.getCursor().line, e = Math.max(0, line - 9), found = false; line >= e; --line) {
+      var str = cm.getLine(line), extra = 0;
+      for (var pos = 0;;) {
+        var tab = str.indexOf("\t", pos);
+        if (tab == -1) break;
+        extra += tabSize - (tab + extra) % tabSize - 1;
+        pos = tab + 1;
+      }
+      ch = lex.column - extra;
+      if (str.charAt(ch) == "(") {found = true; break;}
+    }
+    if (!found) return;
+
+    var start = Pos(line, ch);
+    var cache = ts.cachedArgHints;
+    if (cache && cache.doc == cm.getDoc() && cmpPos(start, cache.start) == 0)
+      return showArgHints(ts, cm, argPos);
+
+    ts.request(cm, {type: "type", preferFunction: true, end: start}, function(error, data) {
+      if (error || !data.type || !(/^fn\(/).test(data.type)) return;
+      ts.cachedArgHints = {
+        start: pos,
+        type: parseFnType(data.type),
+        name: data.exprName || data.name || "fn",
+        guess: data.guess,
+        doc: cm.getDoc()
+      };
+      showArgHints(ts, cm, argPos);
+    });
+  }
+
+  function showArgHints(ts, cm, pos) {
+    closeArgHints(ts);
+
+    var cache = ts.cachedArgHints, tp = cache.type;
+    var tip = elt("span", cache.guess ? cls + "fhint-guess" : null,
+                  elt("span", cls + "fname", cache.name), "(");
+    for (var i = 0; i < tp.args.length; ++i) {
+      if (i) tip.appendChild(document.createTextNode(", "));
+      var arg = tp.args[i];
+      tip.appendChild(elt("span", cls + "farg" + (i == pos ? " " + cls + "farg-current" : ""), arg.name || "?"));
+      if (arg.type != "?") {
+        tip.appendChild(document.createTextNode(":\u00a0"));
+        tip.appendChild(elt("span", cls + "type", arg.type));
+      }
+    }
+    tip.appendChild(document.createTextNode(tp.rettype ? ") ->\u00a0" : ")"));
+    if (tp.rettype) tip.appendChild(elt("span", cls + "type", tp.rettype));
+    var place = cm.cursorCoords(null, "page");
+    ts.activeArgHints = makeTooltip(place.right + 1, place.bottom, tip);
+  }
+
+  function parseFnType(text) {
+    var args = [], pos = 3;
+
+    function skipMatching(upto) {
+      var depth = 0, start = pos;
+      for (;;) {
+        var next = text.charAt(pos);
+        if (upto.test(next) && !depth) return text.slice(start, pos);
+        if (/[{\[\(]/.test(next)) ++depth;
+        else if (/[}\]\)]/.test(next)) --depth;
+        ++pos;
+      }
+    }
+
+    // Parse arguments
+    if (text.charAt(pos) != ")") for (;;) {
+      var name = text.slice(pos).match(/^([^, \(\[\{]+): /);
+      if (name) {
+        pos += name[0].length;
+        name = name[1];
+      }
+      args.push({name: name, type: skipMatching(/[\),]/)});
+      if (text.charAt(pos) == ")") break;
+      pos += 2;
+    }
+
+    var rettype = text.slice(pos).match(/^\) -> (.*)$/);
+
+    return {args: args, rettype: rettype && rettype[1]};
+  }
+
+  // Moving to the definition of something
+
+  function jumpToDef(ts, cm) {
+    function inner(varName) {
+      var req = {type: "definition", variable: varName || null};
+      var doc = findDoc(ts, cm.getDoc());
+      ts.server.request(buildRequest(ts, doc, req), function(error, data) {
+        if (error) return showError(ts, cm, error);
+        if (!data.file && data.url) { window.open(data.url); return; }
+
+        if (data.file) {
+          var localDoc = ts.docs[data.file], found;
+          if (localDoc && (found = findContext(localDoc.doc, data))) {
+            ts.jumpStack.push({file: doc.name,
+                               start: cm.getCursor("from"),
+                               end: cm.getCursor("to")});
+            moveTo(ts, doc, localDoc, found.start, found.end);
+            return;
+          }
+        }
+        showError(ts, cm, "Could not find a definition.");
+      });
+    }
+
+    if (!atInterestingExpression(cm))
+      dialog(cm, "Jump to variable", function(name) { if (name) inner(name); });
+    else
+      inner();
+  }
+
+  function jumpBack(ts, cm) {
+    var pos = ts.jumpStack.pop(), doc = pos && ts.docs[pos.file];
+    if (!doc) return;
+    moveTo(ts, findDoc(ts, cm.getDoc()), doc, pos.start, pos.end);
+  }
+
+  function moveTo(ts, curDoc, doc, start, end) {
+    doc.doc.setSelection(start, end);
+    if (curDoc != doc && ts.options.switchToDoc) {
+      closeArgHints(ts);
+      ts.options.switchToDoc(doc.name, doc.doc);
+    }
+  }
+
+  // The {line,ch} representation of positions makes this rather awkward.
+  function findContext(doc, data) {
+    var before = data.context.slice(0, data.contextOffset).split("\n");
+    var startLine = data.start.line - (before.length - 1);
+    var start = Pos(startLine, (before.length == 1 ? data.start.ch : doc.getLine(startLine).length) - before[0].length);
+
+    var text = doc.getLine(startLine).slice(start.ch);
+    for (var cur = startLine + 1; cur < doc.lineCount() && text.length < data.context.length; ++cur)
+      text += "\n" + doc.getLine(cur);
+    if (text.slice(0, data.context.length) == data.context) return data;
+
+    var cursor = doc.getSearchCursor(data.context, 0, false);
+    var nearest, nearestDist = Infinity;
+    while (cursor.findNext()) {
+      var from = cursor.from(), dist = Math.abs(from.line - start.line) * 10000;
+      if (!dist) dist = Math.abs(from.ch - start.ch);
+      if (dist < nearestDist) { nearest = from; nearestDist = dist; }
+    }
+    if (!nearest) return null;
+
+    if (before.length == 1)
+      nearest.ch += before[0].length;
+    else
+      nearest = Pos(nearest.line + (before.length - 1), before[before.length - 1].length);
+    if (data.start.line == data.end.line)
+      var end = Pos(nearest.line, nearest.ch + (data.end.ch - data.start.ch));
+    else
+      var end = Pos(nearest.line + (data.end.line - data.start.line), data.end.ch);
+    return {start: nearest, end: end};
+  }
+
+  function atInterestingExpression(cm) {
+    var pos = cm.getCursor("end"), tok = cm.getTokenAt(pos);
+    if (tok.start < pos.ch && tok.type == "comment") return false;
+    return /[\w)\]]/.test(cm.getLine(pos.line).slice(Math.max(pos.ch - 1, 0), pos.ch + 1));
+  }
+
+  // Variable renaming
+
+  function rename(ts, cm) {
+    var token = cm.getTokenAt(cm.getCursor());
+    if (!/\w/.test(token.string)) return showError(ts, cm, "Not at a variable");
+    dialog(cm, "New name for " + token.string, function(newName) {
+      ts.request(cm, {type: "rename", newName: newName, fullDocs: true}, function(error, data) {
+        if (error) return showError(ts, cm, error);
+        applyChanges(ts, data.changes);
+      });
+    });
+  }
+
+  function selectName(ts, cm) {
+    var name = findDoc(ts, cm.doc).name;
+    ts.request(cm, {type: "refs"}, function(error, data) {
+      if (error) return showError(ts, cm, error);
+      var ranges = [], cur = 0;
+      var curPos = cm.getCursor();
+      for (var i = 0; i < data.refs.length; i++) {
+        var ref = data.refs[i];
+        if (ref.file == name) {
+          ranges.push({anchor: ref.start, head: ref.end});
+          if (cmpPos(curPos, ref.start) >= 0 && cmpPos(curPos, ref.end) <= 0)
+            cur = ranges.length - 1;
+        }
+      }
+      cm.setSelections(ranges, cur);
+    });
+  }
+
+  var nextChangeOrig = 0;
+  function applyChanges(ts, changes) {
+    var perFile = Object.create(null);
+    for (var i = 0; i < changes.length; ++i) {
+      var ch = changes[i];
+      (perFile[ch.file] || (perFile[ch.file] = [])).push(ch);
+    }
+    for (var file in perFile) {
+      var known = ts.docs[file], chs = perFile[file];;
+      if (!known) continue;
+      chs.sort(function(a, b) { return cmpPos(b.start, a.start); });
+      var origin = "*rename" + (++nextChangeOrig);
+      for (var i = 0; i < chs.length; ++i) {
+        var ch = chs[i];
+        known.doc.replaceRange(ch.text, ch.start, ch.end, origin);
+      }
+    }
+  }
+
+  // Generic request-building helper
+
+  function buildRequest(ts, doc, query, pos) {
+    var files = [], offsetLines = 0, allowFragments = !query.fullDocs;
+    if (!allowFragments) delete query.fullDocs;
+    if (typeof query == "string") query = {type: query};
+    query.lineCharPositions = true;
+    if (query.end == null) {
+      query.end = pos || doc.doc.getCursor("end");
+      if (doc.doc.somethingSelected())
+        query.start = doc.doc.getCursor("start");
+    }
+    var startPos = query.start || query.end;
+
+    if (doc.changed) {
+      if (doc.doc.lineCount() > bigDoc && allowFragments !== false &&
+          doc.changed.to - doc.changed.from < 100 &&
+          doc.changed.from <= startPos.line && doc.changed.to > query.end.line) {
+        files.push(getFragmentAround(doc, startPos, query.end));
+        query.file = "#0";
+        var offsetLines = files[0].offsetLines;
+        if (query.start != null) query.start = Pos(query.start.line - -offsetLines, query.start.ch);
+        query.end = Pos(query.end.line - offsetLines, query.end.ch);
+      } else {
+        files.push({type: "full",
+                    name: doc.name,
+                    text: docValue(ts, doc)});
+        query.file = doc.name;
+        doc.changed = null;
+      }
+    } else {
+      query.file = doc.name;
+    }
+    for (var name in ts.docs) {
+      var cur = ts.docs[name];
+      if (cur.changed && cur != doc) {
+        files.push({type: "full", name: cur.name, text: docValue(ts, cur)});
+        cur.changed = null;
+      }
+    }
+
+    return {query: query, files: files};
+  }
+
+  function getFragmentAround(data, start, end) {
+    var doc = data.doc;
+    var minIndent = null, minLine = null, endLine, tabSize = 4;
+    for (var p = start.line - 1, min = Math.max(0, p - 50); p >= min; --p) {
+      var line = doc.getLine(p), fn = line.search(/\bfunction\b/);
+      if (fn < 0) continue;
+      var indent = CodeMirror.countColumn(line, null, tabSize);
+      if (minIndent != null && minIndent <= indent) continue;
+      minIndent = indent;
+      minLine = p;
+    }
+    if (minLine == null) minLine = min;
+    var max = Math.min(doc.lastLine(), end.line + 20);
+    if (minIndent == null || minIndent == CodeMirror.countColumn(doc.getLine(start.line), null, tabSize))
+      endLine = max;
+    else for (endLine = end.line + 1; endLine < max; ++endLine) {
+      var indent = CodeMirror.countColumn(doc.getLine(endLine), null, tabSize);
+      if (indent <= minIndent) break;
+    }
+    var from = Pos(minLine, 0);
+
+    return {type: "part",
+            name: data.name,
+            offsetLines: from.line,
+            text: doc.getRange(from, Pos(endLine, 0))};
+  }
+
+  // Generic utilities
+
+  var cmpPos = CodeMirror.cmpPos;
+
+  function elt(tagname, cls /*, ... elts*/) {
+    var e = document.createElement(tagname);
+    if (cls) e.className = cls;
+    for (var i = 2; i < arguments.length; ++i) {
+      var elt = arguments[i];
+      if (typeof elt == "string") elt = document.createTextNode(elt);
+      e.appendChild(elt);
+    }
+    return e;
+  }
+
+  function dialog(cm, text, f) {
+    if (cm.openDialog)
+      cm.openDialog(text + ": <input type=text>", f);
+    else
+      f(prompt(text, ""));
+  }
+
+  // Tooltips
+
+  function tempTooltip(cm, content, ts) {
+    if (cm.state.ternTooltip) remove(cm.state.ternTooltip);
+    var where = cm.cursorCoords();
+    var tip = cm.state.ternTooltip = makeTooltip(where.right + 1, where.bottom, content);
+    function maybeClear() {
+      old = true;
+      if (!mouseOnTip) clear();
+    }
+    function clear() {
+      cm.state.ternTooltip = null;
+      if (!tip.parentNode) return;
+      cm.off("cursorActivity", clear);
+      cm.off('blur', clear);
+      cm.off('scroll', clear);
+      fadeOut(tip);
+    }
+    var mouseOnTip = false, old = false;
+    CodeMirror.on(tip, "mousemove", function() { mouseOnTip = true; });
+    CodeMirror.on(tip, "mouseout", function(e) {
+      if (!CodeMirror.contains(tip, e.relatedTarget || e.toElement)) {
+        if (old) clear();
+        else mouseOnTip = false;
+      }
+    });
+    setTimeout(maybeClear, ts.options.hintDelay ? ts.options.hintDelay : 1700);
+    cm.on("cursorActivity", clear);
+    cm.on('blur', clear);
+    cm.on('scroll', clear);
+  }
+
+  function makeTooltip(x, y, content) {
+    var node = elt("div", cls + "tooltip", content);
+    node.style.left = x + "px";
+    node.style.top = y + "px";
+    document.body.appendChild(node);
+    return node;
+  }
+
+  function remove(node) {
+    var p = node && node.parentNode;
+    if (p) p.removeChild(node);
+  }
+
+  function fadeOut(tooltip) {
+    tooltip.style.opacity = "0";
+    setTimeout(function() { remove(tooltip); }, 1100);
+  }
+
+  function showError(ts, cm, msg) {
+    if (ts.options.showError)
+      ts.options.showError(cm, msg);
+    else
+      tempTooltip(cm, String(msg), ts);
+  }
+
+  function closeArgHints(ts) {
+    if (ts.activeArgHints) { remove(ts.activeArgHints); ts.activeArgHints = null; }
+  }
+
+  function docValue(ts, doc) {
+    var val = doc.doc.getValue();
+    if (ts.options.fileFilter) val = ts.options.fileFilter(val, doc.name, doc.doc);
+    return val;
+  }
+
+  // Worker wrapper
+
+  function WorkerServer(ts) {
+    var worker = ts.worker = new Worker(ts.options.workerScript);
+    worker.postMessage({type: "init",
+                        defs: ts.options.defs,
+                        plugins: ts.options.plugins,
+                        scripts: ts.options.workerDeps});
+    var msgId = 0, pending = {};
+
+    function send(data, c) {
+      if (c) {
+        data.id = ++msgId;
+        pending[msgId] = c;
+      }
+      worker.postMessage(data);
+    }
+    worker.onmessage = function(e) {
+      var data = e.data;
+      if (data.type == "getFile") {
+        getFile(ts, data.name, function(err, text) {
+          send({type: "getFile", err: String(err), text: text, id: data.id});
+        });
+      } else if (data.type == "debug") {
+        window.console.log(data.message);
+      } else if (data.id && pending[data.id]) {
+        pending[data.id](data.err, data.body);
+        delete pending[data.id];
+      }
+    };
+    worker.onerror = function(e) {
+      for (var id in pending) pending[id](e);
+      pending = {};
+    };
+
+    this.addFile = function(name, text) { send({type: "add", name: name, text: text}); };
+    this.delFile = function(name) { send({type: "del", name: name}); };
+    this.request = function(body, c) { send({type: "req", body: body}, c); };
+  }
+});

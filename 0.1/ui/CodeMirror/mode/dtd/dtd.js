@@ -1,1 +1,142 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";t.defineMode("dtd",function(t){function e(t,e){return a=e,t}function n(t,n){var a=t.next();if("<"!=a||!t.eat("!")){if("<"==a&&t.eat("?"))return n.tokenize=u("meta","?>"),e("meta",a);if("#"==a&&t.eatWhile(/[\w]/))return e("atom","tag");if("|"==a)return e("keyword","seperator");if(a.match(/[\(\)\[\]\-\.,\+\?>]/))return e(null,a);if(a.match(/[\[\]]/))return e("rule",a);if('"'==a||"'"==a)return n.tokenize=i(a),n.tokenize(t,n);if(t.eatWhile(/[a-zA-Z\?\+\d]/)){var o=t.current();return null!==o.substr(o.length-1,o.length).match(/\?|\+/)&&t.backUp(1),e("tag","tag")}return"%"==a||"*"==a?e("number","number"):(t.eatWhile(/[\w\\\-_%.{,]/),e(null,null))}return t.eatWhile(/[\-]/)?(n.tokenize=r,r(t,n)):t.eatWhile(/[\w]/)?e("keyword","doindent"):void 0}function r(t,r){for(var i,u=0;null!=(i=t.next());){if(u>=2&&">"==i){r.tokenize=n;break}u="-"==i?u+1:0}return e("comment","comment")}function i(t){return function(r,i){for(var u,a=!1;null!=(u=r.next());){if(u==t&&!a){i.tokenize=n;break}a=!a&&"\\"==u}return e("string","tag")}}function u(t,e){return function(r,i){for(;!r.eol();){if(r.match(e)){i.tokenize=n;break}r.next()}return t}}var a,o=t.indentUnit;return{startState:function(t){return{tokenize:n,baseIndent:t||0,stack:[]}},token:function(t,e){if(t.eatSpace())return null;var n=e.tokenize(t,e),r=e.stack[e.stack.length-1];return"["==t.current()||"doindent"===a||"["==a?e.stack.push("rule"):"endtag"===a?e.stack[e.stack.length-1]="endtag":"]"==t.current()||"]"==a||">"==a&&"rule"==r?e.stack.pop():"["==a&&e.stack.push("["),n},indent:function(t,e){var n=t.stack.length;return e.match(/\]\s+|\]/)?n-=1:">"===e.substr(e.length-1,e.length)&&("<"===e.substr(0,1)||"doindent"==a&&e.length>1||("doindent"==a?n--:">"==a&&e.length>1||"tag"==a&&">"!==e||("tag"==a&&"rule"==t.stack[t.stack.length-1]?n--:"tag"==a?n++:">"===e&&"rule"==t.stack[t.stack.length-1]&&">"===a?n--:">"===e&&"rule"==t.stack[t.stack.length-1]||("<"!==e.substr(0,1)&&">"===e.substr(0,1)?n-=1:">"===e||(n-=1)))),(null==a||"]"==a)&&n--),t.baseIndent+n*o},electricChars:"]>"}}),t.defineMIME("application/xml-dtd","dtd")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+/*
+  DTD mode
+  Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
+  Report bugs/issues here: https://github.com/codemirror/CodeMirror/issues
+  GitHub: @peterkroon
+*/
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("dtd", function(config) {
+  var indentUnit = config.indentUnit, type;
+  function ret(style, tp) {type = tp; return style;}
+
+  function tokenBase(stream, state) {
+    var ch = stream.next();
+
+    if (ch == "<" && stream.eat("!") ) {
+      if (stream.eatWhile(/[\-]/)) {
+        state.tokenize = tokenSGMLComment;
+        return tokenSGMLComment(stream, state);
+      } else if (stream.eatWhile(/[\w]/)) return ret("keyword", "doindent");
+    } else if (ch == "<" && stream.eat("?")) { //xml declaration
+      state.tokenize = inBlock("meta", "?>");
+      return ret("meta", ch);
+    } else if (ch == "#" && stream.eatWhile(/[\w]/)) return ret("atom", "tag");
+    else if (ch == "|") return ret("keyword", "seperator");
+    else if (ch.match(/[\(\)\[\]\-\.,\+\?>]/)) return ret(null, ch);//if(ch === ">") return ret(null, "endtag"); else
+    else if (ch.match(/[\[\]]/)) return ret("rule", ch);
+    else if (ch == "\"" || ch == "'") {
+      state.tokenize = tokenString(ch);
+      return state.tokenize(stream, state);
+    } else if (stream.eatWhile(/[a-zA-Z\?\+\d]/)) {
+      var sc = stream.current();
+      if( sc.substr(sc.length-1,sc.length).match(/\?|\+/) !== null )stream.backUp(1);
+      return ret("tag", "tag");
+    } else if (ch == "%" || ch == "*" ) return ret("number", "number");
+    else {
+      stream.eatWhile(/[\w\\\-_%.{,]/);
+      return ret(null, null);
+    }
+  }
+
+  function tokenSGMLComment(stream, state) {
+    var dashes = 0, ch;
+    while ((ch = stream.next()) != null) {
+      if (dashes >= 2 && ch == ">") {
+        state.tokenize = tokenBase;
+        break;
+      }
+      dashes = (ch == "-") ? dashes + 1 : 0;
+    }
+    return ret("comment", "comment");
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      var escaped = false, ch;
+      while ((ch = stream.next()) != null) {
+        if (ch == quote && !escaped) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        escaped = !escaped && ch == "\\";
+      }
+      return ret("string", "tag");
+    };
+  }
+
+  function inBlock(style, terminator) {
+    return function(stream, state) {
+      while (!stream.eol()) {
+        if (stream.match(terminator)) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        stream.next();
+      }
+      return style;
+    };
+  }
+
+  return {
+    startState: function(base) {
+      return {tokenize: tokenBase,
+              baseIndent: base || 0,
+              stack: []};
+    },
+
+    token: function(stream, state) {
+      if (stream.eatSpace()) return null;
+      var style = state.tokenize(stream, state);
+
+      var context = state.stack[state.stack.length-1];
+      if (stream.current() == "[" || type === "doindent" || type == "[") state.stack.push("rule");
+      else if (type === "endtag") state.stack[state.stack.length-1] = "endtag";
+      else if (stream.current() == "]" || type == "]" || (type == ">" && context == "rule")) state.stack.pop();
+      else if (type == "[") state.stack.push("[");
+      return style;
+    },
+
+    indent: function(state, textAfter) {
+      var n = state.stack.length;
+
+      if( textAfter.match(/\]\s+|\]/) )n=n-1;
+      else if(textAfter.substr(textAfter.length-1, textAfter.length) === ">"){
+        if(textAfter.substr(0,1) === "<")n;
+        else if( type == "doindent" && textAfter.length > 1 )n;
+        else if( type == "doindent")n--;
+        else if( type == ">" && textAfter.length > 1)n;
+        else if( type == "tag" && textAfter !== ">")n;
+        else if( type == "tag" && state.stack[state.stack.length-1] == "rule")n--;
+        else if( type == "tag")n++;
+        else if( textAfter === ">" && state.stack[state.stack.length-1] == "rule" && type === ">")n--;
+        else if( textAfter === ">" && state.stack[state.stack.length-1] == "rule")n;
+        else if( textAfter.substr(0,1) !== "<" && textAfter.substr(0,1) === ">" )n=n-1;
+        else if( textAfter === ">")n;
+        else n=n-1;
+        //over rule them all
+        if(type == null || type == "]")n--;
+      }
+
+      return state.baseIndent + n * indentUnit;
+    },
+
+    electricChars: "]>"
+  };
+});
+
+CodeMirror.defineMIME("application/xml-dtd", "dtd");
+
+});

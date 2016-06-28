@@ -1,1 +1,126 @@
-Std.ui.module("SpinBox",{parent:"LineEdit",option:{min:"infinite",max:"infinite",minWidth:32,minHeight:12,defaultClass:"StdUI_SpinBox",validator:"Number"},extend:{initEvents:function(){var e=this,n=e.opts;e.D.input.on({keydown:function(e){var n=e.which,i=e.keyCode,t=this.value();switch(!0){case 190===i&&!t.has("."):isEmpty(t)&&this.value("0");break;case i>36&&41>i:case 173===n&&0===t.length:case 8===i||13===i:case n>47&&58>n:"0"==t&&this.value("");break;case 9===i:break;default:e.preventDefault()}},keyup:function(){var i=this.value();"infinite"!==n.min&&i<n.min?e.value(n.min):"infinite"!==n.max&&i>n.max&&e.value(n.max)}})}},"protected":{initHandle:function(){var e=this,n=function(){e.value(~~e.value()+1).select()},i=function(){e.value(~~e.value()-1).select()};return e[0].append(e.D.handles=newDiv("_handles").append([e.D.add=newDiv("_handle _add").mouse({down:n,longpress:n}),e.D.subtract=newDiv("_handle _subtract").mouse({down:i,longpress:i})]).on("mousedown",function(e){e.preventDefault()})),e}},"public":{value:function(e){var n=this,i=n.opts,t=n.D;return void 0===e?float(t.input.value()):(isNumber(e)||(e=float(e)),"infinite"!==i.min&&e<i.min&&(e=i.min),"infinite"!==i.max&&e>i.max&&(e=i.max),n.placeHolderState(""===e),t.input.value(e+""),n)}},main:function(e){e.initHandle()}});
+/**
+ *  Spin box
+*/
+Std.ui.module("SpinBox",{
+    /*[#module option:parent]*/
+    parent:"LineEdit",
+    /*[#module option:option]*/
+    option:{
+        min:"infinite",
+        max:"infinite",
+        minWidth:32,
+        minHeight:12,
+        defaultClass:"StdUI_SpinBox",
+        validator:"Number"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.D.input.on({
+                keydown:function(e){
+                    var which   = e.which;
+                    var keyCode = e.keyCode;
+                    var value   = this.value();
+
+                    switch(true){
+                        case keyCode === 190 && !value.has("."):
+                            if(isEmpty(value)){
+                                this.value("0");
+                            }
+                            break;
+                        case keyCode >36 && keyCode < 41:
+                        case which === 173 && value.length === 0:
+                        case keyCode === 8 || keyCode === 13:
+                        case which >47 && which <58:
+                            if(value == "0"){
+                                this.value("");
+                            }
+                            break;
+                        case keyCode === 9:
+                            break;
+                        default:
+                            e.preventDefault();
+                    }
+                },
+                keyup:function(){
+                    var value = this.value();
+                    if(opts.min !== "infinite" && value < opts.min){
+                        that.value(opts.min);
+                    }else if(opts.max !== "infinite" && value > opts.max){
+                        that.value(opts.max)
+                    }
+                }
+            });
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init handle
+        */
+        initHandle:function(){
+            var that     = this;
+            var add      = function(){
+                that.value(~~that.value() + 1).select();
+            };
+            var subtract = function(){
+                that.value(~~that.value() - 1).select();
+            };
+
+            that[0].append(
+                that.D.handles = newDiv("_handles").append([
+                    that.D.add      = newDiv("_handle _add").mouse({
+                        down:add,
+                        longpress:add
+                    }),
+                    that.D.subtract = newDiv("_handle _subtract").mouse({
+                        down:subtract,
+                        longpress:subtract
+                    })
+                ]).on("mousedown",function(e){
+                    e.preventDefault();
+                })
+            );
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * get or set value
+        */
+        value:function(value){
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
+
+            if(value === undefined){
+                return float(doms.input.value());
+            }
+            if(!isNumber(value)){
+                value = float(value);
+            }
+            if(opts.min !== "infinite" && value < opts.min){
+                value = opts.min;
+            }
+            if(opts.max !== "infinite" && value > opts.max){
+                value = opts.max;
+            }
+            that.placeHolderState(value === "");
+            doms.input.value(value + "");
+
+            return that;
+        }
+    },
+    /*[#module option:private]*/
+    main:function(that){
+        that.initHandle();
+    }
+});
+

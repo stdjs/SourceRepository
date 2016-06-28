@@ -1,1 +1,154 @@
-Std.ui.module("ToolBar",{parent:"widget",action:{children:"append"},option:{level:3,height:30,minHeight:28,items:null,styleType:"textBesideIcon",defaultClass:"StdUI_ToolBar"},extend:{render:function(){var e=this;e.items.each(function(e,t){t.render()})},height:function(e){var t=this;t.items.each(function(i,n){n.height(e-t.boxSize.height)})},remove:function(e){var t=this,i=t.items;if(void 0===e)t.clear();else if(isNumber(e))i[e].remove(),i.remove(e);else if(isWidget(e)){var n=i.indexOf(e);-1!==n&&(i[n].remove(),i.remove(n))}}},"protected":{createTool:function(e){var t=this,i=t.opts,n=null;return isWidget(e)?n=e:isString(e)?n=Std.ui("ToolButton",{text:e,styleType:i.styleType}):isObject(e)&&(e.styleType=i.styleType,n=Std.ui(e.ui||"ToolButton",e)),isWidget(n)&&n.parent(t),n}},"public":{append:Std.func(function(e){var t=this,i=t.createTool(e);null!==i&&(i.appendTo(t.D.buttons),t.renderState&&i.render(),t.items.push(i))},{each:[isArray]}),insert:function(e,t){var i=this,n=i.items.length;if(n>t){var r=i.createTool(e);null!==r&&(i.D.buttons.insertBefore(r,i.items[t]),i.items.insert(r,t))}else t===n&&i.append(e);return i},clear:function(){for(var e=this,t=e.items,i=0,n=t.length;n>i;i++)t[i].remove();return t.clear(),e}},main:function(e,t,i){e.D={buttons:newDiv("_buttons").appendTo(i)},e.items=[],t.items&&e.append(t.items)}});
+/**
+ * toolbar widget
+*/
+Std.ui.module("ToolBar",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:action]*/
+    action:{
+        children:"append"
+    },
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        height:30,
+        minHeight:28,
+        items:null,
+        styleType:"textBesideIcon", //textBesideIcon,textUnderIcon
+        defaultClass:"StdUI_ToolBar"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that.items.each(function(i,item){
+                item.render();
+            });
+        },
+        /*
+         *  height
+        */
+        height:function(height){
+            var that = this;
+
+            that.items.each(function(i,item){
+                item.height(height - that.boxSize.height);
+            });
+        },
+        /*
+         *  remove
+        */
+        remove:function(button){
+            var that  = this;
+            var items = that.items;
+
+            if(button === undefined){
+                that.clear();
+            }else if(isNumber(button)){
+                items[button].remove();
+                items.remove(button);
+            }else if(isWidget(button)){
+                var index = items.indexOf(button);
+                if(index !== -1){
+                    items[index].remove();
+                    items.remove(index);
+                }
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * create tool
+        */
+        createTool:function(data){
+            var that  = this;
+            var opts  = that.opts;
+            var item  = null;
+
+            if(isWidget(data)){
+                item = data;
+            }else if(isString(data)){
+                item = Std.ui("ToolButton",{
+                    text:data,
+                    styleType:opts.styleType
+                });
+            }else if(isObject(data)){
+                data.styleType = opts.styleType;
+                item = Std.ui(data.ui || "ToolButton",data)
+            }
+
+            if(isWidget(item)){
+                item.parent(that);
+            }
+            return item;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * append tool button
+        */
+        append:Std.func(function(data){
+            var that = this;
+            var item = that.createTool(data);
+
+            if(item !== null){
+                item.appendTo(that.D.buttons);
+                if(that.renderState){
+                    item.render();
+                }
+                that.items.push(item);
+            }
+        },{
+            each:[isArray]
+        }),
+        /*
+         * insert tool button
+        */
+        insert:function(data,pos){
+            var that   = this;
+            var length = that.items.length;
+
+            if(pos < length){
+                var item = that.createTool(data);
+                if(item !== null){
+                    that.D.buttons.insertBefore(item,that.items[pos]);
+                    that.items.insert(item,pos);
+                }
+            }else if(pos === length){
+                that.append(data);
+            }
+            return that;
+        },
+        /*
+         * clear tool buttons
+        */
+        clear:function(){
+            var that  = this;
+            var items = that.items;
+
+            for(var i=0,length=items.length;i<length;i++){
+                items[i].remove();
+            }
+            items.clear();
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.D     = {
+            buttons:newDiv("_buttons").appendTo(dom)
+        };
+        that.items = [];
+
+        if(opts.items){
+            that.append(opts.items);
+        }
+    }
+});

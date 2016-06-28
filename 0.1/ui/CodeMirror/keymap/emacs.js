@@ -1,1 +1,412 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../lib/codemirror")):"function"==typeof define&&define.amd?define(["../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";function e(t,e){return t.line==e.line&&t.ch==e.ch}function n(t){M.push(t),M.length>50&&M.shift()}function r(t){return M.length?void(M[M.length-1]+=t):n(t)}function o(t){return M[M.length-(t?Math.min(t,1):1)]||""}function i(){return M.length>1&&M.pop(),o()}function l(t,o,i,l,c){null==c&&(c=t.getRange(o,i)),l&&B&&B.cm==t&&e(o,B.pos)&&t.isClean(B.gen)?r(c):n(c),t.replaceRange("",o,i,"+delete"),B=l?{cm:t,pos:o,gen:t.changeGeneration()}:null}function c(t,e,n){return t.findPosH(e,n,"char",!0)}function a(t,e,n){return t.findPosH(e,n,"word",!0)}function u(t,e,n){return t.findPosV(e,n,"line",t.doc.sel.goalColumn)}function f(t,e,n){return t.findPosV(e,n,"page",t.doc.sel.goalColumn)}function s(t,e,n){for(var r=e.line,o=t.getLine(r),i=/\S/.test(0>n?o.slice(0,e.ch):o.slice(e.ch)),l=t.firstLine(),c=t.lastLine();;){if(r+=n,l>r||r>c)return t.clipPos(H(r-n,0>n?0:null));o=t.getLine(r);var a=/\S/.test(o);if(a)i=!0;else if(i)return H(r,0)}}function C(t,e,n){for(var r=e.line,o=e.ch,i=t.getLine(e.line),l=!1;;){var c=i.charAt(o+(0>n?-1:0));if(c){if(l&&/[!?.]/.test(c))return H(r,o+(n>0?1:0));l||(l=/\w/.test(c)),o+=n}else{if(r==(0>n?t.firstLine():t.lastLine()))return H(r,o);if(i=t.getLine(r+n),!/\S/.test(i))return H(r,o);r+=n,o=0>n?i.length:0}}}function g(t,n,r){var o;if(t.findMatchingBracket&&(o=t.findMatchingBracket(n,!0))&&o.match&&(o.forward?1:-1)==r)return r>0?H(o.to.line,o.to.ch+1):o.to;for(var i=!0;;i=!1){var l=t.getTokenAt(n),c=H(n.line,0>r?l.start:l.end);if(!(i&&r>0&&l.end==n.ch)&&/\w/.test(l.string))return c;var a=t.findPosH(c,r,"char");if(e(c,a))return n;n=a}}function d(t,e){var n=t.state.emacsPrefix;return n?(x(t),"-"==n?-1:Number(n)):e?null:1}function p(t){var e="string"==typeof t?function(e){e.execCommand(t)}:t;return function(t){var n=d(t);e(t);for(var r=1;n>r;++r)e(t)}}function h(t,n,r,o){var i=d(t);0>i&&(o=-o,i=-i);for(var l=0;i>l;++l){var c=r(t,n,o);if(e(c,n))break;n=c}return n}function v(t,e){var n=function(n){n.extendSelection(h(n,n.getCursor(),t,e))};return n.motion=!0,n}function A(t,e,n){for(var r,o=t.listSelections(),i=o.length;i--;)r=o[i].head,l(t,r,h(t,r,e,n),!0)}function m(t){if(t.somethingSelected()){for(var e,n=t.listSelections(),r=n.length;r--;)e=n[r],l(t,e.anchor,e.head);return!0}}function S(t,e){return t.state.emacsPrefix?void("-"!=e&&(t.state.emacsPrefix+=e)):(t.state.emacsPrefix=e,t.on("keyHandled",P),void t.on("inputRead",L))}function P(t,e){t.state.emacsPrefixMap||G.hasOwnProperty(e)||x(t)}function x(t){t.state.emacsPrefix=null,t.off("keyHandled",P),t.off("inputRead",L)}function L(t,e){var n=d(t);if(n>1&&"+input"==e.origin){for(var r=e.text.join("\n"),o="",i=1;n>i;++i)o+=r;t.replaceSelection(o)}}function R(t){t.state.emacsPrefixMap=!0,t.addKeyMap(T),t.on("keyHandled",y),t.on("inputRead",y)}function y(t,e){("string"!=typeof e||!/^\d$/.test(e)&&"Ctrl-U"!=e)&&(t.removeKeyMap(T),t.state.emacsPrefixMap=!1,t.off("keyHandled",y),t.off("inputRead",y))}function w(t){t.setCursor(t.getCursor()),t.setExtending(!t.getExtending()),t.on("change",function(){t.setExtending(!1)})}function b(t){t.setExtending(!1),t.setCursor(t.getCursor())}function k(t,e,n){t.openDialog?t.openDialog(e+': <input type="text" style="width: 10em"/>',n,{bottom:!0}):n(prompt(e,""))}function U(t,e){var n=t.getCursor(),r=t.findPosH(n,1,"word");t.replaceRange(e(t.getRange(n,r)),n,r),t.setCursor(r)}function X(t){for(var e=t.getCursor(),n=e.line,r=e.ch,o=[];n>=t.firstLine();){for(var i=t.getLine(n),l=null==r?i.length:r;l>0;){var r=i.charAt(--l);if(")"==r)o.push("(");else if("]"==r)o.push("[");else if("}"==r)o.push("{");else if(/[\(\{\[]/.test(r)&&(!o.length||o.pop()!=r))return t.extendSelection(H(n,l))}--n,r=null}}function D(t){t.execCommand("clearSearch"),b(t)}function E(t){T[t]=function(e){S(e,t)},K["Ctrl-"+t]=function(e){S(e,t)},G["Ctrl-"+t]=!0}for(var H=t.Pos,M=[],B=null,G={"Alt-G":!0,"Ctrl-X":!0,"Ctrl-Q":!0,"Ctrl-U":!0},K=t.keyMap.emacs=t.normalizeKeyMap({"Ctrl-W":function(t){l(t,t.getCursor("start"),t.getCursor("end"))},"Ctrl-K":p(function(t){var e=t.getCursor(),n=t.clipPos(H(e.line)),r=t.getRange(e,n);/\S/.test(r)||(r+="\n",n=H(e.line+1,0)),l(t,e,n,!0,r)}),"Alt-W":function(t){n(t.getSelection()),b(t)},"Ctrl-Y":function(t){var e=t.getCursor();t.replaceRange(o(d(t)),e,e,"paste"),t.setSelection(e,t.getCursor())},"Alt-Y":function(t){t.replaceSelection(i(),"around","paste")},"Ctrl-Space":w,"Ctrl-Shift-2":w,"Ctrl-F":v(c,1),"Ctrl-B":v(c,-1),Right:v(c,1),Left:v(c,-1),"Ctrl-D":function(t){A(t,c,1)},Delete:function(t){m(t)||A(t,c,1)},"Ctrl-H":function(t){A(t,c,-1)},Backspace:function(t){m(t)||A(t,c,-1)},"Alt-F":v(a,1),"Alt-B":v(a,-1),"Alt-D":function(t){A(t,a,1)},"Alt-Backspace":function(t){A(t,a,-1)},"Ctrl-N":v(u,1),"Ctrl-P":v(u,-1),Down:v(u,1),Up:v(u,-1),"Ctrl-A":"goLineStart","Ctrl-E":"goLineEnd",End:"goLineEnd",Home:"goLineStart","Alt-V":v(f,-1),"Ctrl-V":v(f,1),PageUp:v(f,-1),PageDown:v(f,1),"Ctrl-Up":v(s,-1),"Ctrl-Down":v(s,1),"Alt-A":v(C,-1),"Alt-E":v(C,1),"Alt-K":function(t){A(t,C,1)},"Ctrl-Alt-K":function(t){A(t,g,1)},"Ctrl-Alt-Backspace":function(t){A(t,g,-1)},"Ctrl-Alt-F":v(g,1),"Ctrl-Alt-B":v(g,-1),"Shift-Ctrl-Alt-2":function(t){var e=t.getCursor();t.setSelection(h(t,e,g,1),e)},"Ctrl-Alt-T":function(t){var e=g(t,t.getCursor(),-1),n=g(t,e,1),r=g(t,n,1),o=g(t,r,-1);t.replaceRange(t.getRange(o,r)+t.getRange(n,o)+t.getRange(e,n),e,r)},"Ctrl-Alt-U":p(X),"Alt-Space":function(t){for(var e=t.getCursor(),n=e.ch,r=e.ch,o=t.getLine(e.line);n&&/\s/.test(o.charAt(n-1));)--n;for(;r<o.length&&/\s/.test(o.charAt(r));)++r;t.replaceRange(" ",H(e.line,n),H(e.line,r))},"Ctrl-O":p(function(t){t.replaceSelection("\n","start")}),"Ctrl-T":p(function(t){t.execCommand("transposeChars")}),"Alt-C":p(function(t){U(t,function(t){var e=t.search(/\w/);return-1==e?t:t.slice(0,e)+t.charAt(e).toUpperCase()+t.slice(e+1).toLowerCase()})}),"Alt-U":p(function(t){U(t,function(t){return t.toUpperCase()})}),"Alt-L":p(function(t){U(t,function(t){return t.toLowerCase()})}),"Alt-;":"toggleComment","Ctrl-/":p("undo"),"Shift-Ctrl--":p("undo"),"Ctrl-Z":p("undo"),"Cmd-Z":p("undo"),"Shift-Alt-,":"goDocStart","Shift-Alt-.":"goDocEnd","Ctrl-S":"findNext","Ctrl-R":"findPrev","Ctrl-G":D,"Shift-Alt-5":"replace","Alt-/":"autocomplete","Ctrl-J":"newlineAndIndent",Enter:!1,Tab:"indentAuto","Alt-G G":function(t){var e=d(t,!0);return null!=e&&e>0?t.setCursor(e-1):void k(t,"Goto line",function(e){var n;e&&!isNaN(n=Number(e))&&n==(0|n)&&n>0&&t.setCursor(n-1)})},"Ctrl-X Tab":function(t){t.indentSelection(d(t,!0)||t.getOption("indentUnit"))},"Ctrl-X Ctrl-X":function(t){t.setSelection(t.getCursor("head"),t.getCursor("anchor"))},"Ctrl-X Ctrl-S":"save","Ctrl-X Ctrl-W":"save","Ctrl-X S":"saveAll","Ctrl-X F":"open","Ctrl-X U":p("undo"),"Ctrl-X K":"close","Ctrl-X Delete":function(t){l(t,t.getCursor(),C(t,t.getCursor(),1),!0)},"Ctrl-X H":"selectAll","Ctrl-Q Tab":p("insertTab"),"Ctrl-U":R}),T={"Ctrl-G":x},N=0;10>N;++N)E(String(N));E("-")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var Pos = CodeMirror.Pos;
+  function posEq(a, b) { return a.line == b.line && a.ch == b.ch; }
+
+  // Kill 'ring'
+
+  var killRing = [];
+  function addToRing(str) {
+    killRing.push(str);
+    if (killRing.length > 50) killRing.shift();
+  }
+  function growRingTop(str) {
+    if (!killRing.length) return addToRing(str);
+    killRing[killRing.length - 1] += str;
+  }
+  function getFromRing(n) { return killRing[killRing.length - (n ? Math.min(n, 1) : 1)] || ""; }
+  function popFromRing() { if (killRing.length > 1) killRing.pop(); return getFromRing(); }
+
+  var lastKill = null;
+
+  function kill(cm, from, to, mayGrow, text) {
+    if (text == null) text = cm.getRange(from, to);
+
+    if (mayGrow && lastKill && lastKill.cm == cm && posEq(from, lastKill.pos) && cm.isClean(lastKill.gen))
+      growRingTop(text);
+    else
+      addToRing(text);
+    cm.replaceRange("", from, to, "+delete");
+
+    if (mayGrow) lastKill = {cm: cm, pos: from, gen: cm.changeGeneration()};
+    else lastKill = null;
+  }
+
+  // Boundaries of various units
+
+  function byChar(cm, pos, dir) {
+    return cm.findPosH(pos, dir, "char", true);
+  }
+
+  function byWord(cm, pos, dir) {
+    return cm.findPosH(pos, dir, "word", true);
+  }
+
+  function byLine(cm, pos, dir) {
+    return cm.findPosV(pos, dir, "line", cm.doc.sel.goalColumn);
+  }
+
+  function byPage(cm, pos, dir) {
+    return cm.findPosV(pos, dir, "page", cm.doc.sel.goalColumn);
+  }
+
+  function byParagraph(cm, pos, dir) {
+    var no = pos.line, line = cm.getLine(no);
+    var sawText = /\S/.test(dir < 0 ? line.slice(0, pos.ch) : line.slice(pos.ch));
+    var fst = cm.firstLine(), lst = cm.lastLine();
+    for (;;) {
+      no += dir;
+      if (no < fst || no > lst)
+        return cm.clipPos(Pos(no - dir, dir < 0 ? 0 : null));
+      line = cm.getLine(no);
+      var hasText = /\S/.test(line);
+      if (hasText) sawText = true;
+      else if (sawText) return Pos(no, 0);
+    }
+  }
+
+  function bySentence(cm, pos, dir) {
+    var line = pos.line, ch = pos.ch;
+    var text = cm.getLine(pos.line), sawWord = false;
+    for (;;) {
+      var next = text.charAt(ch + (dir < 0 ? -1 : 0));
+      if (!next) { // End/beginning of line reached
+        if (line == (dir < 0 ? cm.firstLine() : cm.lastLine())) return Pos(line, ch);
+        text = cm.getLine(line + dir);
+        if (!/\S/.test(text)) return Pos(line, ch);
+        line += dir;
+        ch = dir < 0 ? text.length : 0;
+        continue;
+      }
+      if (sawWord && /[!?.]/.test(next)) return Pos(line, ch + (dir > 0 ? 1 : 0));
+      if (!sawWord) sawWord = /\w/.test(next);
+      ch += dir;
+    }
+  }
+
+  function byExpr(cm, pos, dir) {
+    var wrap;
+    if (cm.findMatchingBracket && (wrap = cm.findMatchingBracket(pos, true))
+        && wrap.match && (wrap.forward ? 1 : -1) == dir)
+      return dir > 0 ? Pos(wrap.to.line, wrap.to.ch + 1) : wrap.to;
+
+    for (var first = true;; first = false) {
+      var token = cm.getTokenAt(pos);
+      var after = Pos(pos.line, dir < 0 ? token.start : token.end);
+      if (first && dir > 0 && token.end == pos.ch || !/\w/.test(token.string)) {
+        var newPos = cm.findPosH(after, dir, "char");
+        if (posEq(after, newPos)) return pos;
+        else pos = newPos;
+      } else {
+        return after;
+      }
+    }
+  }
+
+  // Prefixes (only crudely supported)
+
+  function getPrefix(cm, precise) {
+    var digits = cm.state.emacsPrefix;
+    if (!digits) return precise ? null : 1;
+    clearPrefix(cm);
+    return digits == "-" ? -1 : Number(digits);
+  }
+
+  function repeated(cmd) {
+    var f = typeof cmd == "string" ? function(cm) { cm.execCommand(cmd); } : cmd;
+    return function(cm) {
+      var prefix = getPrefix(cm);
+      f(cm);
+      for (var i = 1; i < prefix; ++i) f(cm);
+    };
+  }
+
+  function findEnd(cm, pos, by, dir) {
+    var prefix = getPrefix(cm);
+    if (prefix < 0) { dir = -dir; prefix = -prefix; }
+    for (var i = 0; i < prefix; ++i) {
+      var newPos = by(cm, pos, dir);
+      if (posEq(newPos, pos)) break;
+      pos = newPos;
+    }
+    return pos;
+  }
+
+  function move(by, dir) {
+    var f = function(cm) {
+      cm.extendSelection(findEnd(cm, cm.getCursor(), by, dir));
+    };
+    f.motion = true;
+    return f;
+  }
+
+  function killTo(cm, by, dir) {
+    var selections = cm.listSelections(), cursor;
+    var i = selections.length;
+    while (i--) {
+      cursor = selections[i].head;
+      kill(cm, cursor, findEnd(cm, cursor, by, dir), true);
+    }
+  }
+
+  function killRegion(cm) {
+    if (cm.somethingSelected()) {
+      var selections = cm.listSelections(), selection;
+      var i = selections.length;
+      while (i--) {
+        selection = selections[i];
+        kill(cm, selection.anchor, selection.head);
+      }
+      return true;
+    }
+  }
+
+  function addPrefix(cm, digit) {
+    if (cm.state.emacsPrefix) {
+      if (digit != "-") cm.state.emacsPrefix += digit;
+      return;
+    }
+    // Not active yet
+    cm.state.emacsPrefix = digit;
+    cm.on("keyHandled", maybeClearPrefix);
+    cm.on("inputRead", maybeDuplicateInput);
+  }
+
+  var prefixPreservingKeys = {"Alt-G": true, "Ctrl-X": true, "Ctrl-Q": true, "Ctrl-U": true};
+
+  function maybeClearPrefix(cm, arg) {
+    if (!cm.state.emacsPrefixMap && !prefixPreservingKeys.hasOwnProperty(arg))
+      clearPrefix(cm);
+  }
+
+  function clearPrefix(cm) {
+    cm.state.emacsPrefix = null;
+    cm.off("keyHandled", maybeClearPrefix);
+    cm.off("inputRead", maybeDuplicateInput);
+  }
+
+  function maybeDuplicateInput(cm, event) {
+    var dup = getPrefix(cm);
+    if (dup > 1 && event.origin == "+input") {
+      var one = event.text.join("\n"), txt = "";
+      for (var i = 1; i < dup; ++i) txt += one;
+      cm.replaceSelection(txt);
+    }
+  }
+
+  function addPrefixMap(cm) {
+    cm.state.emacsPrefixMap = true;
+    cm.addKeyMap(prefixMap);
+    cm.on("keyHandled", maybeRemovePrefixMap);
+    cm.on("inputRead", maybeRemovePrefixMap);
+  }
+
+  function maybeRemovePrefixMap(cm, arg) {
+    if (typeof arg == "string" && (/^\d$/.test(arg) || arg == "Ctrl-U")) return;
+    cm.removeKeyMap(prefixMap);
+    cm.state.emacsPrefixMap = false;
+    cm.off("keyHandled", maybeRemovePrefixMap);
+    cm.off("inputRead", maybeRemovePrefixMap);
+  }
+
+  // Utilities
+
+  function setMark(cm) {
+    cm.setCursor(cm.getCursor());
+    cm.setExtending(!cm.getExtending());
+    cm.on("change", function() { cm.setExtending(false); });
+  }
+
+  function clearMark(cm) {
+    cm.setExtending(false);
+    cm.setCursor(cm.getCursor());
+  }
+
+  function getInput(cm, msg, f) {
+    if (cm.openDialog)
+      cm.openDialog(msg + ": <input type=\"text\" style=\"width: 10em\"/>", f, {bottom: true});
+    else
+      f(prompt(msg, ""));
+  }
+
+  function operateOnWord(cm, op) {
+    var start = cm.getCursor(), end = cm.findPosH(start, 1, "word");
+    cm.replaceRange(op(cm.getRange(start, end)), start, end);
+    cm.setCursor(end);
+  }
+
+  function toEnclosingExpr(cm) {
+    var pos = cm.getCursor(), line = pos.line, ch = pos.ch;
+    var stack = [];
+    while (line >= cm.firstLine()) {
+      var text = cm.getLine(line);
+      for (var i = ch == null ? text.length : ch; i > 0;) {
+        var ch = text.charAt(--i);
+        if (ch == ")")
+          stack.push("(");
+        else if (ch == "]")
+          stack.push("[");
+        else if (ch == "}")
+          stack.push("{");
+        else if (/[\(\{\[]/.test(ch) && (!stack.length || stack.pop() != ch))
+          return cm.extendSelection(Pos(line, i));
+      }
+      --line; ch = null;
+    }
+  }
+
+  function quit(cm) {
+    cm.execCommand("clearSearch");
+    clearMark(cm);
+  }
+
+  // Actual keymap
+
+  var keyMap = CodeMirror.keyMap.emacs = CodeMirror.normalizeKeyMap({
+    "Ctrl-W": function(cm) {kill(cm, cm.getCursor("start"), cm.getCursor("end"));},
+    "Ctrl-K": repeated(function(cm) {
+      var start = cm.getCursor(), end = cm.clipPos(Pos(start.line));
+      var text = cm.getRange(start, end);
+      if (!/\S/.test(text)) {
+        text += "\n";
+        end = Pos(start.line + 1, 0);
+      }
+      kill(cm, start, end, true, text);
+    }),
+    "Alt-W": function(cm) {
+      addToRing(cm.getSelection());
+      clearMark(cm);
+    },
+    "Ctrl-Y": function(cm) {
+      var start = cm.getCursor();
+      cm.replaceRange(getFromRing(getPrefix(cm)), start, start, "paste");
+      cm.setSelection(start, cm.getCursor());
+    },
+    "Alt-Y": function(cm) {cm.replaceSelection(popFromRing(), "around", "paste");},
+
+    "Ctrl-Space": setMark, "Ctrl-Shift-2": setMark,
+
+    "Ctrl-F": move(byChar, 1), "Ctrl-B": move(byChar, -1),
+    "Right": move(byChar, 1), "Left": move(byChar, -1),
+    "Ctrl-D": function(cm) { killTo(cm, byChar, 1); },
+    "Delete": function(cm) { killRegion(cm) || killTo(cm, byChar, 1); },
+    "Ctrl-H": function(cm) { killTo(cm, byChar, -1); },
+    "Backspace": function(cm) { killRegion(cm) || killTo(cm, byChar, -1); },
+
+    "Alt-F": move(byWord, 1), "Alt-B": move(byWord, -1),
+    "Alt-D": function(cm) { killTo(cm, byWord, 1); },
+    "Alt-Backspace": function(cm) { killTo(cm, byWord, -1); },
+
+    "Ctrl-N": move(byLine, 1), "Ctrl-P": move(byLine, -1),
+    "Down": move(byLine, 1), "Up": move(byLine, -1),
+    "Ctrl-A": "goLineStart", "Ctrl-E": "goLineEnd",
+    "End": "goLineEnd", "Home": "goLineStart",
+
+    "Alt-V": move(byPage, -1), "Ctrl-V": move(byPage, 1),
+    "PageUp": move(byPage, -1), "PageDown": move(byPage, 1),
+
+    "Ctrl-Up": move(byParagraph, -1), "Ctrl-Down": move(byParagraph, 1),
+
+    "Alt-A": move(bySentence, -1), "Alt-E": move(bySentence, 1),
+    "Alt-K": function(cm) { killTo(cm, bySentence, 1); },
+
+    "Ctrl-Alt-K": function(cm) { killTo(cm, byExpr, 1); },
+    "Ctrl-Alt-Backspace": function(cm) { killTo(cm, byExpr, -1); },
+    "Ctrl-Alt-F": move(byExpr, 1), "Ctrl-Alt-B": move(byExpr, -1),
+
+    "Shift-Ctrl-Alt-2": function(cm) {
+      var cursor = cm.getCursor();
+      cm.setSelection(findEnd(cm, cursor, byExpr, 1), cursor);
+    },
+    "Ctrl-Alt-T": function(cm) {
+      var leftStart = byExpr(cm, cm.getCursor(), -1), leftEnd = byExpr(cm, leftStart, 1);
+      var rightEnd = byExpr(cm, leftEnd, 1), rightStart = byExpr(cm, rightEnd, -1);
+      cm.replaceRange(cm.getRange(rightStart, rightEnd) + cm.getRange(leftEnd, rightStart) +
+                      cm.getRange(leftStart, leftEnd), leftStart, rightEnd);
+    },
+    "Ctrl-Alt-U": repeated(toEnclosingExpr),
+
+    "Alt-Space": function(cm) {
+      var pos = cm.getCursor(), from = pos.ch, to = pos.ch, text = cm.getLine(pos.line);
+      while (from && /\s/.test(text.charAt(from - 1))) --from;
+      while (to < text.length && /\s/.test(text.charAt(to))) ++to;
+      cm.replaceRange(" ", Pos(pos.line, from), Pos(pos.line, to));
+    },
+    "Ctrl-O": repeated(function(cm) { cm.replaceSelection("\n", "start"); }),
+    "Ctrl-T": repeated(function(cm) {
+      cm.execCommand("transposeChars");
+    }),
+
+    "Alt-C": repeated(function(cm) {
+      operateOnWord(cm, function(w) {
+        var letter = w.search(/\w/);
+        if (letter == -1) return w;
+        return w.slice(0, letter) + w.charAt(letter).toUpperCase() + w.slice(letter + 1).toLowerCase();
+      });
+    }),
+    "Alt-U": repeated(function(cm) {
+      operateOnWord(cm, function(w) { return w.toUpperCase(); });
+    }),
+    "Alt-L": repeated(function(cm) {
+      operateOnWord(cm, function(w) { return w.toLowerCase(); });
+    }),
+
+    "Alt-;": "toggleComment",
+
+    "Ctrl-/": repeated("undo"), "Shift-Ctrl--": repeated("undo"),
+    "Ctrl-Z": repeated("undo"), "Cmd-Z": repeated("undo"),
+    "Shift-Alt-,": "goDocStart", "Shift-Alt-.": "goDocEnd",
+    "Ctrl-S": "findNext", "Ctrl-R": "findPrev", "Ctrl-G": quit, "Shift-Alt-5": "replace",
+    "Alt-/": "autocomplete",
+    "Ctrl-J": "newlineAndIndent", "Enter": false, "Tab": "indentAuto",
+
+    "Alt-G G": function(cm) {
+      var prefix = getPrefix(cm, true);
+      if (prefix != null && prefix > 0) return cm.setCursor(prefix - 1);
+
+      getInput(cm, "Goto line", function(str) {
+        var num;
+        if (str && !isNaN(num = Number(str)) && num == (num|0) && num > 0)
+          cm.setCursor(num - 1);
+      });
+    },
+
+    "Ctrl-X Tab": function(cm) {
+      cm.indentSelection(getPrefix(cm, true) || cm.getOption("indentUnit"));
+    },
+    "Ctrl-X Ctrl-X": function(cm) {
+      cm.setSelection(cm.getCursor("head"), cm.getCursor("anchor"));
+    },
+    "Ctrl-X Ctrl-S": "save",
+    "Ctrl-X Ctrl-W": "save",
+    "Ctrl-X S": "saveAll",
+    "Ctrl-X F": "open",
+    "Ctrl-X U": repeated("undo"),
+    "Ctrl-X K": "close",
+    "Ctrl-X Delete": function(cm) { kill(cm, cm.getCursor(), bySentence(cm, cm.getCursor(), 1), true); },
+    "Ctrl-X H": "selectAll",
+
+    "Ctrl-Q Tab": repeated("insertTab"),
+    "Ctrl-U": addPrefixMap
+  });
+
+  var prefixMap = {"Ctrl-G": clearPrefix};
+  function regPrefix(d) {
+    prefixMap[d] = function(cm) { addPrefix(cm, d); };
+    keyMap["Ctrl-" + d] = function(cm) { addPrefix(cm, d); };
+    prefixPreservingKeys["Ctrl-" + d] = true;
+  }
+  for (var i = 0; i < 10; ++i) regPrefix(String(i));
+  regPrefix("-");
+});

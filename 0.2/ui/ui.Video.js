@@ -1,0 +1,6 @@
+/**
+    Std UI Kit Library
+    http://ui.stdjs.com
+	module: Video
+*/
+Std.ui.module("video",{b:"widget",e:{defaultClass:"StdUI_Video",autoplay:!1,preload:!0,src:null,loop:!1},c:"statusChange",g:{render:function(){var t=this,o=t.opts;o.autoplay&&t.play()},width:function(t){var o=this,s=o.dom,a=-o.outerSize.width;a+=isNumber(t)?t:o.width(),s.video.width(a)},height:function(t){var o=this,s=o.dom,a=-o.outerSize.height;a+=isNumber(t)?t:o.height(),s.video.height(a)}},j:{autoplay:function(t){return this.opt("autoplay",t)},preload:function(t){return this.opt("preload",t)},src:function(t){return this.opt("src",t)},loop:function(t){return this.opt("loop",t)},status:function(t){var o=this,s=o.D.video.dom;switch(t){case"play":s.play();break;case"pause":s.pause();break;case"stop":s.stop()}return o.emit("statusChange",t)},play:function(t){var o=this;return void 0==t?"play"==o.status():(o.status(1==t?"play":"stop"),o)},pause:function(t){var o=this;return void 0==t?"pause"==o.status():(o.status(1==t?"pause":"play"),o)},stop:function(t){var o=this;return void 0==t?"stop"==o.status():(o.status(1==t?"stop":"play"),o)}},k:function(t,o,s){t.D={},s.appendChild(t.D.video=newDom("video"))}});

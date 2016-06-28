@@ -1,1 +1,188 @@
-Std.css({".StdUI_Label":{"float":"left",fontSize:"12px",color:"#3B3B3B",overflow:"hidden",textOverflow:"ellipsis",textDecoration:"none"}}),Std.ui.module("Label",{parent:"widget",nodeName:"a",action:{content:"value"},option:{defaultClass:"StdUI_Label",level:1,bold:!1,underline:!1,wordwrap:!1,wordnowrap:!1,textAlign:null,color:null,fontSize:12,lineHeight:null,indent:0,href:null,target:null,value:"label",background:"",textFormat:"html"},"public":{textFormat:function(t){return this.opt("textFormat",t)},href:function(t){return this.opt("href",t,function(){this[0].attr("href",t)})},target:function(t){return this.opt("target",t,function(){this[0].attr("target",t)})},wordwrap:function(t){var n=this;return n.opt("wordwrap",t,function(){n.toggleClass("Std_wordwrap",t)})},wordnowrap:function(t){var n=this;return n.opt("wordnowrap",t,function(){n.toggleClass("Std_wordnowrap",t)})},value:function(t){var n=this;return n.opt("value",t,function(){n[0][n.opts.textFormat](t)})},color:function(t){var n=this;return void 0===t?n[0].color():(n[0].color(t),n)},fontSize:function(t){return this.opt("fontSize",t,function(){this[0].css("font-size",t+"px")})},lineHeight:function(t){var n=this;return void 0===t?n[0].css("lineHeight"):n[0].css("lineHeight",t)},bold:function(t){var n=this;return n.opt("state",t,function(){n[0].css("font-weight",t?"bold":"")})},underline:function(t){var n=this;return n.opt("underline",t,function(){n[0].css("text-decoration",t?"underline":"")})},indent:function(t){return this.opt("indent",t,function(){this[0].css("text-indent",t+"px")})},background:function(t){return this.opt("background",t,function(){this[0].css("background",t)})},textAlign:function(t){return this.opt("textAlign",t,function(){this[0].css("text-align",t)})}},main:function(t){t.call_opts({bold:!1,indent:0,underline:!1,background:""},!0),t.call_opts(["fontSize","color","wordwrap","wordnowrap","lineHeight","textAlign","href","target"],!0),t.call_opts("value")}});
+/**
+ * init label module base css
+*/
+Std.css({
+    ".StdUI_Label":{
+        float:"left",
+        fontSize:"12px",
+        color:"#3B3B3B",
+        overflow:"hidden",
+        textOverflow:"ellipsis",
+        textDecoration: "none"
+    }
+});
+
+/**
+ * label widget module
+*/
+Std.ui.module("Label",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:nodeName]*/
+    nodeName:"a",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_Label",
+        level:1,
+        bold:false,
+        underline:false,
+        wordwrap:false,
+        wordnowrap:false,
+        textAlign:null,
+        color:null,
+        fontSize:12,
+        lineHeight:null,
+        indent:0,
+        href:null,
+        target:null,
+        value:"label",
+        background:"",
+        textFormat:"html"    //html,text
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * text format
+        */
+        textFormat:function(type){
+            return this.opt("textFormat",type);
+        },
+        /*
+         * href
+        */
+        href:function(href){
+            return this.opt("href",href,function(){
+                this[0].attr("href",href);
+            });
+        },
+        /*
+         * target
+        */
+        target:function(href){
+            return this.opt("target",href,function(){
+                this[0].attr("target",href);
+            });
+        },
+        /*
+         * get or set wordwrap
+        */
+        wordwrap:function(state){
+            var that = this;
+
+            return that.opt("wordwrap",state,function(){
+                that.toggleClass("Std_wordwrap",state);
+            });
+        },
+        /*
+         * get or set wordnowrap
+        */
+        wordnowrap:function(state){
+            var that = this;
+
+            return that.opt("wordnowrap",state,function(){
+                that.toggleClass("Std_wordnowrap",state);
+            });
+        },
+        /*
+         * get or set label text
+        */
+        value:function(value){
+            var that = this;
+
+            return that.opt("value",value,function(){
+                that[0][that.opts.textFormat](value);
+            });
+        },
+        /*
+         * font color
+        */
+        color:function(color){
+            var that = this;
+
+            if(color === undefined){
+                return that[0].color();
+            }
+            that[0].color(color);
+            return that;
+        },
+        /*
+         * font size
+        */
+        fontSize:function(size){
+            return this.opt("fontSize",size,function(){
+                this[0].css("font-size",size + "px");
+            });
+        },
+        /*
+         * get or set line height
+        */
+        lineHeight:function(size){
+            var that = this;
+
+            if(size === undefined){
+                return that[0].css("lineHeight");
+            }
+            return that[0].css("lineHeight",size);
+        },
+        /*
+         * get or set font bold
+        */
+        bold:function(state){
+            var that = this;
+
+            return that.opt("state",state,function(){
+                that[0].css("font-weight",state ? "bold" : "");
+            });
+        },
+        /*
+         * get or set font underline
+        */
+        underline:function(state){
+            var that = this;
+
+            return that.opt("underline",state,function(){
+                that[0].css("text-decoration",state ? "underline" : "");
+            });
+        },
+        /*
+         * indent
+        */
+        indent:function(value){
+            return this.opt("indent",value,function(){
+                this[0].css("text-indent",value + "px");
+            });
+        },
+        /*
+         * background
+        */
+        background:function(value){
+            return this.opt("background",value,function(){
+                this[0].css("background",value);
+            });
+        },
+        /*
+         * text align
+        */
+        textAlign:function(value){
+            return this.opt("textAlign",value,function(){
+                this[0].css("text-align",value);
+            });
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that){
+        that.call_opts({
+            bold:false,
+            indent:0,
+            underline:false,
+            background:""
+        },true);
+
+        that.call_opts(["fontSize","color","wordwrap","wordnowrap","lineHeight","textAlign","href","target"],true);
+        that.call_opts("value");
+    }
+});

@@ -1,1 +1,139 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("shell",function(){function e(e,t){for(var n=t.split(" "),r=0;r<n.length;r++)i[n[r]]=e}function t(e,t){if(e.eatSpace())return null;var s=e.sol(),u=e.next();if("\\"===u)return e.next(),null;if("'"===u||'"'===u||"`"===u)return t.tokens.unshift(n(u)),r(e,t);if("#"===u)return s&&e.eat("!")?(e.skipToEnd(),"meta"):(e.skipToEnd(),"comment");if("$"===u)return t.tokens.unshift(o),r(e,t);if("+"===u||"="===u)return"operator";if("-"===u)return e.eat("-"),e.eatWhile(/\w/),"attribute";if(/\d/.test(u)&&(e.eatWhile(/\d/),e.eol()||!/\w/.test(e.peek())))return"number";e.eatWhile(/[\w-]/);var f=e.current();return"="===e.peek()&&/\w+/.test(f)?"def":i.hasOwnProperty(f)?i[f]:null}function n(e){return function(t,n){for(var r,i=!1,s=!1;null!=(r=t.next());){if(r===e&&!s){i=!0;break}if("$"===r&&!s&&"'"!==e){s=!0,t.backUp(1),n.tokens.unshift(o);break}s=!s&&"\\"===r}return(i||!s)&&n.tokens.shift(),"`"===e||")"===e?"quote":"string"}}function r(e,n){return(n.tokens[0]||t)(e,n)}var i={};e("atom","true false"),e("keyword","if then do else elif while until for in esac fi fin fil done exit set unset export function"),e("builtin","ab awk bash beep cat cc cd chown chmod chroot clear cp curl cut diff echo find gawk gcc get git grep kill killall ln ls make mkdir openssl mv nc node npm ping ps restart rm rmdir sed service sh shopt shred source sort sleep ssh start stop su sudo tee telnet top touch vi vim wall wc wget who write yes zsh");var o=function(e,t){t.tokens.length>1&&e.eat("$");var i=e.next(),o=/\w/;return"{"===i&&(o=/[^}]/),"("===i?(t.tokens[0]=n(")"),r(e,t)):(/\d/.test(i)||(e.eatWhile(o),e.eat("}")),t.tokens.shift(),"def")};return{startState:function(){return{tokens:[]}},token:function(e,t){return r(e,t)},lineComment:"#",fold:"brace"}}),e.defineMIME("text/x-sh","shell")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode('shell', function() {
+
+  var words = {};
+  function define(style, string) {
+    var split = string.split(' ');
+    for(var i = 0; i < split.length; i++) {
+      words[split[i]] = style;
+    }
+  };
+
+  // Atoms
+  define('atom', 'true false');
+
+  // Keywords
+  define('keyword', 'if then do else elif while until for in esac fi fin ' +
+    'fil done exit set unset export function');
+
+  // Commands
+  define('builtin', 'ab awk bash beep cat cc cd chown chmod chroot clear cp ' +
+    'curl cut diff echo find gawk gcc get git grep kill killall ln ls make ' +
+    'mkdir openssl mv nc node npm ping ps restart rm rmdir sed service sh ' +
+    'shopt shred source sort sleep ssh start stop su sudo tee telnet top ' +
+    'touch vi vim wall wc wget who write yes zsh');
+
+  function tokenBase(stream, state) {
+    if (stream.eatSpace()) return null;
+
+    var sol = stream.sol();
+    var ch = stream.next();
+
+    if (ch === '\\') {
+      stream.next();
+      return null;
+    }
+    if (ch === '\'' || ch === '"' || ch === '`') {
+      state.tokens.unshift(tokenString(ch));
+      return tokenize(stream, state);
+    }
+    if (ch === '#') {
+      if (sol && stream.eat('!')) {
+        stream.skipToEnd();
+        return 'meta'; // 'comment'?
+      }
+      stream.skipToEnd();
+      return 'comment';
+    }
+    if (ch === '$') {
+      state.tokens.unshift(tokenDollar);
+      return tokenize(stream, state);
+    }
+    if (ch === '+' || ch === '=') {
+      return 'operator';
+    }
+    if (ch === '-') {
+      stream.eat('-');
+      stream.eatWhile(/\w/);
+      return 'attribute';
+    }
+    if (/\d/.test(ch)) {
+      stream.eatWhile(/\d/);
+      if(stream.eol() || !/\w/.test(stream.peek())) {
+        return 'number';
+      }
+    }
+    stream.eatWhile(/[\w-]/);
+    var cur = stream.current();
+    if (stream.peek() === '=' && /\w+/.test(cur)) return 'def';
+    return words.hasOwnProperty(cur) ? words[cur] : null;
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      var next, end = false, escaped = false;
+      while ((next = stream.next()) != null) {
+        if (next === quote && !escaped) {
+          end = true;
+          break;
+        }
+        if (next === '$' && !escaped && quote !== '\'') {
+          escaped = true;
+          stream.backUp(1);
+          state.tokens.unshift(tokenDollar);
+          break;
+        }
+        escaped = !escaped && next === '\\';
+      }
+      if (end || !escaped) {
+        state.tokens.shift();
+      }
+      return (quote === '`' || quote === ')' ? 'quote' : 'string');
+    };
+  };
+
+  var tokenDollar = function(stream, state) {
+    if (state.tokens.length > 1) stream.eat('$');
+    var ch = stream.next(), hungry = /\w/;
+    if (ch === '{') hungry = /[^}]/;
+    if (ch === '(') {
+      state.tokens[0] = tokenString(')');
+      return tokenize(stream, state);
+    }
+    if (!/\d/.test(ch)) {
+      stream.eatWhile(hungry);
+      stream.eat('}');
+    }
+    state.tokens.shift();
+    return 'def';
+  };
+
+  function tokenize(stream, state) {
+    return (state.tokens[0] || tokenBase) (stream, state);
+  };
+
+  return {
+    startState: function() {return {tokens:[]};},
+    token: function(stream, state) {
+      return tokenize(stream, state);
+    },
+    lineComment: '#',
+    fold: "brace"
+  };
+});
+
+CodeMirror.defineMIME('text/x-sh', 'shell');
+
+});

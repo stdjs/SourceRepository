@@ -1,1 +1,448 @@
-Std.ui.module("Pagination",{parent:"widget",option:{level:3,total:0,page:0,pageSize:9,pageCount:"auto",tabIndex:null,link:!1,hotKey:!1,text:"<b><?=page?></b> / <b><?=pageCount?></b><b style='margin-left: 10px'>total:</b><?=total?>",href:"#<?=page?>",defaultClass:"StdUI_Pagination",height:34,first:"First",last:"Last",prev:"Prev",next:"Next",editable:!0},events:"change",extend:{render:function(){var e=this;e.refreshPages(),e.refreshText(),e.refreshList()},remove:function(){var e=this;e._pageList&&e._pageList.remove()}},"protected":{initKeyboard:function(){var e=this;return e},initEvents:function(){var e=this,t=e.D;return e[0].on("mouseenter","._buttons > ._button",function(a){var n=this.mouse({auto:!1,click:function(){if(!n.hasClass("selected")){var a=Std.each("first prev next last",function(a,r){return r in t&&t[r].is(n)?(e.page(e.pageIndex(r)),!0):void 0});a!==!0&&e.page(e.pageIndex(n.text()))}}},a)}),e},initElements:function(){var e=this,t=e.D={main:newDom("tr"),buttons:newDom("td"),text:newDom("td","_text")};return e[0].append(newDom("table").attr({cellspacing:0,cellpadding:0}).append(newDom("tbody").append(t.main=newDom("tr").append([t.left,t.buttons.append([t.left=newDiv("_buttons -left"),t.pages=newDiv("_buttons -pages"),t.right=newDiv("_buttons -right"),t.jump=newDiv("_jump")]),t.text])))),e},createButton:function(e){var t=this,a=t.opts,n=newDom("a"),r="_button";return a.link&&n.attr("href",new Std.template(a.href).render({page:t.pageIndex(e)})),-1!="first prev next last".indexOf(e)?(n.html(a[e]),r+=" -"+e):n.html(e),n.className(r)}},"public":{total:function(e){return this.opt("total",e,function(){this.refreshText()})},text:function(e){return this.opt("text",e,function(){this.refreshText()})},editable:function(e){var t=this;return t.opt("editable",e,function(){e?t.refreshList():t._pageList&&t._pageList.remove()})},pageSize:function(e){return this.opt("pageSize",e,function(){this.refreshPages().refreshText()})},page:function(e){var t=this,a=t.opts,n=t._pageList;return void 0===e?int(a.page):(e!=a.page&&(a.page=e=~~e,n&&n.value()!=e&&n.value(e),t.refreshPages().refreshText().emit("change",e)),t)},pageIndex:function(e){switch(e){case"first":e=1;break;case"prev":e=this.page()-1;break;case"next":e=this.page()+1;break;case"last":e=this.pageCount()}return~~e},pageCount:function(e){var t=this,a=t.opts;return void 0===e?"auto"===a.pageCount?Math.ceil(a.total/a.pageSize):a.pageCount:(a.pageCount=e,t.refreshText().refreshList())},pageNumbers:function(){for(var e=this,t=e.opts,a=t.page,n=a,r=e.pageCount(),i=Math.floor(t.pageSize/2),o=[],s=a-1;s>a-1-i&&!(1>s);s--)n=s;for(s=a+1;a+1+i>s&&!(s>Math.ceil(t.total/t.pageSize)||s>r);s++)r=s;for(s=n;r>=s;s++)o.push(s);return o},refreshText:function(){var e=this;return e.renderState&&new Std.template(e.opts.text).renderTo(e.D.text.clear(),{page:e.page(),pageSize:e.pageSize(),pageCount:e.pageCount(),total:e.total()}),e},refreshList:function(){var e=this;return e.opts.editable?(e._pageList||(e._pageList=Std.ui("ComboBox",{inputMode:"input",value:e.page(),renderTo:e.D.jump,width:60}),e._pageList.on("change",function(){e.page(~~this.value())})),e._pageList.clear().append(function(){for(var t=[],a=1,n=e.pageCount();n>=a;a++)a>1e4&&n>a+1e4?a+=9999:a>1e3&&n>a+1e3?a+=999:a>100&&n>a+100&&(a+=99),t.push(a+"");return t}()).value(e.page()),e):e},refreshPages:function(){var e=this.clear(),t=e.opts,a=e.D,n=t.page;return e.renderState?(n>1&&a.left.append([a.first=e.createButton("first"),a.prev=e.createButton("prev")]),Std.each(e.pageNumbers(),function(t,r){var i=e.createButton(r).appendTo(a.pages);n==r&&i.addClass("selected")}),n<e.pageCount()&&a.right.append([a.next=e.createButton("next"),a.last=e.createButton("last")]),e):e},repaint:function(){var e=this;return e.refreshPages(),e.refreshText(),e.refreshList(),e},clear:function(){var e=this,t=e.D;return t.left.clear(),t.pages.clear(),t.right.clear(),Std.each("first prev next last",function(e,a){delete t[a]}),e}},main:function(e,t){t.change&&e.on("change",t.change),e.initElements(),e.initEvents(),e.initKeyboard()}}),Std.plugin.module("dataSourcePagination",{option:{dataPath:""},"protected":{initDataGrid:function(){var e=this,t=e.opts,a=e.owner,n=e._pagination,r=function(){a[2].height(a.height()-a.opts.headerHeight-a.boxSize.height-1-n.height())};return a.on("resize",r),a.on("dataSourceLoad",function(e){var a=Std.mold.dataPath(e,t.dataPath);Std.each("total pageSize pageCount page",function(e,t){n.opts[t]=a[t]}),n.refreshPages().refreshText().refreshList()}),n.renderTo(a)[0].css("borderTopColor",a[0].css("borderTopColor")),a.renderState&&r(),e}},"public":{remove:function(){this._pagination.remove()}},main:function(e,t,a){switch(e._pagination=Std.ui("Pagination",t),a.ui){case"DataGrid":e.initDataGrid()}}});
+/**
+ * pagination widget module
+*/
+Std.ui.module("Pagination",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        total:0,
+        page:0,
+        pageSize:9,
+        pageCount:"auto",
+        tabIndex:null,
+        link:false,
+        hotKey:false,
+        text:"<b><?=page?></b> / <b><?=pageCount?></b><b style='margin-left: 10px'>total:</b><?=total?>",
+        href:"#<?=page?>",
+        defaultClass:"StdUI_Pagination",
+        height:34,
+        first:"First",
+        last:"Last",
+        prev:"Prev",
+        next:"Next",
+        editable:true
+    },
+    /*[#module option:events]*/
+    events:"change",
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that.refreshPages();
+            that.refreshText();
+            that.refreshList();
+        },
+        /*
+         * remove
+        */
+        remove:function(){
+            var that = this;
+
+            if(that._pageList){
+                that._pageList.remove();
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init keyboard
+        */
+        initKeyboard:function(){
+            var that = this;
+
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var doms = that.D;
+
+            that[0].on("mouseenter","._buttons > ._button",function(e){
+                var button = this.mouse({
+                    auto:false,
+                    click:function(){
+                        if(button.hasClass("selected")){
+                            return;
+                        }
+                        var result = Std.each("first prev next last",function(i,name){
+                            if(name in doms && doms[name].is(button)){
+                                that.page(that.pageIndex(name));
+                                return true;
+                            }
+                        });
+                        if(result !== true){
+                            that.page(that.pageIndex(button.text()));
+                        }
+                    }
+                },e);
+            });
+            return that;
+        },
+        /*
+         * init elements
+        */
+        initElements:function(){
+            var that = this;
+            var doms = that.D = {
+                main:newDom("tr"),
+                buttons:newDom("td"),
+                text:newDom("td","_text")
+            };
+
+            that[0].append(newDom("table").attr({cellspacing:0,cellpadding:0}).append(
+                newDom("tbody").append(
+                    doms.main = newDom("tr").append([
+                        doms.left,
+                        doms.buttons.append([
+                            doms.left  = newDiv("_buttons -left"),
+                            doms.pages = newDiv("_buttons -pages"),
+                            doms.right = newDiv("_buttons -right"),
+                            doms.jump  = newDiv("_jump")
+                        ]),
+                        doms.text
+                    ])
+                )
+            ));
+            return that;
+        },
+        /*
+         * create button
+        */
+        createButton:function(page){
+            var that      = this;
+            var opts      = that.opts;
+            var element   = newDom("a");
+            var className = "_button";
+
+            if(opts.link){
+                element.attr("href",(new Std.template(opts.href)).render({
+                    page:that.pageIndex(page)
+                }))
+            }
+            if("first prev next last".indexOf(page) != -1){
+                element.html(opts[page]);
+                className += " -" +page;
+            }else{
+                element.html(page);
+            }
+            return element.className(className);
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * total
+        */
+        total:function(total){
+            return this.opt("total",total,function(){
+                this.refreshText();
+            });
+        },
+        /*
+         * text
+         */
+        text:function(text){
+            return this.opt("text",text,function(){
+                this.refreshText();
+            });
+        },
+        /*
+         * editable
+        */
+        editable:function(editable){
+            var that = this;
+
+            return that.opt("editable",editable,function(){
+                if(editable){
+                    that.refreshList();
+                }else{
+                    that._pageList && that._pageList.remove();
+                }
+            });
+        },
+        /*
+         * page size
+        */
+        pageSize:function(size){
+            return this.opt("pageSize",size,function(){
+                this.refreshPages().refreshText();
+            });
+        },
+        /*
+         * page
+        */
+        page:function(page){
+            var that     = this;
+            var opts     = that.opts;
+            var pageList = that._pageList;
+
+            if(page === undefined){
+                return int(opts.page)
+            }
+            if(page != opts.page){
+                opts.page = page = ~~page;
+                if(pageList && pageList.value() != page){
+                    pageList.value(page);
+                }
+                that.refreshPages().refreshText().emit("change",page);
+            }
+            return that;
+        },
+        /*
+         * page index
+        */
+        pageIndex:function(page){
+            switch(page){
+                case "first":
+                    page = 1;
+                    break;
+                case "prev":
+                    page = this.page() - 1;
+                    break;
+                case "next":
+                    page = this.page() + 1;
+                    break;
+                case "last":
+                    page = this.pageCount();
+                    break;
+            }
+            return ~~page;
+        },
+        /*
+         * page count
+        */
+        pageCount:function(count){
+            var that = this;
+            var opts = that.opts;
+
+            if(count === undefined){
+                if(opts.pageCount === "auto"){
+                    return Math.ceil(opts.total / opts.pageSize);
+                }
+                return opts.pageCount;
+            }
+            opts.pageCount = count;
+            return that.refreshText().refreshList();
+        },
+        /*
+         * page numbers
+        */
+        pageNumbers:function(){
+            var that  = this;
+            var opts  = that.opts;
+            var page  = opts.page;
+            var min   = page;
+            var max   = that.pageCount();
+            var half  = Math.floor(opts.pageSize / 2);
+            var pages = [];
+
+            for(var i=page-1;i>page-1-half;i--){
+                if(i < 1){
+                    break;
+                }
+                min = i;
+            }
+            for(i=page+1;i<page+1+half;i++){
+                if(i > Math.ceil(opts.total / opts.pageSize) || i > max){
+                    break;
+                }
+                max = i;
+            }
+            for(i=min;i<=max;i++){
+                pages.push(i);
+            }
+            return pages;
+        },
+        /*
+         * refresh text
+        */
+        refreshText:function(){
+            var that = this;
+
+            if(that.renderState){
+                (new Std.template(that.opts.text)).renderTo(that.D.text.clear(),{
+                    page:that.page(),
+                    pageSize:that.pageSize(),
+                    pageCount:that.pageCount(),
+                    total:that.total()
+                });
+            }
+            return that;
+        },
+        /*
+         * refresh list
+        */
+        refreshList:function(){
+            var that = this;
+
+            if(!that.opts.editable){
+                return that;
+            }
+            if(!that._pageList){
+                that._pageList = Std.ui("ComboBox",{
+                    inputMode:"input",
+                    value:that.page(),
+                    renderTo:that.D.jump,
+                    width:60
+                });
+                that._pageList.on("change",function(){
+                    that.page(~~this.value());
+                });
+            }
+            that._pageList.clear().append(function(){
+                var pages = [];
+                for(var i=1,length=that.pageCount();i<=length;i++){
+                    if(i > 10000 && i + 10000 < length){
+                        i += 9999;
+                    }else if(i > 1000 && i + 1000 < length){
+                        i += 999;
+                    }else if(i > 100 && i + 100 < length){
+                        i += 99;
+                    }
+                    pages.push(i+"");
+                }
+                return pages;
+            }()).value(that.page());
+
+            return that;
+        },
+        /*
+         * refresh pages
+        */
+        refreshPages:function(){
+            var that = this.clear();
+            var opts = that.opts;
+            var doms = that.D;
+            var page = opts.page;
+
+            if(!that.renderState){
+                return that;
+            }
+            if(page > 1){
+                doms.left.append([
+                    doms.first = that.createButton("first"),
+                    doms.prev  = that.createButton("prev")
+                ]);
+            }
+            Std.each(that.pageNumbers(),function(i,number){
+                var pageElement = that.createButton(number).appendTo(doms.pages);
+                if(page == number){
+                    pageElement.addClass("selected");
+                }
+            });
+            if(page < that.pageCount()){
+                doms.right.append([
+                    doms.next = that.createButton("next"),
+                    doms.last = that.createButton("last")
+                ]);
+            }
+            return that;
+        },
+        /*
+         * repaint
+        */
+        repaint:function(){
+            var that = this;
+
+            that.refreshPages();
+            that.refreshText();
+            that.refreshList();
+
+            return that;
+        },
+        /*
+         * clear
+        */
+        clear:function(){
+            var that = this;
+            var doms = that.D;
+
+            doms.left.clear();
+            doms.pages.clear();
+            doms.right.clear();
+
+            Std.each("first prev next last",function(i,name){
+                delete doms[name];
+            });
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        if(opts.change){
+            that.on("change",opts.change);
+        }
+        that.initElements();
+        that.initEvents();
+        that.initKeyboard();
+    }
+});
+
+/**
+ * data source pagination plugin
+*/
+Std.plugin.module("dataSourcePagination",{
+    /*[#module option:option]*/
+    option:{
+        dataPath:""
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init DataGrid
+        */
+        initDataGrid:function(){
+            var that       = this;
+            var opts       = that.opts;
+            var owner      = that.owner;
+            var pagination = that._pagination;
+            var updateSize = function(){
+                owner[2].height(owner.height() - owner.opts.headerHeight - owner.boxSize.height - 1 - pagination.height());
+            };
+
+            owner.on("resize",updateSize);
+            owner.on("dataSourceLoad",function(responseJSON){
+                var data = Std.mold.dataPath(responseJSON,opts.dataPath);
+
+                Std.each("total pageSize pageCount page",function(i,type){
+                    pagination.opts[type] = data[type];
+                });
+                pagination.refreshPages().refreshText().refreshList();
+            });
+            pagination.renderTo(owner)[0].css("borderTopColor",owner[0].css("borderTopColor"));
+
+            if(owner.renderState){
+                updateSize();
+            }
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * remove
+        */
+        remove:function(){
+            this._pagination.remove();
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,owner){
+        that._pagination = Std.ui("Pagination",opts);
+
+        switch(owner.ui){
+            case "DataGrid":
+                that.initDataGrid();
+                break;
+        }
+    }
+});

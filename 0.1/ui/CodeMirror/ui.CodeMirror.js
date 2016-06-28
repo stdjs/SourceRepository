@@ -1,1 +1,123 @@
-Std.ui.module("CodeMirror",{parent:"widget",option:{level:4,width:200,height:200,value:"",mode:"javascript",lineNumbers:!0,theme:"monokai",basePath:function(){var e="";return Std.dom.united("script").each(function(t,r){var o=r.attr("src")||"";return/codemirror[\w\-\.]*\.js/.test(o.toLowerCase())?e=o.substring(0,o.lastIndexOf("/")+1):void 0}),e}()},"private":{timer:null},extend:{render:function(){var e=this,t=e.opts,r={};Std.each("tabSize lineNumbers lineSeparator theme indentUnit smartIndent indentWithTabs electricCharsspecialChars specialCharPlaceholder rtlMoveVisually keyMap extraKeys lineWrappingfirstLineNumber lineNumberFormatter gutters fixedGutter scrollbarStyle coverGutterNextToScrollbarinputStyle readOnly showCursorWhenSelecting lineWiseCopyCut undoDepth historyEventDelaycursorBlinkRate cursorScrollMargin cursorHeight resetSelectionOnContextMenu workTime workDelaypollInterval flattenSpans addModeClass maxHighlightLength viewportMargin",function(e,o){o in t&&(r[o]=t[o])}),e.codeMirror=CodeMirror(e[0].dom,Std.extend({value:t.value,autofocus:!0},r)),Std.loader.js(t.basePath+"mode/"+t.mode+"/"+t.mode+".js",function(){e.option("mode",t.mode)}),e.codeMirror.setSize("100%","100%")}},"public":{option:function(e,t){return this.opt(e,t,function(){this.codeMirror.setOption(e,t)})},value:function(e){var t=this;return void 0===e?this.codeMirror.getValue():(this.codeMirror.setValue(e),t)},theme:function(e){var t=this;return t.opt("theme",e,function(){Std.loader.css(t.opts.basePath+"theme/"+e+".css",function(){t.option("theme",e)})})},on:function(e,t){var r=this;return r.codeMirror.on(e,t),r},off:function(e,t){var r=this;return r.codeMirror.off(e,t),r},clear:function(){return this.value("")}},main:function(e){e.call_opts("theme")}});
+Std.ui.module("CodeMirror",{
+    parent:"widget",
+    option:{
+        level:4,
+        width:200,
+        height:200,
+        value:"",
+        mode:"javascript",
+        lineNumbers:true,
+        theme:"monokai",
+        basePath:function(){
+            var path = "";
+            Std.dom.united("script").each(function(i,script){
+                var src = script.attr("src") || "";
+                if(/codemirror[\w\-\.]*\.js/.test(src.toLowerCase())) {
+                    return path = src.substring(0, src.lastIndexOf('/') + 1);
+                }
+            });
+            return path;
+        }()
+    },
+    private:{
+        timer:null
+    },
+    extend:{
+        /*
+         * render
+         */
+        render:function(){
+            var that    = this;
+            var opts    = that.opts;
+            var options = {};
+
+            Std.each("tabSize lineNumbers lineSeparator theme indentUnit smartIndent indentWithTabs electricChars" +
+                "specialChars specialCharPlaceholder rtlMoveVisually keyMap extraKeys lineWrapping" +
+                "firstLineNumber lineNumberFormatter gutters fixedGutter scrollbarStyle coverGutterNextToScrollbar" +
+                "inputStyle readOnly showCursorWhenSelecting lineWiseCopyCut undoDepth historyEventDelay" +
+                "cursorBlinkRate cursorScrollMargin cursorHeight resetSelectionOnContextMenu workTime workDelay" +
+                "pollInterval flattenSpans addModeClass maxHighlightLength viewportMargin",function(i,name){
+
+                if(name in opts){
+                    options[name] = opts[name];
+                }
+            });
+            that.codeMirror = CodeMirror(that[0].dom,Std.extend({
+                value : opts.value,
+                autofocus:true
+            },options));
+
+            Std.loader.js(opts.basePath + "mode/" + opts.mode + "/" + opts.mode + ".js",function(){
+                that.option("mode",opts.mode);
+            });
+
+            that.codeMirror.setSize("100%","100%");
+        }
+    },
+    public:{
+        /*
+         * setOption
+        */
+        option:function(name,value){
+            return this.opt(name,value,function(){
+                this.codeMirror.setOption(name,value);
+            });
+        },
+        /*
+         * value
+         */
+        value:function(value){
+            var that = this;
+
+            if(value === undefined){
+                return this.codeMirror.getValue();
+            }
+            this.codeMirror.setValue(value);
+
+            return that;
+        },
+        /*
+         * theme
+        */
+        theme:function(theme){
+            var that = this;
+
+            return that.opt("theme",theme,function(){
+                Std.loader.css(that.opts.basePath + "theme/" + theme + ".css",function(){
+                    that.option("theme",theme);
+                });
+            });
+        },
+        /*
+         * on
+        */
+        on:function(name,callback){
+            var that = this;
+
+            that.codeMirror.on(name,callback);
+
+            return that;
+        },
+        /*
+         * off
+        */
+        off:function(name,callback){
+            var that = this;
+
+            that.codeMirror.off(name,callback);
+
+            return that;
+        },
+        /*
+         * clear
+        */
+        clear:function(){
+            return this.value("")
+        }
+    },
+    main:function(that,opts,dom){
+
+        that.call_opts("theme")
+    }
+});
+

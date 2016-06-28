@@ -1,1 +1,285 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("ruby",function(e){function t(e){for(var t={},n=0,r=e.length;r>n;++n)t[e[n]]=!0;return t}function n(e,t,n){return n.tokenize.push(e),e(t,n)}function r(e,t){if(e.sol()&&e.match("=begin")&&e.eol())return t.tokenize.push(f),"comment";if(e.eatSpace())return null;var r,i=e.next();if("`"==i||"'"==i||'"'==i)return n(a(i,"string",'"'==i||"`"==i),e,t);if("/"==i){var o=e.current().length;if(e.skipTo("/")){var d=e.current().length;e.backUp(e.current().length-o);for(var c=0;e.current().length<d;){var s=e.next();if("("==s?c+=1:")"==s&&(c-=1),0>c)break}if(e.backUp(e.current().length-o),0==c)return n(a(i,"string-2",!0),e,t)}return"operator"}if("%"==i){var k="string",h=!0;e.eat("s")?k="atom":e.eat(/[WQ]/)?k="string":e.eat(/[r]/)?k="string-2":e.eat(/[wxq]/)&&(k="string",h=!1);var m=e.eat(/[^\w\s=]/);return m?(p.propertyIsEnumerable(m)&&(m=p[m]),n(a(m,k,h,!0),e,t)):"operator"}if("#"==i)return e.skipToEnd(),"comment";if("<"==i&&(r=e.match(/^<-?[\`\"\']?([a-zA-Z_?]\w*)[\`\"\']?(?:;|$)/)))return n(u(r[1]),e,t);if("0"==i)return e.eatWhile(e.eat("x")?/[\da-fA-F]/:e.eat("b")?/[01]/:/[0-7]/),"number";if(/\d/.test(i))return e.match(/^[\d_]*(?:\.[\d_]+)?(?:[eE][+\-]?[\d_]+)?/),"number";if("?"==i){for(;e.match(/^\\[CM]-/););return e.eat("\\")?e.eatWhile(/\w/):e.next(),"string"}if(":"==i)return e.eat("'")?n(a("'","atom",!1),e,t):e.eat('"')?n(a('"',"atom",!0),e,t):e.eat(/[\<\>]/)?(e.eat(/[\<\>]/),"atom"):e.eat(/[\+\-\*\/\&\|\:\!]/)?"atom":e.eat(/[a-zA-Z$@_\xa1-\uffff]/)?(e.eatWhile(/[\w$\xa1-\uffff]/),e.eat(/[\?\!\=]/),"atom"):"operator";if("@"==i&&e.match(/^@?[a-zA-Z_\xa1-\uffff]/))return e.eat("@"),e.eatWhile(/[\w\xa1-\uffff]/),"variable-2";if("$"==i)return e.eat(/[a-zA-Z_]/)?e.eatWhile(/[\w]/):e.eat(/\d/)?e.eat(/\d/):e.next(),"variable-3";if(/[a-zA-Z_\xa1-\uffff]/.test(i))return e.eatWhile(/[\w\xa1-\uffff]/),e.eat(/[\?\!]/),e.eat(":")?"atom":"ident";if("|"!=i||!t.varList&&"{"!=t.lastTok&&"do"!=t.lastTok){if(/[\(\)\[\]{}\\;]/.test(i))return l=i,null;if("-"==i&&e.eat(">"))return"arrow";if(/[=+\-\/*:\.^%<>~|]/.test(i)){var x=e.eatWhile(/[=+\-\/*:\.^%<>~|]/);return"."!=i||x||(l="."),"operator"}return null}return l="|",null}function i(e){return e||(e=1),function(t,n){if("}"==t.peek()){if(1==e)return n.tokenize.pop(),n.tokenize[n.tokenize.length-1](t,n);n.tokenize[n.tokenize.length-1]=i(e-1)}else"{"==t.peek()&&(n.tokenize[n.tokenize.length-1]=i(e+1));return r(t,n)}}function o(){var e=!1;return function(t,n){return e?(n.tokenize.pop(),n.tokenize[n.tokenize.length-1](t,n)):(e=!0,r(t,n))}}function a(e,t,n,r){return function(a,u){var f,l=!1;for("read-quoted-paused"===u.context.type&&(u.context=u.context.prev,a.eat("}"));null!=(f=a.next());){if(f==e&&(r||!l)){u.tokenize.pop();break}if(n&&"#"==f&&!l){if(a.eat("{")){"}"==e&&(u.context={prev:u.context,type:"read-quoted-paused"}),u.tokenize.push(i());break}if(/[@\$]/.test(a.peek())){u.tokenize.push(o());break}}l=!l&&"\\"==f}return t}}function u(e){return function(t,n){return t.match(e)?n.tokenize.pop():t.skipToEnd(),"string"}}function f(e,t){return e.sol()&&e.match("=end")&&e.eol()&&t.tokenize.pop(),e.skipToEnd(),"comment"}var l,d=t(["alias","and","BEGIN","begin","break","case","class","def","defined?","do","else","elsif","END","end","ensure","false","for","if","in","module","next","not","or","redo","rescue","retry","return","self","super","then","true","undef","unless","until","when","while","yield","nil","raise","throw","catch","fail","loop","callcc","caller","lambda","proc","public","protected","private","require","load","require_relative","extend","autoload","__END__","__FILE__","__LINE__","__dir__"]),c=t(["def","class","case","for","while","module","then","catch","loop","proc","begin"]),s=t(["end","until"]),p={"[":"]","{":"}","(":")"};return{startState:function(){return{tokenize:[r],indented:0,context:{type:"top",indented:-e.indentUnit},continuedLine:!1,lastTok:null,varList:!1}},token:function(e,t){l=null,e.sol()&&(t.indented=e.indentation());var n,r=t.tokenize[t.tokenize.length-1](e,t),i=l;if("ident"==r){var o=e.current();r="."==t.lastTok?"property":d.propertyIsEnumerable(e.current())?"keyword":/^[A-Z]/.test(o)?"tag":"def"==t.lastTok||"class"==t.lastTok||t.varList?"def":"variable","keyword"==r&&(i=o,c.propertyIsEnumerable(o)?n="indent":s.propertyIsEnumerable(o)?n="dedent":"if"!=o&&"unless"!=o||e.column()!=e.indentation()?"do"==o&&t.context.indented<t.indented&&(n="indent"):n="indent")}return(l||r&&"comment"!=r)&&(t.lastTok=i),"|"==l&&(t.varList=!t.varList),"indent"==n||/[\(\[\{]/.test(l)?t.context={prev:t.context,type:l||r,indented:t.indented}:("dedent"==n||/[\)\]\}]/.test(l))&&t.context.prev&&(t.context=t.context.prev),e.eol()&&(t.continuedLine="\\"==l||"operator"==r),r},indent:function(t,n){if(t.tokenize[t.tokenize.length-1]!=r)return 0;var i=n&&n.charAt(0),o=t.context,a=o.type==p[i]||"keyword"==o.type&&/^(?:end|until|else|elsif|when|rescue)\b/.test(n);return o.indented+(a?0:e.indentUnit)+(t.continuedLine?e.indentUnit:0)},electricChars:"}de",lineComment:"#"}}),e.defineMIME("text/x-ruby","ruby")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("ruby", function(config) {
+  function wordObj(words) {
+    var o = {};
+    for (var i = 0, e = words.length; i < e; ++i) o[words[i]] = true;
+    return o;
+  }
+  var keywords = wordObj([
+    "alias", "and", "BEGIN", "begin", "break", "case", "class", "def", "defined?", "do", "else",
+    "elsif", "END", "end", "ensure", "false", "for", "if", "in", "module", "next", "not", "or",
+    "redo", "rescue", "retry", "return", "self", "super", "then", "true", "undef", "unless",
+    "until", "when", "while", "yield", "nil", "raise", "throw", "catch", "fail", "loop", "callcc",
+    "caller", "lambda", "proc", "public", "protected", "private", "require", "load",
+    "require_relative", "extend", "autoload", "__END__", "__FILE__", "__LINE__", "__dir__"
+  ]);
+  var indentWords = wordObj(["def", "class", "case", "for", "while", "module", "then",
+                             "catch", "loop", "proc", "begin"]);
+  var dedentWords = wordObj(["end", "until"]);
+  var matching = {"[": "]", "{": "}", "(": ")"};
+  var curPunc;
+
+  function chain(newtok, stream, state) {
+    state.tokenize.push(newtok);
+    return newtok(stream, state);
+  }
+
+  function tokenBase(stream, state) {
+    if (stream.sol() && stream.match("=begin") && stream.eol()) {
+      state.tokenize.push(readBlockComment);
+      return "comment";
+    }
+    if (stream.eatSpace()) return null;
+    var ch = stream.next(), m;
+    if (ch == "`" || ch == "'" || ch == '"') {
+      return chain(readQuoted(ch, "string", ch == '"' || ch == "`"), stream, state);
+    } else if (ch == "/") {
+      var currentIndex = stream.current().length;
+      if (stream.skipTo("/")) {
+        var search_till = stream.current().length;
+        stream.backUp(stream.current().length - currentIndex);
+        var balance = 0;  // balance brackets
+        while (stream.current().length < search_till) {
+          var chchr = stream.next();
+          if (chchr == "(") balance += 1;
+          else if (chchr == ")") balance -= 1;
+          if (balance < 0) break;
+        }
+        stream.backUp(stream.current().length - currentIndex);
+        if (balance == 0)
+          return chain(readQuoted(ch, "string-2", true), stream, state);
+      }
+      return "operator";
+    } else if (ch == "%") {
+      var style = "string", embed = true;
+      if (stream.eat("s")) style = "atom";
+      else if (stream.eat(/[WQ]/)) style = "string";
+      else if (stream.eat(/[r]/)) style = "string-2";
+      else if (stream.eat(/[wxq]/)) { style = "string"; embed = false; }
+      var delim = stream.eat(/[^\w\s=]/);
+      if (!delim) return "operator";
+      if (matching.propertyIsEnumerable(delim)) delim = matching[delim];
+      return chain(readQuoted(delim, style, embed, true), stream, state);
+    } else if (ch == "#") {
+      stream.skipToEnd();
+      return "comment";
+    } else if (ch == "<" && (m = stream.match(/^<-?[\`\"\']?([a-zA-Z_?]\w*)[\`\"\']?(?:;|$)/))) {
+      return chain(readHereDoc(m[1]), stream, state);
+    } else if (ch == "0") {
+      if (stream.eat("x")) stream.eatWhile(/[\da-fA-F]/);
+      else if (stream.eat("b")) stream.eatWhile(/[01]/);
+      else stream.eatWhile(/[0-7]/);
+      return "number";
+    } else if (/\d/.test(ch)) {
+      stream.match(/^[\d_]*(?:\.[\d_]+)?(?:[eE][+\-]?[\d_]+)?/);
+      return "number";
+    } else if (ch == "?") {
+      while (stream.match(/^\\[CM]-/)) {}
+      if (stream.eat("\\")) stream.eatWhile(/\w/);
+      else stream.next();
+      return "string";
+    } else if (ch == ":") {
+      if (stream.eat("'")) return chain(readQuoted("'", "atom", false), stream, state);
+      if (stream.eat('"')) return chain(readQuoted('"', "atom", true), stream, state);
+
+      // :> :>> :< :<< are valid symbols
+      if (stream.eat(/[\<\>]/)) {
+        stream.eat(/[\<\>]/);
+        return "atom";
+      }
+
+      // :+ :- :/ :* :| :& :! are valid symbols
+      if (stream.eat(/[\+\-\*\/\&\|\:\!]/)) {
+        return "atom";
+      }
+
+      // Symbols can't start by a digit
+      if (stream.eat(/[a-zA-Z$@_\xa1-\uffff]/)) {
+        stream.eatWhile(/[\w$\xa1-\uffff]/);
+        // Only one ? ! = is allowed and only as the last character
+        stream.eat(/[\?\!\=]/);
+        return "atom";
+      }
+      return "operator";
+    } else if (ch == "@" && stream.match(/^@?[a-zA-Z_\xa1-\uffff]/)) {
+      stream.eat("@");
+      stream.eatWhile(/[\w\xa1-\uffff]/);
+      return "variable-2";
+    } else if (ch == "$") {
+      if (stream.eat(/[a-zA-Z_]/)) {
+        stream.eatWhile(/[\w]/);
+      } else if (stream.eat(/\d/)) {
+        stream.eat(/\d/);
+      } else {
+        stream.next(); // Must be a special global like $: or $!
+      }
+      return "variable-3";
+    } else if (/[a-zA-Z_\xa1-\uffff]/.test(ch)) {
+      stream.eatWhile(/[\w\xa1-\uffff]/);
+      stream.eat(/[\?\!]/);
+      if (stream.eat(":")) return "atom";
+      return "ident";
+    } else if (ch == "|" && (state.varList || state.lastTok == "{" || state.lastTok == "do")) {
+      curPunc = "|";
+      return null;
+    } else if (/[\(\)\[\]{}\\;]/.test(ch)) {
+      curPunc = ch;
+      return null;
+    } else if (ch == "-" && stream.eat(">")) {
+      return "arrow";
+    } else if (/[=+\-\/*:\.^%<>~|]/.test(ch)) {
+      var more = stream.eatWhile(/[=+\-\/*:\.^%<>~|]/);
+      if (ch == "." && !more) curPunc = ".";
+      return "operator";
+    } else {
+      return null;
+    }
+  }
+
+  function tokenBaseUntilBrace(depth) {
+    if (!depth) depth = 1;
+    return function(stream, state) {
+      if (stream.peek() == "}") {
+        if (depth == 1) {
+          state.tokenize.pop();
+          return state.tokenize[state.tokenize.length-1](stream, state);
+        } else {
+          state.tokenize[state.tokenize.length - 1] = tokenBaseUntilBrace(depth - 1);
+        }
+      } else if (stream.peek() == "{") {
+        state.tokenize[state.tokenize.length - 1] = tokenBaseUntilBrace(depth + 1);
+      }
+      return tokenBase(stream, state);
+    };
+  }
+  function tokenBaseOnce() {
+    var alreadyCalled = false;
+    return function(stream, state) {
+      if (alreadyCalled) {
+        state.tokenize.pop();
+        return state.tokenize[state.tokenize.length-1](stream, state);
+      }
+      alreadyCalled = true;
+      return tokenBase(stream, state);
+    };
+  }
+  function readQuoted(quote, style, embed, unescaped) {
+    return function(stream, state) {
+      var escaped = false, ch;
+
+      if (state.context.type === 'read-quoted-paused') {
+        state.context = state.context.prev;
+        stream.eat("}");
+      }
+
+      while ((ch = stream.next()) != null) {
+        if (ch == quote && (unescaped || !escaped)) {
+          state.tokenize.pop();
+          break;
+        }
+        if (embed && ch == "#" && !escaped) {
+          if (stream.eat("{")) {
+            if (quote == "}") {
+              state.context = {prev: state.context, type: 'read-quoted-paused'};
+            }
+            state.tokenize.push(tokenBaseUntilBrace());
+            break;
+          } else if (/[@\$]/.test(stream.peek())) {
+            state.tokenize.push(tokenBaseOnce());
+            break;
+          }
+        }
+        escaped = !escaped && ch == "\\";
+      }
+      return style;
+    };
+  }
+  function readHereDoc(phrase) {
+    return function(stream, state) {
+      if (stream.match(phrase)) state.tokenize.pop();
+      else stream.skipToEnd();
+      return "string";
+    };
+  }
+  function readBlockComment(stream, state) {
+    if (stream.sol() && stream.match("=end") && stream.eol())
+      state.tokenize.pop();
+    stream.skipToEnd();
+    return "comment";
+  }
+
+  return {
+    startState: function() {
+      return {tokenize: [tokenBase],
+              indented: 0,
+              context: {type: "top", indented: -config.indentUnit},
+              continuedLine: false,
+              lastTok: null,
+              varList: false};
+    },
+
+    token: function(stream, state) {
+      curPunc = null;
+      if (stream.sol()) state.indented = stream.indentation();
+      var style = state.tokenize[state.tokenize.length-1](stream, state), kwtype;
+      var thisTok = curPunc;
+      if (style == "ident") {
+        var word = stream.current();
+        style = state.lastTok == "." ? "property"
+          : keywords.propertyIsEnumerable(stream.current()) ? "keyword"
+          : /^[A-Z]/.test(word) ? "tag"
+          : (state.lastTok == "def" || state.lastTok == "class" || state.varList) ? "def"
+          : "variable";
+        if (style == "keyword") {
+          thisTok = word;
+          if (indentWords.propertyIsEnumerable(word)) kwtype = "indent";
+          else if (dedentWords.propertyIsEnumerable(word)) kwtype = "dedent";
+          else if ((word == "if" || word == "unless") && stream.column() == stream.indentation())
+            kwtype = "indent";
+          else if (word == "do" && state.context.indented < state.indented)
+            kwtype = "indent";
+        }
+      }
+      if (curPunc || (style && style != "comment")) state.lastTok = thisTok;
+      if (curPunc == "|") state.varList = !state.varList;
+
+      if (kwtype == "indent" || /[\(\[\{]/.test(curPunc))
+        state.context = {prev: state.context, type: curPunc || style, indented: state.indented};
+      else if ((kwtype == "dedent" || /[\)\]\}]/.test(curPunc)) && state.context.prev)
+        state.context = state.context.prev;
+
+      if (stream.eol())
+        state.continuedLine = (curPunc == "\\" || style == "operator");
+      return style;
+    },
+
+    indent: function(state, textAfter) {
+      if (state.tokenize[state.tokenize.length-1] != tokenBase) return 0;
+      var firstChar = textAfter && textAfter.charAt(0);
+      var ct = state.context;
+      var closing = ct.type == matching[firstChar] ||
+        ct.type == "keyword" && /^(?:end|until|else|elsif|when|rescue)\b/.test(textAfter);
+      return ct.indented + (closing ? 0 : config.indentUnit) +
+        (state.continuedLine ? config.indentUnit : 0);
+    },
+
+    electricChars: "}de", // enD and rescuE
+    lineComment: "#"
+  };
+});
+
+CodeMirror.defineMIME("text/x-ruby", "ruby");
+
+});

@@ -1,1 +1,537 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function t(e,t){var r=2,i=-1,a=0,l=e.indentation();switch(t.tlvCurCtlFlowChar){case"\\":l=0;break;case"|":if("@"==t.tlvPrevPrevCtlFlowChar){a=-2;break}n[t.tlvPrevCtlFlowChar]&&(a=1);break;case"M":if("@"==t.tlvPrevPrevCtlFlowChar){a=-2;break}n[t.tlvPrevCtlFlowChar]&&(a=1);break;case"@":"S"==t.tlvPrevCtlFlowChar&&(a=-1),"|"==t.tlvPrevCtlFlowChar&&(a=1);break;case"S":"@"==t.tlvPrevCtlFlowChar&&(a=1),n[t.tlvPrevCtlFlowChar]&&(a=1)}var o=r;return i=l+a*o,i>=0?i:l}e.defineMode("verilog",function(t,n){function r(e){for(var t={},n=e.split(" "),r=0;r<n.length;++r)t[n[r]]=!0;return t}function i(e,t){var n,r=e.peek();if(g[r]&&0!=(n=g[r](e,t)))return n;if(g.tokenBase&&0!=(n=g.tokenBase(e,t)))return n;if(/[,;:\.]/.test(r))return v=e.next(),null;if(y.test(r))return v=e.next(),"bracket";if("`"==r)return e.next(),e.eatWhile(/[\w\$_]/)?"def":null;if("$"==r)return e.next(),e.eatWhile(/[\w\$_]/)?"meta":null;if("#"==r)return e.next(),e.eatWhile(/[\d_.]/),"def";if('"'==r)return e.next(),t.tokenize=a(r),t.tokenize(e,t);if("/"==r){if(e.next(),e.eat("*"))return t.tokenize=l,l(e,t);if(e.eat("/"))return e.skipToEnd(),"comment";e.backUp(1)}if(e.match(q)||e.match(_)||e.match(F)||e.match(z)||e.match(P)||e.match(b)||e.match(q))return"number";if(e.eatWhile(k))return"meta";if(e.eatWhile(/[\w\$_]/)){var i=e.current();return x[i]?(I[i]&&(v="newblock"),$[i]&&(v="newstatement"),f=i,"keyword"):"variable"}return e.next(),null}function a(e){return function(t,n){for(var r,a=!1,l=!1;null!=(r=t.next());){if(r==e&&!a){l=!0;break}a=!a&&"\\"==r}return(l||!a&&!w)&&(n.tokenize=i),"string"}}function l(e,t){for(var n,r=!1;n=e.next();){if("/"==n&&r){t.tokenize=i;break}r="*"==n}return"comment"}function o(e,t,n,r,i){this.indented=e,this.column=t,this.type=n,this.align=r,this.prev=i}function s(e,t,n){var r=e.indented,i=new o(r,t,n,null,e.context);return e.context=i}function c(e){var t=e.context.type;return(")"==t||"]"==t||"}"==t)&&(e.indented=e.context.indented),e.context=e.context.prev}function u(e,t){if(e==t)return!0;var n=t.split(";");for(var r in n)if(e==n[r])return!0;return!1}function d(){var e=[];for(var t in I)if(I[t]){var n=I[t].split(";");for(var r in n)e.push(n[r])}var i=new RegExp("[{}()\\[\\]]|("+e.join("|")+")$");return i}var v,f,p=t.indentUnit,C=n.statementIndentUnit||p,m=n.dontAlignCalls,h=n.noIndentKeywords||[],w=n.multiLineStrings,g=n.hooks||{},x=r("accept_on alias always always_comb always_ff always_latch and assert assign assume automatic before begin bind bins binsof bit break buf bufif0 bufif1 byte case casex casez cell chandle checker class clocking cmos config const constraint context continue cover covergroup coverpoint cross deassign default defparam design disable dist do edge else end endcase endchecker endclass endclocking endconfig endfunction endgenerate endgroup endinterface endmodule endpackage endprimitive endprogram endproperty endspecify endsequence endtable endtask enum event eventually expect export extends extern final first_match for force foreach forever fork forkjoin function generate genvar global highz0 highz1 if iff ifnone ignore_bins illegal_bins implements implies import incdir include initial inout input inside instance int integer interconnect interface intersect join join_any join_none large let liblist library local localparam logic longint macromodule matches medium modport module nand negedge nettype new nexttime nmos nor noshowcancelled not notif0 notif1 null or output package packed parameter pmos posedge primitive priority program property protected pull0 pull1 pulldown pullup pulsestyle_ondetect pulsestyle_onevent pure rand randc randcase randsequence rcmos real realtime ref reg reject_on release repeat restrict return rnmos rpmos rtran rtranif0 rtranif1 s_always s_eventually s_nexttime s_until s_until_with scalared sequence shortint shortreal showcancelled signed small soft solve specify specparam static string strong strong0 strong1 struct super supply0 supply1 sync_accept_on sync_reject_on table tagged task this throughout time timeprecision timeunit tran tranif0 tranif1 tri tri0 tri1 triand trior trireg type typedef union unique unique0 unsigned until until_with untyped use uwire var vectored virtual void wait wait_order wand weak weak0 weak1 while wildcard wire with within wor xnor xor"),k=/[\+\-\*\/!~&|^%=?:]/,y=/[\[\]{}()]/,b=/\d[0-9_]*/,_=/\d*\s*'s?d\s*\d[0-9_]*/i,F=/\d*\s*'s?b\s*[xz01][xz01_]*/i,z=/\d*\s*'s?o\s*[xz0-7][xz0-7_]*/i,P=/\d*\s*'s?h\s*[0-9a-fxz?][0-9a-fxz?_]*/i,q=/(\d[\d_]*(\.\d[\d_]*)?E-?[\d_]+)|(\d[\d_]*\.\d[\d_]*)/i,A=/^((\w+)|[)}\]])/,S=/[)}\]]/,j=r("case checker class clocking config function generate interface module packageprimitive program property specify sequence table task"),I={};for(var M in j)I[M]="end"+M;I.begin="end",I.casex="endcase",I.casez="endcase",I["do"]="while",I.fork="join;join_any;join_none",I.covergroup="endgroup";for(var E in h){var M=h[E];I[M]&&(I[M]=void 0)}var $=r("always always_comb always_ff always_latch assert assign assume else export for foreach forever if import initial repeat while");return{electricInput:d(),startState:function(e){var t={tokenize:null,context:new o((e||0)-p,0,"top",!1),indented:0,startOfLine:!0};return g.startState&&g.startState(t),t},token:function(e,t){var n=t.context;if(e.sol()&&(null==n.align&&(n.align=!1),t.indented=e.indentation(),t.startOfLine=!0),g.token&&g.token(e,t),e.eatSpace())return null;v=null,f=null;var r=(t.tokenize||i)(e,t);if("comment"==r||"meta"==r||"variable"==r)return r;if(null==n.align&&(n.align=!0),v==n.type)c(t);else if(";"==v&&"statement"==n.type||n.type&&u(f,n.type))for(n=c(t);n&&"statement"==n.type;)n=c(t);else if("{"==v)s(t,e.column(),"}");else if("["==v)s(t,e.column(),"]");else if("("==v)s(t,e.column(),")");else if(n&&"endcase"==n.type&&":"==v)s(t,e.column(),"statement");else if("newstatement"==v)s(t,e.column(),"statement");else if("newblock"==v)if("function"!=f||!n||"statement"!=n.type&&"endgroup"!=n.type)if("task"==f&&n&&"statement"==n.type);else{var a=I[f];s(t,e.column(),a)}else;return t.startOfLine=!1,r},indent:function(t,n){if(t.tokenize!=i&&null!=t.tokenize)return e.Pass;if(g.indent){var r=g.indent(t);if(r>=0)return r}var a=t.context,l=n&&n.charAt(0);"statement"==a.type&&"}"==l&&(a=a.prev);var o=!1,s=n.match(A);return s&&(o=u(s[0],a.type)),"statement"==a.type?a.indented+("{"==l?0:C):S.test(a.type)&&a.align&&!m?a.column+(o?0:1):")"!=a.type||o?a.indented+(o?0:p):a.indented+C},blockCommentStart:"/*",blockCommentEnd:"*/",lineComment:"//"}}),e.defineMIME("text/x-verilog",{name:"verilog"}),e.defineMIME("text/x-systemverilog",{name:"verilog"});var n={">":"property","->":"property","-":"hr","|":"link","?$":"qualifier","?*":"qualifier","@-":"variable-3","@":"variable-3","?":"qualifier"};e.defineMIME("text/x-tlv",{name:"verilog",hooks:{"\\":function(e,n){var r=0,i=!1,a=e.string;return e.sol()&&(/\\SV/.test(e.string)||/\\TLV/.test(e.string))&&(a=/\\TLV_version/.test(e.string)?"\\TLV_version":e.string,e.skipToEnd(),"\\SV"==a&&n.vxCodeActive&&(n.vxCodeActive=!1),(/\\TLV/.test(a)&&!n.vxCodeActive||"\\TLV_version"==a&&n.vxCodeActive)&&(n.vxCodeActive=!0),i="keyword",n.tlvCurCtlFlowChar=n.tlvPrevPrevCtlFlowChar=n.tlvPrevCtlFlowChar="",1==n.vxCodeActive&&(n.tlvCurCtlFlowChar="\\",r=t(e,n)),n.vxIndentRq=r),i},tokenBase:function(e,r){var i=0,a=!1,l=/[\[\]=:]/,o={"**":"variable-2","*":"variable-2",$$:"variable",$:"variable","^^":"attribute","^":"attribute"},s=e.peek(),c=r.tlvCurCtlFlowChar;return 1==r.vxCodeActive&&(/[\[\]{}\(\);\:]/.test(s)?(a="meta",e.next()):"/"==s?(e.next(),e.eat("/")?(e.skipToEnd(),a="comment",r.tlvCurCtlFlowChar="S"):e.backUp(1)):"@"==s?(a=n[s],r.tlvCurCtlFlowChar="@",e.next(),e.eatWhile(/[\w\$_]/)):e.match(/\b[mM]4+/,!0)?(e.skipTo("("),a="def",r.tlvCurCtlFlowChar="M"):"!"==s&&e.sol()?(a="comment",e.next()):l.test(s)?(e.eatWhile(l),a="operator"):"#"==s?(r.tlvCurCtlFlowChar=""==r.tlvCurCtlFlowChar?s:r.tlvCurCtlFlowChar,e.next(),e.eatWhile(/[+-]\d/),a="tag"):o.propertyIsEnumerable(s)?(a=o[s],r.tlvCurCtlFlowChar=""==r.tlvCurCtlFlowChar?"S":r.tlvCurCtlFlowChar,e.next(),e.match(/[a-zA-Z_0-9]+/)):(a=n[s]||!1)&&(r.tlvCurCtlFlowChar=""==r.tlvCurCtlFlowChar?s:r.tlvCurCtlFlowChar,e.next(),e.match(/[a-zA-Z_0-9]+/)),r.tlvCurCtlFlowChar!=c&&(i=t(e,r),r.vxIndentRq=i)),a},token:function(e,t){1==t.vxCodeActive&&e.sol()&&""!=t.tlvCurCtlFlowChar&&(t.tlvPrevPrevCtlFlowChar=t.tlvPrevCtlFlowChar,t.tlvPrevCtlFlowChar=t.tlvCurCtlFlowChar,t.tlvCurCtlFlowChar="")},indent:function(e){return 1==e.vxCodeActive?e.vxIndentRq:-1},startState:function(e){e.tlvCurCtlFlowChar="",e.tlvPrevCtlFlowChar="",e.tlvPrevPrevCtlFlowChar="",e.vxCodeActive=!0,e.vxIndentRq=0}}})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("verilog", function(config, parserConfig) {
+
+  var indentUnit = config.indentUnit,
+      statementIndentUnit = parserConfig.statementIndentUnit || indentUnit,
+      dontAlignCalls = parserConfig.dontAlignCalls,
+      noIndentKeywords = parserConfig.noIndentKeywords || [],
+      multiLineStrings = parserConfig.multiLineStrings,
+      hooks = parserConfig.hooks || {};
+
+  function words(str) {
+    var obj = {}, words = str.split(" ");
+    for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+    return obj;
+  }
+
+  /**
+   * Keywords from IEEE 1800-2012
+   */
+  var keywords = words(
+    "accept_on alias always always_comb always_ff always_latch and assert assign assume automatic before begin bind " +
+    "bins binsof bit break buf bufif0 bufif1 byte case casex casez cell chandle checker class clocking cmos config " +
+    "const constraint context continue cover covergroup coverpoint cross deassign default defparam design disable " +
+    "dist do edge else end endcase endchecker endclass endclocking endconfig endfunction endgenerate endgroup " +
+    "endinterface endmodule endpackage endprimitive endprogram endproperty endspecify endsequence endtable endtask " +
+    "enum event eventually expect export extends extern final first_match for force foreach forever fork forkjoin " +
+    "function generate genvar global highz0 highz1 if iff ifnone ignore_bins illegal_bins implements implies import " +
+    "incdir include initial inout input inside instance int integer interconnect interface intersect join join_any " +
+    "join_none large let liblist library local localparam logic longint macromodule matches medium modport module " +
+    "nand negedge nettype new nexttime nmos nor noshowcancelled not notif0 notif1 null or output package packed " +
+    "parameter pmos posedge primitive priority program property protected pull0 pull1 pulldown pullup " +
+    "pulsestyle_ondetect pulsestyle_onevent pure rand randc randcase randsequence rcmos real realtime ref reg " +
+    "reject_on release repeat restrict return rnmos rpmos rtran rtranif0 rtranif1 s_always s_eventually s_nexttime " +
+    "s_until s_until_with scalared sequence shortint shortreal showcancelled signed small soft solve specify " +
+    "specparam static string strong strong0 strong1 struct super supply0 supply1 sync_accept_on sync_reject_on " +
+    "table tagged task this throughout time timeprecision timeunit tran tranif0 tranif1 tri tri0 tri1 triand trior " +
+    "trireg type typedef union unique unique0 unsigned until until_with untyped use uwire var vectored virtual void " +
+    "wait wait_order wand weak weak0 weak1 while wildcard wire with within wor xnor xor");
+
+  /** Operators from IEEE 1800-2012
+     unary_operator ::=
+       + | - | ! | ~ | & | ~& | | | ~| | ^ | ~^ | ^~
+     binary_operator ::=
+       + | - | * | / | % | == | != | === | !== | ==? | !=? | && | || | **
+       | < | <= | > | >= | & | | | ^ | ^~ | ~^ | >> | << | >>> | <<<
+       | -> | <->
+     inc_or_dec_operator ::= ++ | --
+     unary_module_path_operator ::=
+       ! | ~ | & | ~& | | | ~| | ^ | ~^ | ^~
+     binary_module_path_operator ::=
+       == | != | && | || | & | | | ^ | ^~ | ~^
+  */
+  var isOperatorChar = /[\+\-\*\/!~&|^%=?:]/;
+  var isBracketChar = /[\[\]{}()]/;
+
+  var unsignedNumber = /\d[0-9_]*/;
+  var decimalLiteral = /\d*\s*'s?d\s*\d[0-9_]*/i;
+  var binaryLiteral = /\d*\s*'s?b\s*[xz01][xz01_]*/i;
+  var octLiteral = /\d*\s*'s?o\s*[xz0-7][xz0-7_]*/i;
+  var hexLiteral = /\d*\s*'s?h\s*[0-9a-fxz?][0-9a-fxz?_]*/i;
+  var realLiteral = /(\d[\d_]*(\.\d[\d_]*)?E-?[\d_]+)|(\d[\d_]*\.\d[\d_]*)/i;
+
+  var closingBracketOrWord = /^((\w+)|[)}\]])/;
+  var closingBracket = /[)}\]]/;
+
+  var curPunc;
+  var curKeyword;
+
+  // Block openings which are closed by a matching keyword in the form of ("end" + keyword)
+  // E.g. "task" => "endtask"
+  var blockKeywords = words(
+    "case checker class clocking config function generate interface module package" +
+    "primitive program property specify sequence table task"
+  );
+
+  // Opening/closing pairs
+  var openClose = {};
+  for (var keyword in blockKeywords) {
+    openClose[keyword] = "end" + keyword;
+  }
+  openClose["begin"] = "end";
+  openClose["casex"] = "endcase";
+  openClose["casez"] = "endcase";
+  openClose["do"   ] = "while";
+  openClose["fork" ] = "join;join_any;join_none";
+  openClose["covergroup"] = "endgroup";
+
+  for (var i in noIndentKeywords) {
+    var keyword = noIndentKeywords[i];
+    if (openClose[keyword]) {
+      openClose[keyword] = undefined;
+    }
+  }
+
+  // Keywords which open statements that are ended with a semi-colon
+  var statementKeywords = words("always always_comb always_ff always_latch assert assign assume else export for foreach forever if import initial repeat while");
+
+  function tokenBase(stream, state) {
+    var ch = stream.peek(), style;
+    if (hooks[ch] && (style = hooks[ch](stream, state)) != false) return style;
+    if (hooks.tokenBase && (style = hooks.tokenBase(stream, state)) != false)
+      return style;
+
+    if (/[,;:\.]/.test(ch)) {
+      curPunc = stream.next();
+      return null;
+    }
+    if (isBracketChar.test(ch)) {
+      curPunc = stream.next();
+      return "bracket";
+    }
+    // Macros (tick-defines)
+    if (ch == '`') {
+      stream.next();
+      if (stream.eatWhile(/[\w\$_]/)) {
+        return "def";
+      } else {
+        return null;
+      }
+    }
+    // System calls
+    if (ch == '$') {
+      stream.next();
+      if (stream.eatWhile(/[\w\$_]/)) {
+        return "meta";
+      } else {
+        return null;
+      }
+    }
+    // Time literals
+    if (ch == '#') {
+      stream.next();
+      stream.eatWhile(/[\d_.]/);
+      return "def";
+    }
+    // Strings
+    if (ch == '"') {
+      stream.next();
+      state.tokenize = tokenString(ch);
+      return state.tokenize(stream, state);
+    }
+    // Comments
+    if (ch == "/") {
+      stream.next();
+      if (stream.eat("*")) {
+        state.tokenize = tokenComment;
+        return tokenComment(stream, state);
+      }
+      if (stream.eat("/")) {
+        stream.skipToEnd();
+        return "comment";
+      }
+      stream.backUp(1);
+    }
+
+    // Numeric literals
+    if (stream.match(realLiteral) ||
+        stream.match(decimalLiteral) ||
+        stream.match(binaryLiteral) ||
+        stream.match(octLiteral) ||
+        stream.match(hexLiteral) ||
+        stream.match(unsignedNumber) ||
+        stream.match(realLiteral)) {
+      return "number";
+    }
+
+    // Operators
+    if (stream.eatWhile(isOperatorChar)) {
+      return "meta";
+    }
+
+    // Keywords / plain variables
+    if (stream.eatWhile(/[\w\$_]/)) {
+      var cur = stream.current();
+      if (keywords[cur]) {
+        if (openClose[cur]) {
+          curPunc = "newblock";
+        }
+        if (statementKeywords[cur]) {
+          curPunc = "newstatement";
+        }
+        curKeyword = cur;
+        return "keyword";
+      }
+      return "variable";
+    }
+
+    stream.next();
+    return null;
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      var escaped = false, next, end = false;
+      while ((next = stream.next()) != null) {
+        if (next == quote && !escaped) {end = true; break;}
+        escaped = !escaped && next == "\\";
+      }
+      if (end || !(escaped || multiLineStrings))
+        state.tokenize = tokenBase;
+      return "string";
+    };
+  }
+
+  function tokenComment(stream, state) {
+    var maybeEnd = false, ch;
+    while (ch = stream.next()) {
+      if (ch == "/" && maybeEnd) {
+        state.tokenize = tokenBase;
+        break;
+      }
+      maybeEnd = (ch == "*");
+    }
+    return "comment";
+  }
+
+  function Context(indented, column, type, align, prev) {
+    this.indented = indented;
+    this.column = column;
+    this.type = type;
+    this.align = align;
+    this.prev = prev;
+  }
+  function pushContext(state, col, type) {
+    var indent = state.indented;
+    var c = new Context(indent, col, type, null, state.context);
+    return state.context = c;
+  }
+  function popContext(state) {
+    var t = state.context.type;
+    if (t == ")" || t == "]" || t == "}") {
+      state.indented = state.context.indented;
+    }
+    return state.context = state.context.prev;
+  }
+
+  function isClosing(text, contextClosing) {
+    if (text == contextClosing) {
+      return true;
+    } else {
+      // contextClosing may be mulitple keywords separated by ;
+      var closingKeywords = contextClosing.split(";");
+      for (var i in closingKeywords) {
+        if (text == closingKeywords[i]) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  function buildElectricInputRegEx() {
+    // Reindentation should occur on any bracket char: {}()[]
+    // or on a match of any of the block closing keywords, at
+    // the end of a line
+    var allClosings = [];
+    for (var i in openClose) {
+      if (openClose[i]) {
+        var closings = openClose[i].split(";");
+        for (var j in closings) {
+          allClosings.push(closings[j]);
+        }
+      }
+    }
+    var re = new RegExp("[{}()\\[\\]]|(" + allClosings.join("|") + ")$");
+    return re;
+  }
+
+  // Interface
+  return {
+
+    // Regex to force current line to reindent
+    electricInput: buildElectricInputRegEx(),
+
+    startState: function(basecolumn) {
+      var state = {
+        tokenize: null,
+        context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
+        indented: 0,
+        startOfLine: true
+      };
+      if (hooks.startState) hooks.startState(state);
+      return state;
+    },
+
+    token: function(stream, state) {
+      var ctx = state.context;
+      if (stream.sol()) {
+        if (ctx.align == null) ctx.align = false;
+        state.indented = stream.indentation();
+        state.startOfLine = true;
+      }
+      if (hooks.token) hooks.token(stream, state);
+      if (stream.eatSpace()) return null;
+      curPunc = null;
+      curKeyword = null;
+      var style = (state.tokenize || tokenBase)(stream, state);
+      if (style == "comment" || style == "meta" || style == "variable") return style;
+      if (ctx.align == null) ctx.align = true;
+
+      if (curPunc == ctx.type) {
+        popContext(state);
+      } else if ((curPunc == ";" && ctx.type == "statement") ||
+               (ctx.type && isClosing(curKeyword, ctx.type))) {
+        ctx = popContext(state);
+        while (ctx && ctx.type == "statement") ctx = popContext(state);
+      } else if (curPunc == "{") {
+        pushContext(state, stream.column(), "}");
+      } else if (curPunc == "[") {
+        pushContext(state, stream.column(), "]");
+      } else if (curPunc == "(") {
+        pushContext(state, stream.column(), ")");
+      } else if (ctx && ctx.type == "endcase" && curPunc == ":") {
+        pushContext(state, stream.column(), "statement");
+      } else if (curPunc == "newstatement") {
+        pushContext(state, stream.column(), "statement");
+      } else if (curPunc == "newblock") {
+        if (curKeyword == "function" && ctx && (ctx.type == "statement" || ctx.type == "endgroup")) {
+          // The 'function' keyword can appear in some other contexts where it actually does not
+          // indicate a function (import/export DPI and covergroup definitions).
+          // Do nothing in this case
+        } else if (curKeyword == "task" && ctx && ctx.type == "statement") {
+          // Same thing for task
+        } else {
+          var close = openClose[curKeyword];
+          pushContext(state, stream.column(), close);
+        }
+      }
+
+      state.startOfLine = false;
+      return style;
+    },
+
+    indent: function(state, textAfter) {
+      if (state.tokenize != tokenBase && state.tokenize != null) return CodeMirror.Pass;
+      if (hooks.indent) {
+        var fromHook = hooks.indent(state);
+        if (fromHook >= 0) return fromHook;
+      }
+      var ctx = state.context, firstChar = textAfter && textAfter.charAt(0);
+      if (ctx.type == "statement" && firstChar == "}") ctx = ctx.prev;
+      var closing = false;
+      var possibleClosing = textAfter.match(closingBracketOrWord);
+      if (possibleClosing)
+        closing = isClosing(possibleClosing[0], ctx.type);
+      if (ctx.type == "statement") return ctx.indented + (firstChar == "{" ? 0 : statementIndentUnit);
+      else if (closingBracket.test(ctx.type) && ctx.align && !dontAlignCalls) return ctx.column + (closing ? 0 : 1);
+      else if (ctx.type == ")" && !closing) return ctx.indented + statementIndentUnit;
+      else return ctx.indented + (closing ? 0 : indentUnit);
+    },
+
+    blockCommentStart: "/*",
+    blockCommentEnd: "*/",
+    lineComment: "//"
+  };
+});
+
+  CodeMirror.defineMIME("text/x-verilog", {
+    name: "verilog"
+  });
+
+  CodeMirror.defineMIME("text/x-systemverilog", {
+    name: "verilog"
+  });
+
+  // TLVVerilog mode
+
+  var tlvchScopePrefixes = {
+    ">": "property", "->": "property", "-": "hr", "|": "link", "?$": "qualifier", "?*": "qualifier",
+    "@-": "variable-3", "@": "variable-3", "?": "qualifier"
+  };
+
+  function tlvGenIndent(stream, state) {
+    var tlvindentUnit = 2;
+    var rtnIndent = -1, indentUnitRq = 0, curIndent = stream.indentation();
+    switch (state.tlvCurCtlFlowChar) {
+    case "\\":
+      curIndent = 0;
+      break;
+    case "|":
+      if (state.tlvPrevPrevCtlFlowChar == "@") {
+        indentUnitRq = -2; //-2 new pipe rq after cur pipe
+        break;
+      }
+      if (tlvchScopePrefixes[state.tlvPrevCtlFlowChar])
+        indentUnitRq = 1; // +1 new scope
+      break;
+    case "M":  // m4
+      if (state.tlvPrevPrevCtlFlowChar == "@") {
+        indentUnitRq = -2; //-2 new inst rq after  pipe
+        break;
+      }
+      if (tlvchScopePrefixes[state.tlvPrevCtlFlowChar])
+        indentUnitRq = 1; // +1 new scope
+      break;
+    case "@":
+      if (state.tlvPrevCtlFlowChar == "S")
+        indentUnitRq = -1; // new pipe stage after stmts
+      if (state.tlvPrevCtlFlowChar == "|")
+        indentUnitRq = 1; // 1st pipe stage
+      break;
+    case "S":
+      if (state.tlvPrevCtlFlowChar == "@")
+        indentUnitRq = 1; // flow in pipe stage
+      if (tlvchScopePrefixes[state.tlvPrevCtlFlowChar])
+        indentUnitRq = 1; // +1 new scope
+      break;
+    }
+    var statementIndentUnit = tlvindentUnit;
+    rtnIndent = curIndent + (indentUnitRq*statementIndentUnit);
+    return rtnIndent >= 0 ? rtnIndent : curIndent;
+  }
+
+  CodeMirror.defineMIME("text/x-tlv", {
+    name: "verilog",
+    hooks: {
+      "\\": function(stream, state) {
+        var vxIndent = 0, style = false;
+        var curPunc  = stream.string;
+        if ((stream.sol()) && ((/\\SV/.test(stream.string)) || (/\\TLV/.test(stream.string)))) {
+          curPunc = (/\\TLV_version/.test(stream.string))
+            ? "\\TLV_version" : stream.string;
+          stream.skipToEnd();
+          if (curPunc == "\\SV" && state.vxCodeActive) {state.vxCodeActive = false;};
+          if ((/\\TLV/.test(curPunc) && !state.vxCodeActive)
+            || (curPunc=="\\TLV_version" && state.vxCodeActive)) {state.vxCodeActive = true;};
+          style = "keyword";
+          state.tlvCurCtlFlowChar  = state.tlvPrevPrevCtlFlowChar
+            = state.tlvPrevCtlFlowChar = "";
+          if (state.vxCodeActive == true) {
+            state.tlvCurCtlFlowChar  = "\\";
+            vxIndent = tlvGenIndent(stream, state);
+          }
+          state.vxIndentRq = vxIndent;
+        }
+        return style;
+      },
+      tokenBase: function(stream, state) {
+        var vxIndent = 0, style = false;
+        var tlvisOperatorChar = /[\[\]=:]/;
+        var tlvkpScopePrefixs = {
+          "**":"variable-2", "*":"variable-2", "$$":"variable", "$":"variable",
+          "^^":"attribute", "^":"attribute"};
+        var ch = stream.peek();
+        var vxCurCtlFlowCharValueAtStart = state.tlvCurCtlFlowChar;
+        if (state.vxCodeActive == true) {
+          if (/[\[\]{}\(\);\:]/.test(ch)) {
+            // bypass nesting and 1 char punc
+            style = "meta";
+            stream.next();
+          } else if (ch == "/") {
+            stream.next();
+            if (stream.eat("/")) {
+              stream.skipToEnd();
+              style = "comment";
+              state.tlvCurCtlFlowChar = "S";
+            } else {
+              stream.backUp(1);
+            }
+          } else if (ch == "@") {
+            // pipeline stage
+            style = tlvchScopePrefixes[ch];
+            state.tlvCurCtlFlowChar = "@";
+            stream.next();
+            stream.eatWhile(/[\w\$_]/);
+          } else if (stream.match(/\b[mM]4+/, true)) { // match: function(pattern, consume, caseInsensitive)
+            // m4 pre proc
+            stream.skipTo("(");
+            style = "def";
+            state.tlvCurCtlFlowChar = "M";
+          } else if (ch == "!" && stream.sol()) {
+            // v stmt in tlv region
+            // state.tlvCurCtlFlowChar  = "S";
+            style = "comment";
+            stream.next();
+          } else if (tlvisOperatorChar.test(ch)) {
+            // operators
+            stream.eatWhile(tlvisOperatorChar);
+            style = "operator";
+          } else if (ch == "#") {
+            // phy hier
+            state.tlvCurCtlFlowChar  = (state.tlvCurCtlFlowChar == "")
+              ? ch : state.tlvCurCtlFlowChar;
+            stream.next();
+            stream.eatWhile(/[+-]\d/);
+            style = "tag";
+          } else if (tlvkpScopePrefixs.propertyIsEnumerable(ch)) {
+            // special TLV operators
+            style = tlvkpScopePrefixs[ch];
+            state.tlvCurCtlFlowChar = state.tlvCurCtlFlowChar == "" ? "S" : state.tlvCurCtlFlowChar;  // stmt
+            stream.next();
+            stream.match(/[a-zA-Z_0-9]+/);
+          } else if (style = tlvchScopePrefixes[ch] || false) {
+            // special TLV operators
+            state.tlvCurCtlFlowChar = state.tlvCurCtlFlowChar == "" ? ch : state.tlvCurCtlFlowChar;
+            stream.next();
+            stream.match(/[a-zA-Z_0-9]+/);
+          }
+          if (state.tlvCurCtlFlowChar != vxCurCtlFlowCharValueAtStart) { // flow change
+            vxIndent = tlvGenIndent(stream, state);
+            state.vxIndentRq = vxIndent;
+          }
+        }
+        return style;
+      },
+      token: function(stream, state) {
+        if (state.vxCodeActive == true && stream.sol() && state.tlvCurCtlFlowChar != "") {
+          state.tlvPrevPrevCtlFlowChar = state.tlvPrevCtlFlowChar;
+          state.tlvPrevCtlFlowChar = state.tlvCurCtlFlowChar;
+          state.tlvCurCtlFlowChar = "";
+        }
+      },
+      indent: function(state) {
+        return (state.vxCodeActive == true) ? state.vxIndentRq : -1;
+      },
+      startState: function(state) {
+        state.tlvCurCtlFlowChar = "";
+        state.tlvPrevCtlFlowChar = "";
+        state.tlvPrevPrevCtlFlowChar = "";
+        state.vxCodeActive = true;
+        state.vxIndentRq = 0;
+      }
+    }
+  });
+});

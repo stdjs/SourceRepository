@@ -1,1 +1,132 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("twig",function(){function e(e,a){var s=e.peek();if(a.incomment)return e.skipTo("#}")?(e.eatWhile(/\#|}/),a.incomment=!1):e.skipToEnd(),"comment";if(a.intag){if(a.operator){if(a.operator=!1,e.match(r))return"atom";if(e.match(o))return"number"}if(a.sign){if(a.sign=!1,e.match(r))return"atom";if(e.match(o))return"number"}if(a.instring)return s==a.instring&&(a.instring=!1),e.next(),"string";if("'"==s||'"'==s)return a.instring=s,e.next(),"string";if(e.match(a.intag+"}")||e.eat("-")&&e.match(a.intag+"}"))return a.intag=!1,"tag";if(e.match(n))return a.operator=!0,"operator";if(e.match(i))a.sign=!0;else if(e.eat(" ")||e.sol()){if(e.match(t))return"keyword";if(e.match(r))return"atom";if(e.match(o))return"number";e.sol()&&e.next()}else e.next();return"variable"}if(e.eat("{")){if(s=e.eat("#"))return a.incomment=!0,e.skipTo("#}")?(e.eatWhile(/\#|}/),a.incomment=!1):e.skipToEnd(),"comment";if(s=e.eat(/\{|%/))return a.intag=s,"{"==s&&(a.intag="}"),e.eat("-"),"tag"}e.next()}var t=["and","as","autoescape","endautoescape","block","do","endblock","else","elseif","extends","for","endfor","embed","endembed","filter","endfilter","flush","from","if","endif","in","is","include","import","not","or","set","spaceless","endspaceless","with","endwith","trans","endtrans","blocktrans","endblocktrans","macro","endmacro","use","verbatim","endverbatim"],n=/^[+\-*&%=<>!?|~^]/,i=/^[:\[\(\{]/,r=["true","false","null","empty","defined","divisibleby","divisible by","even","odd","iterable","sameas","same as"],o=/^(\d[+\-\*\/])?\d+(\.\d+)?/;return t=new RegExp("(("+t.join(")|(")+"))\\b"),r=new RegExp("(("+r.join(")|(")+"))\\b"),{startState:function(){return{}},token:function(t,n){return e(t,n)}}}),e.defineMIME("text/x-twig","twig")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  CodeMirror.defineMode("twig", function() {
+    var keywords = ["and", "as", "autoescape", "endautoescape", "block", "do", "endblock", "else", "elseif", "extends", "for", "endfor", "embed", "endembed", "filter", "endfilter", "flush", "from", "if", "endif", "in", "is", "include", "import", "not", "or", "set", "spaceless", "endspaceless", "with", "endwith", "trans", "endtrans", "blocktrans", "endblocktrans", "macro", "endmacro", "use", "verbatim", "endverbatim"],
+        operator = /^[+\-*&%=<>!?|~^]/,
+        sign = /^[:\[\(\{]/,
+        atom = ["true", "false", "null", "empty", "defined", "divisibleby", "divisible by", "even", "odd", "iterable", "sameas", "same as"],
+        number = /^(\d[+\-\*\/])?\d+(\.\d+)?/;
+
+    keywords = new RegExp("((" + keywords.join(")|(") + "))\\b");
+    atom = new RegExp("((" + atom.join(")|(") + "))\\b");
+
+    function tokenBase (stream, state) {
+      var ch = stream.peek();
+
+      //Comment
+      if (state.incomment) {
+        if (!stream.skipTo("#}")) {
+          stream.skipToEnd();
+        } else {
+          stream.eatWhile(/\#|}/);
+          state.incomment = false;
+        }
+        return "comment";
+      //Tag
+      } else if (state.intag) {
+        //After operator
+        if (state.operator) {
+          state.operator = false;
+          if (stream.match(atom)) {
+            return "atom";
+          }
+          if (stream.match(number)) {
+            return "number";
+          }
+        }
+        //After sign
+        if (state.sign) {
+          state.sign = false;
+          if (stream.match(atom)) {
+            return "atom";
+          }
+          if (stream.match(number)) {
+            return "number";
+          }
+        }
+
+        if (state.instring) {
+          if (ch == state.instring) {
+            state.instring = false;
+          }
+          stream.next();
+          return "string";
+        } else if (ch == "'" || ch == '"') {
+          state.instring = ch;
+          stream.next();
+          return "string";
+        } else if (stream.match(state.intag + "}") || stream.eat("-") && stream.match(state.intag + "}")) {
+          state.intag = false;
+          return "tag";
+        } else if (stream.match(operator)) {
+          state.operator = true;
+          return "operator";
+        } else if (stream.match(sign)) {
+          state.sign = true;
+        } else {
+          if (stream.eat(" ") || stream.sol()) {
+            if (stream.match(keywords)) {
+              return "keyword";
+            }
+            if (stream.match(atom)) {
+              return "atom";
+            }
+            if (stream.match(number)) {
+              return "number";
+            }
+            if (stream.sol()) {
+              stream.next();
+            }
+          } else {
+            stream.next();
+          }
+
+        }
+        return "variable";
+      } else if (stream.eat("{")) {
+        if (ch = stream.eat("#")) {
+          state.incomment = true;
+          if (!stream.skipTo("#}")) {
+            stream.skipToEnd();
+          } else {
+            stream.eatWhile(/\#|}/);
+            state.incomment = false;
+          }
+          return "comment";
+        //Open tag
+        } else if (ch = stream.eat(/\{|%/)) {
+          //Cache close tag
+          state.intag = ch;
+          if (ch == "{") {
+            state.intag = "}";
+          }
+          stream.eat("-");
+          return "tag";
+        }
+      }
+      stream.next();
+    };
+
+    return {
+      startState: function () {
+        return {};
+      },
+      token: function (stream, state) {
+        return tokenBase(stream, state);
+      }
+    };
+  });
+
+  CodeMirror.defineMIME("text/x-twig", "twig");
+});

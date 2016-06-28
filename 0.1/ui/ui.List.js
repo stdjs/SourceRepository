@@ -1,1 +1,436 @@
-Std.ui.module("ListItem",{parent:"Item",option:{defaultClass:"StdUI_Item StdUI_ListItem",iconHeight:16,iconWidth:16,height:24,value:null},"private":{selected:!1},extend:{height:function(e){var t=this,i=t.opts,n=t.D;isNumber(e)||(e=t.height()),n.icon&&n.icon.marginTop(Math.floor((e-i.iconHeight)/2)),t[0].lineHeight(e-t.boxSize.height)}}}),Std.ui.module("List",{parent:"widget",events:"itemClick itemRename select",action:{children:"append"},option:{defaultClass:"StdUI_List",level:4,type:"default",value:null,items:null,editable:!1,template:null,dataSource:null,itemHeight:24,itemWidth:80,iconWidth:16,iconHeight:16,selectionMode:"single"},"private":{selectedItems:null},extend:{render:function(){var e=this;e.items.each(function(t,i){i.renderTo(e[0])})},remove:Std.func(function(e){var t=this,i=t.items,n=t.selectedItems;if(isObject(e)){var s=i.indexOf(e);-1!==s&&(e=s)}isNumber(e)&&e<i.length&&(n.has(e)&&t.clearSelected(e),i[e].remove(),i.remove(i))},{each:[isArray]})},"protected":{initEvents:function(){var e=this;return e[0].focussing(function(){e.addClass("focus")},function(){e.removeClass("focus")},!1),e},initItemEvents:function(){var e=this,t=e.opts.selectionMode,i=function(i,n,s){"multi"===t?(s.ctrlKey||e.clearSelect(),n._selected?e.clearSelect(n):e.select(n)):"none"!==t&&(e.clearSelect(),e.select(i))};return e[0].delegate("mouseenter",".StdUI_ListItem,.StdUI_TemplateItem",function(t){var n=this.index(),s=e.items[n];s[0].mouse({auto:!1,dblclick:function(){e.editable()&&e.editItem(s)},click:function(){e.emit("itemClick",s)},down:function(e){i(n,s,e)}},t)}),e},editItem:function(e){var t=this;return e instanceof Std.ui("ListItem")&&e.edit(function(i,n){t.emit("itemRename",[e,i,n],!0)}),t},createItem:function(e){var t=this,i=t.opts,n="ListItem",s={height:i.itemHeight,iconWidth:i.iconWidth,iconHeight:i.iconHeight};return isWidget(e)?e:(i.template?(n="TemplateItem",Std.extend(s,{data:e,template:t.template(),textField:i.textField,valueField:i.valueField})):isString(e)||isNumber(e)?s.text=e:isObject(e)&&(isString(e.ui)&&(n=e.ui),s=Std.extend(s,e)),null!==s?("block"==i.type&&(s.width=i.itemWidth),Std.ui(n,s)):null)}},"public":{type:function(e){return this.opt("type",e,function(){this[0].toggleClass("_block","block"===e)})},itemWidth:function(e){return this.opt("itemWidth",e,function(){Std.each(this.items,function(t,i){i.width(e)})})},itemHeight:function(e){return this.opt("itemHeight",e,function(){Std.each(this.items,function(t,i){i.height(e)})})},dataSource:function(e){return this.opt("dataSource",e,function(){this.reload()})},editable:function(e){return this.opt("editable",e)},each:function(e,t){var i=this;return Std.each(i.items,function(t,n){return isFunction(e)?e.call(i,t,n):void 0},t)},template:function(e){var t=this,i=t.opts;return void 0===e?i.template:(isString(e)&&(e=Std.template(e)),e instanceof Std.template&&(i.template=e),t)},reload:function(e){var t=this,i=t.opts,n=i.dataSource,s=n.read;return n&&"ajax"===n.type&&isObject(s)&&Std.ajax.json({url:s.url,data:Std.extend(s.data||{},e),type:s.type||"get",success:function(e){t.clear(),t.append(Std.mold.dataPath(e,s.dataPath)),t.emit("dataSourceLoad",e)}}),t},select:Std.func(function(e){var t=this,i=t.opts,n=t.items,s=i.selectionMode;if("none"!==s)if(isWidget(e))t.select(n.indexOf(e));else if(isNumber(e)&&-1!==e){var c=n[e];if(!c||c._selected)return;"single"===s&&t.clearSelect(),c.addClass("selected"),c._selected=!0,t.selectedItems.push(c),t.emit("select",[e,c],!0)}},{each:[isArray]}),insert:function(e,t){var i=this,n=i.createItem(e);null!==n&&isWidget(n)&&(i.items.insert(n,t),i[0].insert(n[0],t),i.renderState&&n.render())},append:Std.func(function(e){this.insert(e)},{each:[isArray]}),clearSelect:function(e){var t=this,i=t.selectedItems;if(void 0===e){for(var n=0,s=i.length;s>n;n++)i[n].removeClass("selected"),i[n]._selected=!1;i.clear()}else if(isNumber(e)&&-1!==e){var c=i[e];c&&c._selected&&(c.removeClass("selected"),c._selected=!1,i.remove(e))}else isWidget(e)&&t.clearSelect(i.indexOf(e));return t},clear:function(){for(var e=this,t=e.items,i=0,n=t.length;n>i;i++)t[i].remove();return t.clear(),e.selectedItems.clear(),e}},main:function(e,t){e.items=[],e.selectedItems=[],e.call_opts({type:"default",template:null},!0),t.items&&e.append(t.items),e.initEvents(),e.initItemEvents()}});
+/**
+ *  ListItem widget module
+*/
+Std.ui.module("ListItem",{
+    /*[#module option:parent]*/
+    parent:"Item",
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_Item StdUI_ListItem",
+        iconHeight:16,
+        iconWidth:16,
+        height:24,
+        value:null
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * selected
+        */
+        selected:false
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend height
+        */
+        height:function(height){
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
+
+            if(!isNumber(height)){
+                height = that.height();
+            }
+            if(doms.icon){
+                doms.icon.marginTop(Math.floor((height - opts.iconHeight) / 2));
+            }
+            that[0].lineHeight(height - that.boxSize.height);
+        }
+    }
+});
+
+/**
+ * List widget module
+*/
+Std.ui.module("List",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"itemClick itemRename select",
+    /*[#module option:action]*/
+    action:{
+        children:"append"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_List",
+        level:4,
+        type:"default",         //default,block
+        value:null,
+        items:null,
+        editable:false,
+        template:null,
+        dataSource:null,
+        itemHeight:24,
+        itemWidth:80,
+        iconWidth:16,
+        iconHeight:16,
+        selectionMode:"single" //single,multi,none
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * selected items
+        */
+        selectedItems:null
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend render
+        */
+        render:function(){
+            var that = this;
+
+            that.items.each(function(i,item){
+                item.renderTo(that[0]);
+            });
+        },
+        /*
+         * extend remove
+        */
+        remove:Std.func(function(item){
+            var that          = this;
+            var items         = that.items;
+            var selectedItems = that.selectedItems;
+
+            if(isObject(item)){
+                var index = items.indexOf(item);
+                if(index !== -1){
+                    item = index;
+                }
+            }
+            if(isNumber(item) && item < items.length){
+                if(selectedItems.has(item)){
+                    that.clearSelected(item);
+                }
+                items[item].remove();
+                items.remove(items);
+            }
+        },{
+            each:[isArray]
+        })
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+
+            that[0].focussing(function(){
+                that.addClass("focus");
+            },function(){
+                that.removeClass("focus");
+            },false);
+
+            return that;
+        },
+        /*
+         * init List Item events
+        */
+        initItemEvents:function(){
+            var that          = this;
+            var selectionMode = that.opts.selectionMode;
+            var select        = function(index,item,e){
+                if(selectionMode === "multi"){
+                    if(!e.ctrlKey){
+                        that.clearSelect();
+                    }
+                    if(item._selected){
+                        that.clearSelect(item);
+                    }else{
+                        that.select(item);
+                    }
+                }else if(selectionMode !== "none"){
+                    that.clearSelect();
+                    that.select(index);
+                }
+            };
+            that[0].delegate("mouseenter",".StdUI_ListItem,.StdUI_TemplateItem",function(e){
+                var index = this.index();
+                var item  = that.items[index];
+
+                item[0].mouse({
+                    auto:false,
+                    dblclick:function(){
+                        if(that.editable()){
+                            that.editItem(item);
+                        }
+                    },
+                    click:function(){
+                        that.emit("itemClick",item);
+                    },
+                    down:function(e){
+                        select(index,item,e);
+                    }
+                },e);
+            });
+            return that;
+        },
+        /*
+         * edit item
+        */
+        editItem:function(item){
+            var that = this;
+
+            if(item instanceof Std.ui("ListItem")){
+                item.edit(function(oldText,text){
+                    that.emit("itemRename",[item,oldText,text],true);
+                });
+            }
+
+            return that;
+        },
+        /*
+         * create item
+        */
+        createItem:function(data){
+            var that   = this;
+            var opts   = that.opts;
+            var UIName = "ListItem";
+            var option = {
+                height:opts.itemHeight,
+                iconWidth:opts.iconWidth,
+                iconHeight:opts.iconHeight
+            };
+
+            if(isWidget(data)){
+                return data;
+            }
+            if(opts.template){
+                UIName = "TemplateItem";
+                Std.extend(option,{
+                    data:data,
+                    template:that.template(),
+                    textField:opts.textField,
+                    valueField:opts.valueField
+                });
+            }else if(isString(data) || isNumber(data)){
+                option.text = data;
+            }else if(isObject(data)){
+                if(isString(data.ui)){
+                    UIName = data.ui;
+                }
+                option = Std.extend(option,data);
+            }
+            if(option !== null){
+                if(opts.type == "block"){
+                    option.width = opts.itemWidth;
+                }
+                return Std.ui(UIName,option);
+            }
+            return null;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * type
+        */
+        type:function(type){
+            return this.opt("type",type,function(){
+                this[0].toggleClass("_block",type === "block");
+            });
+        },
+        /*
+         * item width
+        */
+        itemWidth:function(width){
+            return this.opt("itemWidth",width,function(){
+                Std.each(this.items,function(i,item){
+                    item.width(width);
+                });
+            });
+        },
+        /*
+         * item height
+        */
+        itemHeight:function(height){
+            return this.opt("itemHeight",height,function(){
+                Std.each(this.items,function(i,item){
+                    item.height(height);
+                });
+            });
+        },
+        /*
+         * data source
+        */
+        dataSource:function(dataSource){
+            return this.opt("dataSource",dataSource,function(){
+                this.reload();
+            });
+        },
+        /*
+         * editable
+        */
+        editable:function(editable){
+            return this.opt("editable",editable);
+        },
+        /*
+         * each
+        */
+        each:function(callback,makeReturn){
+            var that = this;
+
+            return Std.each(that.items,function(i,row){
+                if(isFunction(callback)){
+                    return callback.call(that,i,row);
+                }
+            },makeReturn);
+        },
+        /*
+         * template
+        */
+        template:function(template){
+            var that = this;
+            var opts = that.opts;
+
+            if(template === undefined){
+                return opts.template;
+            }
+            if(isString(template)){
+                template = Std.template(template);
+            }
+            if(template instanceof Std.template){
+                opts.template = template;
+            }
+            return that;
+        },
+        /*
+         * reload
+        */
+        reload:function(data){
+            var that       = this;
+            var opts       = that.opts;
+            var dataSource = opts.dataSource;
+            var read       = dataSource.read;
+
+            if(dataSource && dataSource.type === "ajax" && isObject(read)){
+                Std.ajax.json({
+                    url:read.url,
+                    data:Std.extend(read.data || {},data),
+                    type:read.type || "get",
+                    success:function(responseJSON){
+                        that.clear();
+                        that.append(Std.mold.dataPath(responseJSON,read.dataPath));
+                        that.emit("dataSourceLoad",responseJSON);
+                    }
+                });
+            }
+            return that;
+        },
+        /*
+         * select item
+        */
+        select:Std.func(function(index){
+            var that          = this;
+            var opts          = that.opts;
+            var items         = that.items;
+            var selectionMode = opts.selectionMode;
+
+            if(selectionMode === "none"){
+                return;
+            }
+            if(isWidget(index)){
+                that.select(items.indexOf(index));
+            }else if(isNumber(index) && index !== -1){
+                var selectItem = items[index];
+
+                if(!selectItem || selectItem._selected){
+                    return;
+                }else if(selectionMode === "single"){
+                    that.clearSelect();
+                }
+
+                selectItem.addClass("selected");
+                selectItem._selected = true;
+
+                that.selectedItems.push(selectItem);
+                that.emit("select",[index,selectItem],true);
+            }
+        },{
+            each:[isArray]
+        }),
+        /*
+         * insert item
+        */
+        insert:function(data,index){
+            var that = this;
+            var item = that.createItem(data);
+
+            if(item !== null && isWidget(item)){
+                that.items.insert(item,index);
+                that[0].insert(item[0],index);
+                that.renderState && item.render();
+            }
+        },
+        /*
+         * append item
+        */
+        append:Std.func(function(data){
+            this.insert(data);
+        },{
+            each:[isArray]
+        }),
+        /*
+         * clear select
+        */
+        clearSelect:function(data){
+            var that          = this;
+            var selectedItems = that.selectedItems;
+
+            if(data === undefined){
+                for(var i=0,length=selectedItems.length;i<length;i++){
+                    selectedItems[i].removeClass("selected");
+                    selectedItems[i]._selected = false;
+                }
+                selectedItems.clear();
+            }else if(isNumber(data) && data !== -1){
+                var selectedItem = selectedItems[data];
+                if(selectedItem && selectedItem._selected){
+                    selectedItem.removeClass("selected");
+                    selectedItem._selected = false;
+                    selectedItems.remove(data);
+                }
+            }else if(isWidget(data)){
+                that.clearSelect(selectedItems.indexOf(data));
+            }
+            return that;
+        },
+        /*
+         * clear items
+        */
+        clear:function(){
+            var that  = this;
+            var items = that.items;
+
+            for(var i=0,length=items.length;i<length;i++){
+                items[i].remove();
+            }
+            items.clear();
+            that.selectedItems.clear();
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        that.items         = [];
+        that.selectedItems = [];
+
+        that.call_opts({
+            type:"default",
+            template:null
+        },true);
+
+        if(opts.items){
+            that.append(opts.items);
+        }
+
+        that.initEvents();
+        that.initItemEvents();
+    }
+});

@@ -1,1 +1,79 @@
-.StdUI_List{position:relative;border:1px solid #B1B3B0;background:#fff;overflow:auto;transition:background .12s,border-color .2s;outline:0}.StdUI_List.hover{border-color:#6FD6FF}.StdUI_List.focus{border-color:#4AABDB}.StdUI_List.disabled{color:#ACA9A8;border-color:#C0BDBB;background:#EEE}.StdUI_List._block>.StdUI{display:inline-block;vertical-align:top;overflow:hidden}.StdUI_List>.StdUI_ListItem{clear:both;cursor:pointer;padding:0 5px;position:relative;overflow:hidden;color:#5A5A5A;border:1px solid transparent;transition:background .15s,border-color .15s}.StdUI_List>.StdUI_ListItem.hover{background:#D6EBF6}.StdUI_List>.StdUI_ListItem.selected{background:#43ACE8;color:#fff}.StdUI_List>.StdUI_ListItem.disabled{cursor:not-allowed}.StdUI_List>.StdUI_ListItem>._icon{float:left}.StdUI_List>.StdUI_ListItem>._text{float:left;text-indent:5px}.StdUI_List>.StdUI_ListItem>input._edit{float:left;font-size:12px;border:0;padding:0 4px;background:#fff;color:#272727}.StdUI_List>.StdUI_TemplateItem{clear:both;cursor:pointer;transition:background .15s,border-color .15s}.StdUI_List>.StdUI_TemplateItem.hover{background:#D6EBF6}.StdUI_List>.StdUI_TemplateItem.selected{background:#3AA7DD;color:#fff}
+
+
+/************* List *************/
+.StdUI_List{
+    position: relative;
+    border:1px solid #B1B3B0;
+    background: white;
+    overflow: auto;
+    transition: background 0.12s,border-color 0.2s;
+    outline:none;
+}
+.StdUI_List.hover{
+    border-color: #6FD6FF;
+}
+.StdUI_List.focus{
+    border-color: #4AABDB;
+}
+.StdUI_List.disabled{
+    color: #ACA9A8;
+    border-color: #C0BDBB;
+    background: #EEEEEE;
+}
+.StdUI_List._block > .StdUI{
+    display: inline-block;*display: inline;*zoom: 1;
+    vertical-align:top;
+    overflow: hidden;
+}
+
+/************* ListItem *************/
+.StdUI_List > .StdUI_ListItem{
+    clear: both;
+    cursor: pointer;
+    padding: 0 5px 0 5px;
+    position: relative;
+    overflow: hidden;
+    color: #5A5A5A;
+    border: 1px solid transparent;
+    transition: background 0.15s,border-color 0.15s;
+}
+.StdUI_List > .StdUI_ListItem.hover{
+    background: #D6EBF6;
+}
+.StdUI_List > .StdUI_ListItem.selected{
+    background: #43ACE8;
+    color: white;
+}
+.StdUI_List > .StdUI_ListItem.disabled{
+    cursor: not-allowed;
+}
+
+.StdUI_List > .StdUI_ListItem > ._icon{
+    float: left;
+}
+.StdUI_List > .StdUI_ListItem > ._text{
+    float: left;
+    text-indent: 5px;
+}
+.StdUI_List > .StdUI_ListItem > input._edit{
+    float: left;
+    font-size: 12px;
+    border: 0;
+    padding: 0 4px 0 4px;
+    background: white;
+    color: #272727;
+}
+
+/************ Template Item **************/
+.StdUI_List > .StdUI_TemplateItem{
+    clear: both;
+    cursor: pointer;
+    transition: background 0.15s,border-color 0.15s;
+}
+.StdUI_List > .StdUI_TemplateItem.hover{
+    background: #D6EBF6;
+}
+.StdUI_List > .StdUI_TemplateItem.selected{
+    background: #3AA7DD;
+    color: white;
+}

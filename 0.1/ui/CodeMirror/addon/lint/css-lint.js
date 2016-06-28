@@ -1,1 +1,35 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.registerHelper("lint","css",function(r){var o=[];if(!window.CSSLint)return o;for(var i=CSSLint.verify(r),t=i.messages,n=null,s=0;s<t.length;s++){n=t[s];var f=n.line-1,c=n.line-1,l=n.col-1,u=n.col;o.push({from:e.Pos(f,l),to:e.Pos(c,u),message:n.message,severity:n.type})}return o})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Depends on csslint.js from https://github.com/stubbornella/csslint
+
+// declare global: CSSLint
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.registerHelper("lint", "css", function(text) {
+  var found = [];
+  if (!window.CSSLint) return found;
+  var results = CSSLint.verify(text), messages = results.messages, message = null;
+  for ( var i = 0; i < messages.length; i++) {
+    message = messages[i];
+    var startLine = message.line -1, endLine = message.line -1, startCol = message.col -1, endCol = message.col;
+    found.push({
+      from: CodeMirror.Pos(startLine, startCol),
+      to: CodeMirror.Pos(endLine, endCol),
+      message: message.message,
+      severity : message.type
+    });
+  }
+  return found;
+});
+
+});

@@ -1,1 +1,2076 @@
-Std.ui.module("DataGrid",function(){var e="rowNumbers",t="rowCheckable",n="mouseenter",o="selected";return{parent:"widget",events:"clear selectionModeChange cellChange columnClick rowClick cellClick columnDblClick rowDblClick cellDblClick columnDropStart columnDropStop removeColumn removeRow updateRow dataSourceLoad",option:{level:4,height:300,minWidth:120,minHeight:60,headerHeight:29,headerVisible:!0,columnWidth:80,columnResizable:!0,columnSortable:!1,columnTextAlign:"left",columnDroppable:!0,columnEditable:!1,rowHeight:32,rowEditable:!1,rowNumbers:!1,rowCheckable:!1,rowCheckboxWidth:40,rowCollapsible:!1,cellPadding:3,cellEditable:!1,cellBorder:!0,cellTextAlign:"left",cellDroppable:!1,contextMenu:null,stripeRows:!1,hoverMode:"row",selectionMode:"row",items:null,columns:null,dataSource:null,value:null,valueFormat:"auto",boxSizing:"border-box",defaultClass:"StdUI_DataGrid"},"private":{rowCount:0,columnCount:0,rowNumbersWidth:0,selectedColumn:null,selectedRow:null,selectedRowIndex:null,selectedCell:null,columnPositions:null,lastRowBlock:null,sortHandle:null,cellWidgets:null,startAt:0,checkboxInit:!1},extend:{render:function(){var e=this;e.updateRowBlocks(),e.repaint(),e.updateStyle(),e.initEvents(),e.call_opts({contextMenu:null},!0)},height:function(e){var t=this,n=t.opts,o=t.boxSize;isNumber(e)||(e=t.height()),t[1].height(n.headerHeight),t[2].height(e-o.height-n.headerHeight-1),t.renderState&&t.refresh()},remove:function(e){var t=this;void 0===e&&t._CSSStyle.remove(),t.clear()}},"protected":{initHeader:function(){var e=this,t=e.opts;return e[0].append(e[1]=newDiv("_header").append(e.D.columns=newDiv("_columns"))),null!==t.columns&&e.appendColumn(t.columns),e},initBody:function(){var e=this;return e[0].append(e[2]=newDiv("_body")),e},initColumnPositions:function(){var e=this,t=e.opts;e._columnPositions=[];for(var n=0,o=e._columns.length,r=0;o>n;n++){var l=e._columns[n];e._columnPositions.push({begin:r,end:r=isNumber(l.width)?r+l.width:r+t.columnWidth})}return e._columnPositions},initScrollEvent:function(){var e=this,t=null;return e[2].on("scroll",function(){e[1].css("left",-this.scrollLeft())}),e[2].on("scroll",function(){null!==t&&clearTimeout(t),t=setTimeout(function(){e.repaint(),t=null},5+Math.ceil(e._rowCount/5e3))}),e},initColumnResizeEvent:function(e){var t=this,n=e.offset(),o=newDiv("_resizer").appendTo(t[0]).css({left:e.position().x-t[2].scrollLeft(),width:e.offsetWidth(),height:t.height()}),r=function(e){o.width(e.pageX-n.x+2)};return Std.dom(document).on("mousemove",r).once("mouseup",function(){var n=o.outerWidth(),l=e.index()-t._startAt;this.off("mousemove",r),t._columns[l].resizable!==!1&&(t._columns[l].width=n,t.updateStyle().refresh()),o.remove()}),t},initColumnDropHandle:function(e){var t=this,n=t.opts;return newDiv().css({position:"absolute",cursor:"move",zIndex:Std.ui.status.zIndex+1,border:"1px solid "+e.css("border-right-color"),paddingLeft:n.cellPadding+3,outerWidth:e.outerWidth()+1,outerHeight:e.outerHeight()+2,lineHeight:e.height(),background:t[1].css("background-color"),color:e.css("color"),fontSize:e.css("font-size"),textAlign:n.columnTextAlign}).html(e.html()).appendTo("body")},initColumnDropEvent:function(e){var t=this,n=t.opts,o=0,r=0,l=0,i=e.index()-t._startAt,s=e.offset(),u=!1,c=null,a=0,d=t._columnPositions=t.initColumnPositions(),h=null,m=function(n){u=!0,c=t.initColumnDropHandle(e),o=s.x-n.pageX-1,r=s.y-n.pageY-1,a=t[1].offset(),l=e.outerWidth(),a.x+=Std.dom(t._columns[0].element).position().x,t.emit("columnDropStart",[n.pageX,n.pageY],!0)},f=function(e){return!(e.pageX+o+l<a.x||e.pageX+o>a.x+t.width()||e.pageY+r+n.headerHeight<s.y||e.pageY+r>a.y+n.headerHeight)},v=function(e){for(var t=0,n=e.pageX+o+l/2,r=d.length;r>t;t++){var i=d[t].begin,s=d[t].end,u=a.x;if(u>n&&e.pageX+o+l>u)return 0;if(n>=u+i&&u+i+(s-i)/2>=n)return t;if(n>=u+i&&u+s>=n&&n>=u+i+(s-i)/2)return++t;if(t===r-1&&e.pageX+o<=u+s)return++t}return-1},p=function(e){if(0==u&&m(e),f(e)){var n=v(e);-1!==n&&n!=h&&t.showColumnDropPosition(h=n)}else t.hideColumnDropPosition();c.css({left:e.pageX+o,top:e.pageY+r}),e.preventDefault()},w=function(){c.animate("end").animate({to:{left:s.x,top:s.y,opacity:.5}},300,function(){c.remove(),c=null})};Std.dom(document).on("mousemove",p).once("mouseup",function(e){if(null!==c)if(f(e)){var n=v(e);-1!==n&&n!==i&&t.moveColumn(i,n),c.remove(),c=null}else w();this.off("mousemove",p),t.emit("columnDropStop",[e.pageX,e.pageY],!0).updateStyle(),t.hideColumnDropPosition()})},initCheckbox:function(){var e=this;return e.D.columns.on(n,"._defColumn._rowCheckbox>._checkbox",function(t){var n=this.mouse({auto:!1,click:function(){for(var t=!n.hasClass("checked"),o=0,r=e._rows.length;r>o;o++)e._rows[o].checked=t;n.toggleClass("checked",t),e.refresh()}},t)}),e[2].on(n,"._block>._row>._defCell._rowCheckbox>._checkbox",function(t){var n=this,r=n.parent(),l=r.parent(),i=e.computeRowIndexByCell(r),s=e._rows[i];n.mouse({auto:!1,click:function(){n.toggleClass("checked",s.checked=!s.checked),"checkedRows"===e.selectionMode()&&(s.checked?e.selectRow(i,r.parent()):(l.removeClass(o),delete e._selectedRow[i]))}},t)}),e._checkboxInit=!0,e},initHeaderEvents:function(){var e=this,t=e.opts,o=function(n){var o=this.index()-e._startAt;this.mouse({auto:!1,dblclick:function(){t.columnEditable&&e.editColumn(this),e.emit("columnDblClick",o)},down:function(n){var r=t.selectionMode;t.columnDroppable&&1==n.which&&(e.initColumnDropEvent(this),n.preventDefault()),"column"===r&&(e.clearSelected(r),e.selectColumn(o))},click:function(){if(!(0>o)){var n=e._columns[o].sortType;switch(n){case"asc":n="desc";break;case"desc":n="asc";break;default:n="asc"}t.columnSortable&&e.sortColumn(o,n),e.emit("columnClick",o)}}},n)};return e.D.columns.on(n,"._column",o).delegate(n,"._column > ._resizeHandle",function(n){e.enable()&&t.columnResizable&&this.mouse({auto:!1,unselect:!0,down:function(){return e.initColumnResizeEvent(this.parent()),!1}},n)}),e},initCellEvents:function(){var e=this,t=e.opts,r=function(t){this.hasClass(o)?t in e._selectedCell&&(this.removeClass(o),delete e._selectedCell[t]):e.selectCell(t,this)};return e[2].delegate(n,"._block > ._row > ._cell",function(n){if(e.enable())var o=null,l=-1,i=-1,s=-1,u=t.selectionMode,c=null,a=this.mouse({auto:!1,classStatus:"cell"===t.hoverMode,click:function(){e.emit("cellClick",c)},dblclick:function(n){var o=e.column(l).type;if(l>=0&&t.cellEditable&&"widget"!==e.column(l).type){var r=e.queryRowByIndex(10*s+i);e.editCell(this,o,e.queryCellByIndex(r,l),function(t){e.updateCellByIndex(r,l,t),e.emit("cellChange",[c,t],!0),e.refresh()})}e.emit("cellDblClick",c),n.preventDefault()},down:function(t){o=a.parent(),l=a.index()-e._startAt,i=o.index(),s=o.parent().index(),c=sprintf("%d:%d",10*s+i,l),"cells"===u&&t.ctrlKey?("cells"===u&&1===t.which&&(t.preventDefault(),e.cellsSelectStart(this,s,i,l)),r.call(this,c)):("cells"===u||"cell"===u)&&(e.clearSelected("cell"),e.selectCell(c,this))}},n)}),e},initRowEvents:function(){var e=this,t=e.opts,r=function(t){if(this.hasClass(o)){var n=e.rowIndex(t);e._selectedRow[n]&&(this.removeClass(o),delete e._selectedRow[n])}else e.selectRow(t,this)};return e[2].delegate(n,"._block > ._row",function(n){if(e.enable())var o,l,i,s=t.selectionMode,u=this.mouse({auto:!1,classStatus:"row"===t.hoverMode,click:function(){e.emit("rowClick",i)},dblclick:function(){e.emit("rowDblClick",i)},down:function(t){o=u.index(),l=u.parent().index(),i=sprintf("%d:%d",l,o),"rows"===s&&t.ctrlKey?(1===t.which&&(t.preventDefault(),e.rowsSelectStart(u,l,o)),r.call(u,i)):("rows"===s||"row"===s)&&(e.clearSelected("row"),e.selectRow(i,u))}},n)}),e},initBodyEvents:function(){var e=this;return e.initScrollEvent(),e.initRowEvents(),e.initCellEvents(),e},initCellWidgets:function(){var e=this;return Std.each(e._cellWidgets,function(e,t){t.renderState||t.render()}),e},initEvents:function(){var e=this;return e[0].focussing(function(){e.addClass("focus")},function(){e.removeClass("focus")}).mouse(),e.initHeaderEvents(),e.initBodyEvents(),e},showColumnDropPosition:function(e){var t=this,n=t.opts,o=t[1].offset(),r=o.x-6+e+(e===t._columns.length?t._columnPositions[e-1].end:t._columnPositions[e].begin),l=Std.ui.status.zIndex+1;return r+=t._columns[0].element.position().x,t.hideColumnDropPosition(),t.D.columnPos1=newDiv("StdUI_DataGrid_ColumnPosition _top").appendTo("body").css({top:o.y-12,left:r,zIndex:l}),t.D.columnPos2=newDiv("StdUI_DataGrid_ColumnPosition _bottom").appendTo("body").css({top:o.y+n.headerHeight,left:r,zIndex:l}),t},hideColumnDropPosition:function(){var e=this;return e.D.columnPos1&&e.D.columnPos1.remove(),e.D.columnPos2&&e.D.columnPos2.remove(),e},createRowHtml:function(e,t){var n=this.opts,o="",r="",l="_row",i=l+(n.stripeRows?" _odd":"");n.rowNumbers&&(r+="<div class='_defCell _rowNumber'></div>"),n.rowCheckable&&(r+="<div class='_defCell _rowCheckbox'></div>");for(var s=0;t>s;s++)r+="<div class='_cell _cell"+s+"'></div>";for(var u=0;e>u;u++)o+="<div class='"+(u%2==0?l:i)+"'>"+r+"</div>";return o},paintCell:function(e,t,n,o,r){var l=this,i=l.opts;switch(e.type){case"template":t.innerHTML=e.template.render(isObject(n)?n:{value:n});break;case null:case"text":isString(n)||isNumber(n)?t.innerHTML=n+"":isObject(n)&&(isWidget(n)||n.ui?Std.dom(t).widget(n):Std.dom(t).set(n));break;case"widget":if(Std.ui.exist(e.ui)){var s=Std.ui(e.ui,Std.extend({width:(e.width||i.columnWidth)-2*i.cellPadding,height:i.rowHeight-2*i.cellPadding,value:n},e.option));s.on("change",function(){s.renderState&&l.updateCellByIndex(o,r,s.value())}),l._cellWidgets.push(t.ui=s.appendTo(t))}}return t},paintRow:function(e,t,n,o){var r=this,l=r.opts,i=[],s=r._columns,u=o.cells;if(!isArray(u)&&isObject(u)){var c=new Array(r._columnCount),a=[];for(var d in u){var h=r.queryColumnIndexByName(d);-1!==h&&(c[h]=u[d],a[h]=s[h])}s=a,u=c}var m=n.childNodes;l.rowNumbers&&(m[0].innerHTML=e+1),l.rowCheckable&&(m[l.rowNumbers?1:0].appendChild(newDiv("_checkbox"+(o.checked?" checked":"")).dom),o.checked&&"checkedRows"===r.selectionMode()&&r.selectRow(e,Std.dom(n)));for(var f=0,v=m.length;v>f;f++)o&&void 0!=u[f]&&(i[f]=r.paintCell(s[f],m[r._startAt+f],u[f],o,f));return{row:n,cells:i,blockID:t}},editCell:function(e,t,n,o){var r=this,l=e.position(),i=e.text();"template"===t&&(isString(n)||isNumber(n)?i=n:isObject(n)&&"value"in n&&(i=n.value));var s=newDom("input","_input").value(i).on({blur:function(){var e=this.value();s.remove(),Std.func(o).call(r,e)},keypress:function(e){13===e.keyCode&&this.blur()}}).appendTo(this[2]).css({top:l.y+r[2].scrollTop(),left:l.x+r[2].scrollLeft(),outerWidth:e.outerWidth(),outerHeight:e.outerHeight()});return setTimeout(s.focus.bind(s.lineHeight(s.height())),10),r},editColumn:function(e){var t=this,n=e.position(),o=newDom("input","_input").value(e.text()).on({blur:function(){var n=this.value(),r=t._columns[e.index()];Std.dom("._client",e).html(r.text=n),o.remove()},keypress:function(e){13===e.keyCode&&this.blur()}}).appendTo(this[1]).css({top:n.y+t[1].scrollTop(),left:n.x+t[1].scrollLeft(),outerWidth:e.outerWidth(),outerHeight:e.outerHeight()});return setTimeout(o.focus.bind(o.lineHeight(o.height())),10),t},editRow:function(){var e=this;return e},rowsSelectStart:function(e,t,r){var l=this,i="._block > ._row",s={},u=function(){Std.each(s,function(e,t){e in l._selectedRow&&delete l._selectedRow[e],t.removeClass(o),delete s[e]});var e=this,n=e.index(),i=e.parent().index(),u=r,c=t;(c>i||i==c&&u>n)&&(n^=u,u^=n,n^=u,c^=i,i^=c,c^=i);for(var a=c;i>=a;a++){var d=Std.dom(l._rowBlocks[a]).children(),h=d.length,m=0,f=h-1;a===c?(m=u,c===i&&(f=n)):a===i&&(m=0,f=n);for(var v=m;f>=v;v++)s[10*a+v]=d[v]}Std.each(s,function(e,t){t.addClass(o)})};return Std.dom(document).once("mouseup",function(){Std.each(s,function(e,t){l.selectRow(~~e,t)}),l[2].off(n,i,u)}),l[2].delegate(n,i,u),l},cellsSelectStart:function(e,t,r,l){var i=this,s="._block > ._row > ._cell",u={},c=function(){Std.each(u,function(e,t){e in i._selectedCell&&delete i._selectedCell[e],t.removeClass(o),delete u[e]});var e=this,n=e.parent(),s=e.index(),c=n.index(),a=n.parent().index(),d=l,h=r,m=t;d>s&&(s^=d,d^=s,s^=d),(m>a||a==m&&h>c)&&(c^=h,h^=c,c^=h,m^=a,a^=m,m^=a);for(var f=m;a>=f;f++){var v=Std.dom(i._rowBlocks[f]).children(),p=v.length,w=0,_=p-1;f===m?(w=h,m===a&&(_=c)):f===a&&(w=0,_=c);for(var C=w;_>=C;C++)for(var g=v[C].children(),b=d;s>=b;b++)u[10*f+C+":"+b]=g[b]}Std.each(u,function(e,t){t.addClass(o)})};return Std.dom(document).once("mouseup",function(){Std.each(u,function(e,t){i.selectCell(e,t)}),i[2].off(n,s,c)}),i[2].delegate(n,s,c),i},updateRowBlocks:function(){for(var e=this,t=e._rowCount,n=e._rowBlocks,o=document.createDocumentFragment(),r=0,l=Math.ceil(t/10)-n.length;l>r;r++){var i=document.createElement("div");i.className="_block _block"+r,o.appendChild(i),n.push(i)}e[2].dom.appendChild(o),null!==e._lastRowBlock&&Std.dom(e._lastRowBlock).removeStyle("height");var s=Std.dom(n[n.length-1]);return null!==s&&(e._lastRowBlock=s.height((e._rowCount-10*(n.length-1))*e.opts.rowHeight).dom),e},updateStyle:function(){var e=this,t=e.opts,n={},o=0,r=e.width()-e.boxSize.width,l=t.rowHeight-1,i=10*(l+1)+"px",s=l-2*t.cellPadding,u=t.columnWidth,c=t.headerHeight,a=e._rowNumbersWidth,d={"._defColumn":{height:c-1+"px"},"._column":{textAlign:t.columnTextAlign,height:c-1+"px",lineHeight:c-1+"px",">":{"._sortType":{marginTop:(c-7)/2+"px"}}}},h={"._cell":{padding:t.cellPadding+"px",height:s+"px",lineHeight:s+"px",textAlign:t.cellTextAlign}};t.rowNumbers&&(h["._defCell._rowNumber"]={height:t.rowHeight+"px",width:a+1+"px"},d["._defColumn._rowNumbers"]={height:c+"px",width:a+"px"},o+=a+2),t.rowCheckable&&(h["._defCell._rowCheckbox"]={height:t.rowHeight+"px",width:t.rowCheckboxWidth+1+"px"},d["._defColumn._rowCheckbox"]={width:t.rowCheckboxWidth+"px"},o+=t.rowCheckboxWidth+2);for(var m=0,f=e._columnCount;f>m;m++){var v=e._columns[m],p=(v.width||u)-1+"px";d["._column"+m]={width:p},h["._cell"+m]={width:(v.width||u)-2*t.cellPadding+"px"},o+=(v.width||u)+1}r>=o?o="100%":o+="px";var w={height:l+"px",lineHeight:l+"px",">":h};return n[".StdUI_DataGrid.StdUI_"+e.objectName]={">":{"._header":{">":{"._columns":{">":d}}},"._body":{">":{"._block":{width:o,height:i},"._block > ._row":w}}}},t.cellBorder===!1&&(h["._cell"].borderColor=w.borderColor="transparent"),e._CSSStyle.clear().append(n),e}},"public":{each:function(e,t){var n=this;return Std.each(n._rows,function(t,o){return isFunction(e)?e.call(n,t,o):void 0},t)},dataSource:function(e){return this.opt("dataSource",e,function(){this.reload()})},columnResizable:function(e){return this.opt("columnResizable",e)},selectionMode:function(e){return this.opt("selectionMode",e,function(){this.emit("selectionModeChange",e)})},valueFormat:function(e){return this.opt("valueFormat",e)},columnDroppable:function(e){return this.opt("columnDroppable",e)},columnSortable:function(e){return this.opt("columnSortable",e)},columnTextAlign:function(e){return this.opt("columnTextAlign",e,function(){this.updateStyle()})},row:function(e){return this.queryRowByIndex(e)},queryRowByIndex:function(e){return this._rows[this.rowIndex(e)]||null},queryRowByID:function(e){for(var t=this,n=t._rows,o=0,r=n.length;r>o;o++)if(n[o].ID===e)return n[o];return null},cell:function(e,t){return this.queryCellByIndex(e,t)},queryCellByColumnName:function(e,t){var n;if(isObject(e)?n=e.cells:(isNumber(e)||isString(e))&&null!==(e=this.queryRowByIndex(e))&&(n=e.cells),isArray(n)){var o=this.queryColumnIndexByName(t);if(-1!==o&&void 0!==n[o])return n[o]}else if(isObject(n)&&void 0!==n[t])return n[t];return null},queryCellByIndex:function(e,t){var n;if(isObject(e)?n=e.cells:(isNumber(e)||isString(e))&&null!==(e=this.queryRowByIndex(e))&&(n=e.cells),isArray(n)&&void 0!==n[t])return n[t];if(isObject(n)){var o=this.queryColumnByIndex(t);if(o&&o.name&&void 0!==n[o.name])return n[o.name]}return null},column:function(e){var t=this;return isNumber(e)?t.queryColumnByIndex(e):isString(e)?t.queryColumnByName(e):null},queryColumnByIndex:function(e){return this._columns[e]||null},queryColumnIndexByName:function(e){for(var t=0;t<this._columnCount;t++)if(e===this._columns[t].name)return t;return-1},queryColumnByName:function(e){var t=this.queryColumnIndexByName(e);return-1!==t?this._columns[t]:null},rowIndex:function(e){if(isString(e)){var t=(e=e.split(":")).length;1==t?e=~~e[0]:2==t&&(e=10*~~e[0]+~~e[1])}return e},computeRowIndexByCell:function(e){var t=e.parent();return 10*t.parent().index()+t.index()},headerVisible:function(e){var t=this;return t.opt("headerVisible",e,function(){t[1].visible(e)})},contextMenu:function(e){var t=this;return t.plugin("contextMenu",Std.extend({handle:t[2]},e)),t},stripeRows:function(e){return this.opt("stripeRows",e,function(){this.refresh()})},rowCheckable:function(n){var o=this,r=o._defColumns;return o.opt(t,n,function(){if(1!=n||r[t])0==n&&t in r&&(r[t]&&r[t].remove(),delete r[t],o._startAt--);else{var l=r[t]=newDiv("_defColumn _rowCheckbox").append(newDiv("_checkbox"));o._checkboxInit||o.initCheckbox(),o.rowNumbers()?o.D.columns.insertAfter(l,r[e]):o.D.columns.prepend(l),o._startAt++}o.renderState&&o.refresh().updateStyle()})},rowNumbers:function(t){var n=this,o=n._defColumns;return n.opt(e,t,function(){1!=t||o[e]?0==t&&e in o&&(o[e]&&o[e].remove(),n._startAt--,delete o[e]):(n.D.columns.prepend(o[e]=newDiv("_defColumn _rowNumbers")),n._startAt++),n.renderState&&n.refresh().updateStyle()})},selectRow:function(e,t){var n=this,r=-1,l=n._selectedRow;return void 0===e?l:(r=isString(t)&&void 0===e?n.rowIndex(t):isString(e)?n.rowIndex(e):isNumber(t)?t:e,isObject(t)||(t=n._rowBlocks[Math.floor(r/10)].children(r%10)),!t||r in l||(l[r]=t.addClass(o)),n)},selectedRow:function(){var e=this,t=e._selectedRow,n=e.selectionMode();if("row"==n)for(var o in t)return o;else if("rows"==n){var r=[];for(var o in t)r.push(o);return r}return null},selectCell:function(e,t){var n=this,r=n._selectedCell,l=-1;if(void 0===e){if("cell"==n.selectionMode())for(var i in r)return r[i];return r}if(isString(e)&&(l=e.split(":")),!isObject(t)){var s=n._rowBlocks[Math.floor(l[0]/10)].children(l[0]%10);t=s.children(l[1])}return!t||e in r||(r[e]=t.addClass(o)),n},selectedCell:function(){var e=this,t=e._selectedCell,n=e.selectionMode();if("cell"==n)for(var o in t)return t[o];else if("cells"==n){var r=[];for(var o in t)r.push(o);return r}return null},selectColumn:function(e){var t=this,n=t._columns,r=t._selectedColumn;return e in r||(r[e]=n[e],r[e].element.addClass(o)),t},updateCellByColumnName:function(e,t,n){var o;if(isObject(e)?o=e.cells:(isNumber(e)||isString(e))&&null!==(e=this.queryRowByIndex(e))&&(o=e.cells),isArray(o)){var r=this.queryColumnIndexByName(t);-1!==r&&void 0!==o[r]&&(o[r]=n)}else isObject(o)&&void 0!==o[t]&&(o[t]=n);return this},updateCellByIndex:function(e,t,n){var o;if(isObject(e)?o=e.cells:(isNumber(e)||isString(e))&&null!==(e=this.queryRowByIndex(e))&&(o=e.cells),isArray(o)&&void 0!==o[t])o[t]=n;else if(isObject(o)){var r=this.queryColumnByIndex(t);r&&r.name&&void 0!==o[r.name]&&(o[r.name]=n)}return this},updateRowByIndex:function(e,t){var n=this,o=n._rows;if(isNumber(e)||isString(e))-1!==(e=n.rowIndex(e))&&(o[e]=t);else if(isObject(e))for(var r in e)-1!==(r=n.rowIndex(r))&&(o[r]=e[r]);return n},updateRowByID:function(e,t){var n=this,o=n._rows,r=function(e,t){for(var r=0,l=n._rowCount;l>r;r++)if(o[r].ID===e){o[r]=t;break}};if(isNumber(e)||isString(e))r(e,t);else if(isObject(e))for(var l in e)r(l,e[l]);return n},value:function(e){var t=this,n=t.valueFormat();if(void 0!==e)return t;for(var o=null,r=0;r<t._rowCount;r++){var l=t._rows[r];o||("auto"==n?o||(o="ID"in l?{}:[]):"array"==n?o=[]:"object"==n&&(o={})),isArray(o)?o.push(l.cells):isObject(o)&&"ID"in l&&(o[l.ID]=l.cells)}return o},mergeCells:function(){var e=this;return e},moveColumn:function(e,t){var n=this,o=n._columns;t===o.length?o[e].element.insertAfter(o[t-1].element):o[e].element.insertBefore(o[t].element),o.move(e,t>e?--t:t);for(var r=0;r<n._rowCount;r++){var l=n._rows[r].cells;isArray(l)&&l.move(e,t)}return n.resetColumnClass().refresh()},swapColumn:function(e,t){var n=this,o=n._columns;o[e].element.swap(o[t].element),o.swap(e,t);for(var r=0;r<n._rowCount;r++){var l=n._rows[r].cells;isArray(l)&&l.swap(e,t)}return n.resetColumnClass().refresh()},insertColumn:function(e,t){var n=this,o="",r=newDiv("_column _column"+n._columnCount),l=n._columns;isString(e)?o=e:isObject(e)&&(o=e.text||"column"+n._columnCount);var i={text:o,element:r.append([newDiv("_client").html(o),newDiv("_resizeHandle")])};return Std.each("ui name type width option template resizable",function(t,n){i[n]=void 0===e[n]?null:e[n]}),null!=t&&t<n._columnCount?(l.insert(i,t),n.D.columns.insert(r,t)):(n.D.columns.append(r),l.push(i)),n._columnCount++,n.renderState&&n.updateStyle(),n},sortColumn:function(e,t){var n=this,o=n._columns[e],r=function(e,t){return isArray(e)?t:o.name};return null!==n._sortHandle&&n._sortHandle.remove(),"desc"===t?n._rows.sort(function(t,n){return t.cells[r(t.cells,e)]<n.cells[r(n.cells,e)]}):"asc"===t&&n._rows.sort(function(t,n){return t.cells[r(t.cells,e)]>n.cells[r(n.cells,e)]}),o.sortType=t,o.element.append(n._sortHandle=newDiv("_sortType"+(t?" _"+t:""))),n.refresh()},appendColumn:Std.func(function(e){return this.insertColumn(e)},{each:[isArray]}),insertRow:Std.func(function(){},{each:[isArray]}),appendRow:function(e){var t=this;return isArray(e)?(t._rows.mergeArray(e),t._rowCount+=e.length):isObject(e)&&"cells"in e&&(t._rows.push(e),t._rowCount++),t.renderState&&t.refresh(),t},resetColumnClass:function(e){for(var t=this,n=t._columns,o=e||0,r=n.length;r>o;o++)n[o].element.className("_column _column"+o);return t},refresh:function(){var e=this;return e.clearCellWidgets(),e.clearRowBlocks(),e.updateRowBlocks(),e.repaint()},reload:function(e){var t=this,n=t.opts,o=n.dataSource,r=o.read;return o&&"ajax"===o.type&&isObject(r)&&Std.ajax.json({url:r.url,data:Std.extend(r.data||{},e),type:r.type||"get",success:function(e){t.clear(),t.appendRow(Std.mold.dataPath(e,r.dataPath)),t.emit("dataSourceLoad",e)}}),t},repaint:function(){for(var e=this,t=e.opts,n=e[2].dom.scrollTop,o=10*t.rowHeight,r=Math.floor(n/o),l=Math.ceil((e.height()-e.boxSize.height-t.headerHeight-1)/o+n/o%1),i=0,s=0;l>s;s++){var u=r+s,c=e._rowBlocks[u];if(c&&0===c.childNodes.length){for(var a=c===e._lastRowBlock?e._rowCount-10*u:10,d=e.createRowHtml(a,e._columnCount),h=Std.dom.fragment(d),m=0,f=h.childNodes,v=f.length;v>m;m++)e.paintRow(10*u+m,u,f[m],e._rows[i=10*u+m]);c.appendChild(h)}}if(t.rowNumbers){var p=newDom("span","_tester").html(e._rowCount).appendTo(e);(e._rowNumbersWidth=p.width()+10)<30&&(e._rowNumbersWidth=30),p.remove()}return e.initCellWidgets()},clearSelected:Std.func(function(e){var t=this;switch(e){case void 0:t.clearSelected("column row cell");break;case"column":Std.each(t._selectedColumn,function(e,n){n.element.removeClass(o),delete t._selectedColumn[e]});break;case"row":Std.each(t._selectedRow,function(e,n){n.removeClass(o),delete t._selectedRow[e]});break;case"cell":Std.each(t._selectedCell,function(e,n){n.removeClass(o),delete t._selectedCell[e]})}},{each:[isArray,isString]}),removeColumn:function(e){var t=this,n=t._columns;if(isString(e)&&(e=t.queryColumnIndexByName(e)),isNumber(e)&&t._columnCount>e&&e>=0){for(var o=n[e],r=n.indexOf(o),l=0;l<t._rowCount;l++){var i=t._rows[l].cells;isArray(i)?i.remove(r):isObject(i)&&delete i[o.name]}o.element.remove(),n.remove(r),t.resetColumnClass(e)}return t._columnCount=t._columns.length,t.refresh().emit("removeColumn",e)},removeRow:function(e){var t=this;if(isNumber(e)||isArray(e))t._rows.remove(e);else if("select"===e){var n=[];Std.each(t._selectedRow,function(e){n.push(~~e)}),t._rows.remove(n)}return t._rowCount=t._rows.length,t.refresh().emit("removeRow",e)},clear:function(){var e=this;return e._rowCount=0,e._rows.clear(),e.clearRowBlocks(),e.clearCellWidgets(),e.emit("clear")},clearCellWidgets:function(){var e=this;return Std.each(e._cellWidgets,function(e,t){t.remove()}),e._cellWidgets.clear(),e},clearRowBlocks:function(){var e=this;return e._lastRowBlock=null,e._rowBlocks.clear(),e.clearSelected(),e[2].clear(),e}},main:function(e,t){e.addClass("StdUI_"+e.objectName),e.D={},e._CSSStyle=new Std.css,e._rows=[],e._columns=[],e._rowBlocks=[],e._selectedColumn={},e._selectedRow={},e._selectedCell={},e._cellWidgets=[],e._defColumns={},e.initHeader(),e.initBody(),e.call_opts({rowNumbers:!1,rowCheckable:!1,dataSource:null},!0),isArray(t.items)&&(e._rows.mergeArray(t.items),e._rowCount+=t.items.length)}}});
+/**
+ * data grid widget module
+*/
+Std.ui.module("DataGrid",function(){
+    var $rowNumbers   = "rowNumbers";
+    var $rowCheckable = "rowCheckable";
+    var $mouseenter   = "mouseenter";
+    var $selected     = "selected";
+
+    return {
+        /*[#module option:parent]*/
+        parent:"widget",
+        /*[#module option:events]*/
+        events:"clear selectionModeChange cellChange columnClick rowClick cellClick columnDblClick rowDblClick cellDblClick columnDropStart columnDropStop removeColumn removeRow updateRow dataSourceLoad",
+        /*[#module option:option]*/
+        option:{
+            level:4,
+            height:300,
+            minWidth:120,
+            minHeight:60,
+            headerHeight:29,
+            headerVisible:true,
+            columnWidth:80,
+            columnResizable:true,
+            columnSortable:false,
+            columnTextAlign:"left",
+            columnDroppable:true,
+            columnEditable:false,
+            rowHeight:32,
+            rowEditable:false,
+            rowNumbers:false,
+            rowCheckable:false,
+            rowCheckboxWidth:40,
+            rowCollapsible:false,
+            cellPadding:3,
+            cellEditable:false,
+            cellBorder:true,
+            cellTextAlign:"left",
+            cellDroppable:false,
+            contextMenu:null,
+            stripeRows:false,
+            hoverMode:"row",     //row,cell
+            selectionMode:"row", //row,rows,cell,cells,checkedRows,column,columns,none
+            items:null,
+            columns:null,
+            dataSource:null,
+            value:null,
+            valueFormat:"auto",   //auto,array,object
+            boxSizing:"border-box",
+            defaultClass:"StdUI_DataGrid"
+        },
+        /*[#module option:private]*/
+        private:{
+            /*
+             * row count
+             */
+            rowCount:0,
+            /*
+             * column count
+             */
+            columnCount:0,
+            /*
+             * row numbers width
+            */
+            rowNumbersWidth:0,
+            /*
+             * selected column
+             */
+            selectedColumn:null,
+            /*
+             * selected row
+             */
+            selectedRow:null,
+            /*
+             * selected row index
+             */
+            selectedRowIndex:null,
+            /*
+             * selected cell
+             */
+            selectedCell:null,
+            /*
+             * column positions
+             */
+            columnPositions:null,
+            /*
+             * last row block
+            */
+            lastRowBlock:null,
+            /*
+             * sort handle
+             */
+            sortHandle:null,
+            /*
+             * widgets
+             */
+            cellWidgets:null,
+            /*
+             * startAt
+            */
+            startAt:0,
+            /*
+             * checkbox init
+            */
+            checkboxInit:false
+        },
+        /*[#module option:extend]*/
+        extend:{
+            /*
+             * render
+             */
+            render:function(){
+                var that = this;
+
+                that.updateRowBlocks();
+                that.repaint();
+                that.updateStyle();
+                that.initEvents();
+                that.call_opts({
+                    contextMenu:null
+                },true);
+            },
+            /*
+             * height
+             */
+            height:function(height){
+                var that    = this;
+                var opts    = that.opts;
+                var boxSize = that.boxSize;
+
+                if(!isNumber(height)){
+                    height = that.height();
+                }
+                that[1].height(opts.headerHeight);
+                that[2].height(height - boxSize.height - opts.headerHeight - 1);
+
+                if(that.renderState){
+                    that.refresh();
+                }
+            },
+            /*
+             * remove
+             */
+            remove:function(item){
+                var that = this;
+
+                if(item === undefined){
+                    that._CSSStyle.remove();
+                }
+                that.clear();
+            }
+        },
+        /*[#module option:protected]*/
+        protected:{
+            /*
+             * init header
+            */
+            initHeader:function(){
+                var that = this;
+                var opts = that.opts;
+
+                that[0].append(
+                    that[1] = newDiv("_header").append(
+                        that.D.columns = newDiv("_columns")
+                    )
+                );
+                if(opts.columns !== null){
+                    that.appendColumn(opts.columns);
+                }
+                return that;
+            },
+            /*
+             * init body
+            */
+            initBody:function(){
+                var that = this;
+
+                that[0].append(
+                    that[2] = newDiv("_body")
+                );
+
+                return that;
+            },
+            /*
+             * init column positions
+            */
+            initColumnPositions:function(){
+                var that = this;
+                var opts = that.opts;
+
+                that._columnPositions = [];
+
+                for(var i=0,length=that._columns.length,lastColumnEndPos=0;i<length;i++){
+                    var column = that._columns[i];
+
+                    that._columnPositions.push({
+                        begin:lastColumnEndPos,
+                        end  :lastColumnEndPos = (isNumber(column.width) ? lastColumnEndPos + column.width : lastColumnEndPos+opts.columnWidth)
+                    });
+                }
+                return that._columnPositions;
+            },
+            /*
+             * init scroll event
+            */
+            initScrollEvent:function(){
+                var that  = this;
+                var timer = null;
+
+                that[2].on("scroll",function(){
+                    that[1].css("left",-this.scrollLeft());
+                });
+                that[2].on("scroll",function(){
+                    if(timer !== null){
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(function(){
+                        that.repaint();
+                        timer = null;
+                    },5 + Math.ceil(that._rowCount / 5000));
+                });
+                return that;
+            },
+            /*
+             * init resize event
+            */
+            initColumnResizeEvent:function(column){
+                var that      = this;
+                var offset    = column.offset();
+                var resizer   = newDiv("_resizer").appendTo(that[0]).css({
+                    left   : column.position().x - that[2].scrollLeft(),
+                    width  : column.offsetWidth(),
+                    height : that.height()
+                });
+                var mousemove = function(e){
+                    resizer.width(e.pageX - offset.x + 2);
+                };
+                Std.dom(document).on("mousemove",mousemove).once("mouseup",function(e){
+                    var width = resizer.outerWidth();
+                    var index = column.index() - that._startAt;
+
+                    this.off("mousemove",mousemove);
+
+                    if(that._columns[index].resizable !== false){
+                        that._columns[index].width = width;
+                        that.updateStyle().refresh();
+                    }
+                    resizer.remove();
+                });
+                return that;
+            },
+            /*
+             * init column drop handle
+             */
+            initColumnDropHandle:function(columnElement){
+                var that = this;
+                var opts = that.opts;
+
+                return newDiv().css({
+                    position:"absolute",
+                    cursor: "move",
+                    zIndex: Std.ui.status.zIndex+1,
+                    border:"1px solid " + columnElement.css("border-right-color"),
+                    paddingLeft:opts.cellPadding + 3,
+                    outerWidth : columnElement.outerWidth() + 1,
+                    outerHeight: columnElement.outerHeight() + 2,
+                    lineHeight:columnElement.height(),
+                    background:that[1].css("background-color"),
+                    color:columnElement.css("color"),
+                    fontSize:columnElement.css("font-size"),
+                    textAlign:opts.columnTextAlign
+                }).html(columnElement.html()).appendTo("body");
+            },
+            /*
+             * init column drop event
+            */
+            initColumnDropEvent:function(columnElement){
+                var that        = this;
+                var opts        = that.opts;
+                var startX      = 0;
+                var startY      = 0;
+                var columnWidth = 0;
+                var columnIndex = columnElement.index() - that._startAt;
+                var offset      = columnElement.offset();
+                var movestart   = false;
+                var moveHandle  = null;
+                var headOffset  = 0;
+                var columnPos   = that._columnPositions = that.initColumnPositions();
+                var lastIndex   = null;
+                var initHandle  = function(e){
+                    movestart   = true;
+                    moveHandle  = that.initColumnDropHandle(columnElement);
+
+                    startX      = offset.x - e.pageX - 1;
+                    startY      = offset.y - e.pageY - 1;
+                    headOffset  = that[1].offset();
+                    columnWidth = columnElement.outerWidth();
+
+                    headOffset.x += Std.dom(that._columns[0].element).position().x;
+                    that.emit("columnDropStart",[e.pageX,e.pageY],true);
+                };
+                var inRange    = function(e){
+                    return !(
+                        e.pageX + startX + columnWidth < headOffset.x ||
+                        e.pageX + startX > headOffset.x + that.width()
+                        ||
+                        e.pageY + startY + opts.headerHeight < offset.y ||
+                        e.pageY + startY > headOffset.y + opts.headerHeight
+                    );
+                };
+                var computePos = function(e){
+                    for(var i=0,x=e.pageX+startX+columnWidth/2,length=columnPos.length;i<length;i++){
+                        var begin   = columnPos[i].begin;
+                        var end     = columnPos[i].end;
+                        var offsetX = headOffset.x;
+
+                        if(x < offsetX && e.pageX+startX+columnWidth > offsetX){
+                            return 0;
+                        }else if(x >= offsetX+begin && x<=offsetX+begin + (end-begin) / 2){
+                            return i;
+                        }else if(x >= offsetX+begin && x<=offsetX+end && x >= offsetX + begin + (end-begin) / 2){
+                            return ++i;
+                        }else if(i===length-1 && e.pageX+startX <= offsetX+end){
+                            return ++i;
+                        }
+                    }
+                    return -1;
+                };
+                var mousemove = function(e){
+                    if(movestart == false){
+                        initHandle(e);
+                    }
+                    if(!inRange(e)){
+                        that.hideColumnDropPosition();
+                    }else{
+                        var index = computePos(e);
+                        if(index !== -1 && index != lastIndex){
+                            that.showColumnDropPosition(lastIndex = index);
+                        }
+                    }
+                    moveHandle.css({left:e.pageX+startX,top:e.pageY + startY});
+                    e.preventDefault();
+                };
+                var animateBack = function(){
+                    moveHandle.animate("end").animate({
+                        to:{
+                            left:offset.x,
+                            top:offset.y,
+                            opacity:0.5
+                        }
+                    },300,function(){
+                        moveHandle.remove();
+                        moveHandle = null;
+                    });
+                };
+
+                Std.dom(document).on("mousemove",mousemove).once("mouseup",function(e){
+                    if(moveHandle !== null){
+                        if(inRange(e)){
+                            var index = computePos(e);
+                            if(index !== -1 && index !== columnIndex){
+                                that.moveColumn(columnIndex,index)
+                            }
+                            moveHandle.remove();
+                            moveHandle = null;
+                        }else{
+                            animateBack();
+                        }
+                    }
+                    this.off("mousemove",mousemove);
+                    that.emit("columnDropStop",[e.pageX,e.pageY],true).updateStyle();
+                    that.hideColumnDropPosition();
+                });
+            },
+            /*
+             * init checkbox
+            */
+            initCheckbox:function(){
+                var that = this;
+
+                that.D.columns.on($mouseenter,"._defColumn._rowCheckbox>._checkbox",function(e){
+                    var checkbox = this.mouse({auto:false, click:function(){
+                        var checked = !checkbox.hasClass("checked");
+                        for(var i=0,length=that._rows.length;i<length;i++){
+                            that._rows[i].checked = checked;
+                        }
+                        checkbox.toggleClass("checked",checked);
+                        that.refresh();
+                    }},e);
+                });
+
+                that[2].on($mouseenter,"._block>._row>._defCell._rowCheckbox>._checkbox",function(e){
+                    var checkbox   = this;
+                    var cell       = checkbox.parent();
+                    var rowElement = cell.parent();
+                    var rowIndex   = that.computeRowIndexByCell(cell);
+                    var rowData    = that._rows[rowIndex];
+
+                    checkbox.mouse({auto:false, click:function(){
+                        checkbox.toggleClass("checked", rowData.checked = !rowData.checked);
+                        if(that.selectionMode() === "checkedRows"){
+                            if(rowData.checked){
+                                that.selectRow(rowIndex,cell.parent());
+                            }else{
+                                rowElement.removeClass($selected);
+                                delete that._selectedRow[rowIndex];
+                            }
+                        }
+                    }},e);
+                });
+                that._checkboxInit = true;
+                return that;
+            },
+            /*
+             * init header events
+            */
+            initHeaderEvents:function(){
+                var that       = this;
+                var opts       = that.opts;
+                var mouseenter = function(e){
+                    var columnIndex = this.index() - that._startAt;
+                    this.mouse({
+                        auto:false,
+                        dblclick:function(){
+                            if(opts.columnEditable){
+                                that.editColumn(this);
+                            }
+                            that.emit("columnDblClick",columnIndex);
+                        },
+                        down:function(e){
+                            var selectionMode = opts.selectionMode;
+                            if(opts.columnDroppable && e.which == 1){
+                                that.initColumnDropEvent(this);
+                                e.preventDefault();
+                            }
+                            if(selectionMode === "column"){
+                                that.clearSelected(selectionMode);
+                                that.selectColumn(columnIndex);
+                            }
+                        },
+                        click:function(){
+                            if(columnIndex < 0){
+                                return;
+                            }
+                            var sortType = that._columns[columnIndex].sortType;
+                            switch(sortType){
+                                case "asc":
+                                    sortType = "desc";
+                                    break;
+                                case "desc":
+                                    sortType = "asc";
+                                    break;
+                                default:
+                                    sortType = "asc";
+                            }
+                            if(opts.columnSortable){
+                                that.sortColumn(columnIndex,sortType);
+                            }
+                            that.emit("columnClick",columnIndex);
+                        }
+                    },e);
+                };
+                that.D.columns.on($mouseenter,"._column",mouseenter).delegate($mouseenter,"._column > ._resizeHandle",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
+                    opts.columnResizable && this.mouse({
+                        auto:false,
+                        unselect:true,
+                        down:function(){
+                            that.initColumnResizeEvent(this.parent());
+                            return false;
+                        }
+                    },e);
+                });
+                return that;
+            },
+            /*
+             * init cell events
+            */
+            initCellEvents:function(){
+                var that        = this;
+                var opts        = that.opts;
+                var selectCells = function(cellPosition){
+                    if(!this.hasClass($selected)){
+                        that.selectCell(cellPosition,this);
+                    }else if(cellPosition in that._selectedCell){
+                        this.removeClass($selected);
+                        delete that._selectedCell[cellPosition];
+                    }
+                };
+                that[2].delegate($mouseenter,"._block > ._row > ._cell",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
+                    var row             = null;
+                    var startCellIndex  = -1;
+                    var startRowIndex   = -1;
+                    var startBlockIndex = -1;
+                    var selectionMode   = opts.selectionMode;
+                    var cellPosition    = null;
+                    var cell            = this.mouse({
+                        auto:false,
+                        classStatus:opts.hoverMode === "cell",
+                        click:function(){
+                            that.emit("cellClick",cellPosition);
+                        },
+                        dblclick:function(e){
+                            var columnType = that.column(startCellIndex).type;
+                            if(startCellIndex >= 0 && opts.cellEditable && that.column(startCellIndex).type !== "widget"){
+                                var rowData = that.queryRowByIndex(startBlockIndex * 10 + startRowIndex);
+                                that.editCell(this,columnType,that.queryCellByIndex(rowData,startCellIndex),function(text){
+                                    that.updateCellByIndex(rowData,startCellIndex,text);
+                                    that.emit("cellChange",[cellPosition,text],true);
+                                    that.refresh();
+                                });
+                            }
+                            that.emit("cellDblClick",cellPosition);
+                            e.preventDefault();
+                        },
+                        down:function(e){
+                            row             = cell.parent();
+                            startCellIndex  = cell.index() - that._startAt;
+                            startRowIndex   = row.index();
+                            startBlockIndex = row.parent().index();
+                            cellPosition    = sprintf("%d:%d",startBlockIndex * 10 + startRowIndex,startCellIndex);
+
+                            if(selectionMode === "cells" && e.ctrlKey){
+                                if(selectionMode === "cells" && e.which === 1){
+                                    e.preventDefault();
+                                    that.cellsSelectStart(this,startBlockIndex,startRowIndex,startCellIndex);
+                                }
+                                selectCells.call(this,cellPosition);
+                            }else if(selectionMode === "cells" || selectionMode === "cell"){
+                                that.clearSelected("cell");
+                                that.selectCell(cellPosition,this);
+                            }
+                        }
+                    },e);
+                });
+                return that;
+            },
+            /*
+             * init row events
+             */
+            initRowEvents:function(){
+                var that       = this;
+                var opts       = that.opts;
+                var selectRows = function(rowPosition){
+                    if(!this.hasClass($selected)){
+                        that.selectRow(rowPosition,this);
+                    }else{
+                        var index = that.rowIndex(rowPosition);
+                        if(that._selectedRow[index]){
+                            this.removeClass($selected);
+                            delete that._selectedRow[index];
+                        }
+                    }
+                };
+
+                that[2].delegate($mouseenter,"._block > ._row",function(e){
+                    if(!that.enable()){
+                        return;
+                    }
+                    var startIndex,startBlockIndex,rowPosition;
+                    var selectionMode = opts.selectionMode;
+                    var row           = this.mouse({
+                        auto:false,
+                        classStatus:opts.hoverMode === "row",
+                        click:function(){
+                            that.emit("rowClick",rowPosition);
+                        },
+                        dblclick:function(e){
+                            that.emit("rowDblClick",rowPosition);
+                        },
+                        down:function(e){
+                            startIndex      = row.index();
+                            startBlockIndex = row.parent().index();
+                            rowPosition     = sprintf("%d:%d",startBlockIndex,startIndex);
+
+                            if(selectionMode === "rows" && e.ctrlKey){
+                                if(e.which === 1){
+                                    e.preventDefault();
+                                    that.rowsSelectStart(row,startBlockIndex,startIndex);
+                                }
+                                selectRows.call(row,rowPosition);
+                            }else if(selectionMode === "rows" || selectionMode === "row"){
+                                that.clearSelected("row");
+                                that.selectRow(rowPosition,row);
+                            }
+                        }
+                    },e);
+                });
+
+                return that;
+            },
+            /*
+             * init body events
+            */
+            initBodyEvents:function(){
+                var that = this;
+
+                that.initScrollEvent();
+                that.initRowEvents();
+                that.initCellEvents();
+
+                return that;
+            },
+            /*
+             * init cell widgets
+            */
+            initCellWidgets:function(){
+                var that = this;
+
+                Std.each(that._cellWidgets,function(i,widget){
+                    if(!widget.renderState){
+                        widget.render();
+                    }
+                });
+
+                return that;
+            },
+            /*
+             * init events
+            */
+            initEvents:function(){
+                var that = this;
+
+                that[0].focussing(function(){
+                    that.addClass("focus");
+                },function(){
+                    that.removeClass("focus");
+                }).mouse();
+
+                that.initHeaderEvents();
+                that.initBodyEvents();
+
+                return that;
+            },
+            /*
+             * show column drop position
+            */
+            showColumnDropPosition:function(index){
+                var that       = this;
+                var opts       = that.opts;
+                var headOffset = that[1].offset();
+                var offsetLeft = headOffset.x - 6 + index + (index === that._columns.length ? that._columnPositions[index - 1].end : that._columnPositions[index].begin);
+                var zIndex     = Std.ui.status.zIndex + 1;
+
+                offsetLeft += that._columns[0].element.position().x;
+
+                that.hideColumnDropPosition();
+                that.D.columnPos1 = newDiv("StdUI_DataGrid_ColumnPosition _top").appendTo("body").css({
+                    top:headOffset.y - 12,
+                    left:offsetLeft,
+                    zIndex:zIndex
+                });
+                that.D.columnPos2 = newDiv("StdUI_DataGrid_ColumnPosition _bottom").appendTo("body").css({
+                    top:headOffset.y + opts.headerHeight,
+                    left:offsetLeft,
+                    zIndex:zIndex
+                });
+                return that;
+            },
+            /*
+             * hide column drop position
+            */
+            hideColumnDropPosition:function(){
+                var that = this;
+
+                if(that.D.columnPos1){
+                    that.D.columnPos1.remove();
+                }
+                if(that.D.columnPos2){
+                    that.D.columnPos2.remove();
+                }
+                return that;
+            },
+            /*
+             * create row html
+            */
+            createRowHtml:function(row,cell){
+                var opts         = this.opts;
+                var html         = "";
+                var rowHtml      = "";
+                var rowClass     = "_row";
+                var rowClass_odd = rowClass + (opts.stripeRows ? " _odd" : "");
+
+                if(opts.rowNumbers){
+                    rowHtml += "<div class='_defCell _rowNumber'></div>";
+                }
+                if(opts.rowCheckable){
+                    rowHtml += "<div class='_defCell _rowCheckbox'></div>";
+                }
+                for(var i=0;i<cell;i++){
+                    rowHtml += "<div class='_cell _cell"+i+"'></div>";
+                }
+                for(var y=0;y<row;y++){
+                    html += "<div class='" + (y%2==0 ? rowClass : rowClass_odd) + "'>"+rowHtml+"</div>";
+                }
+                return html;
+            },
+            /*
+             * update Cell
+            */
+            paintCell:function(column,element,data,rowData,cellIndex){
+                var that = this;
+                var opts = that.opts;
+
+                switch(column.type){
+                    case "template":
+                        element.innerHTML =  column.template.render(
+                            !isObject(data) ? {value:data} : data
+                        );
+                        break;
+                    case null:
+                    case "text":
+                        if(isString(data) || isNumber(data)){
+                            element.innerHTML = data + "";
+                        }else if(isObject(data)){
+                            if(isWidget(data) || data.ui){
+                                Std.dom(element).widget(data);
+                            }else{
+                                Std.dom(element).set(data);
+                            }
+                        }
+                        break;
+                    case "widget":
+                        if(Std.ui.exist(column.ui)){
+                            var widget = Std.ui(column.ui,Std.extend({
+                                width:(column.width || opts.columnWidth) - opts.cellPadding * 2,
+                                height:opts.rowHeight - opts.cellPadding * 2,
+                                value:data
+                            },column.option));
+
+                            widget.on("change",function(){
+                                if(widget.renderState){
+                                    that.updateCellByIndex(rowData,cellIndex,widget.value());
+                                }
+                            });
+                            that._cellWidgets.push(
+                                element.ui = widget.appendTo(element)
+                            );
+                        }
+                        break;
+                }
+                return element;
+            },
+            /*
+             * paint row
+            */
+            paintRow:function(rowIndex,blockID,rowElement,rowData){
+                var that     = this;
+                var opts     = that.opts;
+                var cells    = [];
+                var columns  = that._columns;
+                var rowCells = rowData.cells;
+
+                if(!isArray(rowCells) && isObject(rowCells)){
+                    var cellsArray   = new Array(that._columnCount);
+                    var columnsArray = [];
+
+                    for(var name in rowCells){
+                        var columnIndex = that.queryColumnIndexByName(name);
+
+                        if(columnIndex !== -1){
+                            cellsArray[columnIndex]   = rowCells[name];
+                            columnsArray[columnIndex] = columns[columnIndex];
+                        }
+                    }
+                    columns  = columnsArray;
+                    rowCells = cellsArray;
+                }
+                var children = rowElement.childNodes;
+
+                if(opts.rowNumbers){
+                    children[0].innerHTML = rowIndex + 1;
+                }
+                if(opts.rowCheckable){
+                    children[opts.rowNumbers ? 1 : 0].appendChild(
+                        newDiv("_checkbox" + (rowData.checked ? " checked" : "")).dom
+                    );
+                    if(rowData.checked && that.selectionMode() === "checkedRows"){
+                        that.selectRow(rowIndex,Std.dom(rowElement));
+                    }
+                }
+                for(var y=0,cellCount=children.length;y<cellCount;y++){
+                    if(!rowData || rowCells[y] == undefined){
+                        continue;
+                    }
+                    cells[y] = that.paintCell(columns[y],children[that._startAt + y],rowCells[y],rowData,y);
+                }
+                return {row:rowElement,cells:cells,blockID:blockID};
+            },
+            /*
+             * edit cell
+            */
+            editCell:function(cell,columnType,cellData,callback){
+                var that     = this;
+                var position = cell.position();
+                var text     = cell.text();
+
+                if(columnType === "template"){
+                    if(isString(cellData) || isNumber(cellData)){
+                        text = cellData;
+                    }else if(isObject(cellData) && "value" in cellData){
+                        text = cellData.value;
+                    }
+                }
+                var input    = newDom("input","_input").value(text).on({
+                    blur:function(){
+                        var value = this.value();
+                        input.remove();
+                        Std.func(callback).call(that,value)
+                    },
+                    keypress:function(e){
+                        if(e.keyCode === 13){
+                            this.blur();
+                        }
+                    }
+                }).appendTo(this[2]).css({
+                    top  : position.y + that[2].scrollTop(),
+                    left : position.x + that[2].scrollLeft(),
+                    outerWidth  : cell.outerWidth(),
+                    outerHeight : cell.outerHeight()
+                });
+                setTimeout(input.focus.bind(
+                    input.lineHeight(input.height())
+                ),10);
+
+                return that;
+            },
+            /*
+             * edit column
+            */
+            editColumn:function(column){
+                var that     = this;
+                var position = column.position();
+                var input    = newDom("input","_input").value(column.text()).on({
+                    blur:function(){
+                        var text       = this.value();
+                        var columnData = that._columns[column.index()];
+
+                        Std.dom("._client",column).html(columnData.text = text);
+                        input.remove();
+                    },
+                    keypress:function(e){
+                        if(e.keyCode === 13){
+                            this.blur();
+                        }
+                    }
+                }).appendTo(this[1]).css({
+                    top  : position.y + that[1].scrollTop(),
+                    left : position.x + that[1].scrollLeft(),
+                    outerWidth  : column.outerWidth(),
+                    outerHeight : column.outerHeight()
+                });
+
+                setTimeout(input.focus.bind(
+                    input.lineHeight(input.height())
+                ),10);
+
+                return that;
+            },
+            /*
+             * edit row
+            */
+            editRow:function(){
+                var that = this;
+
+
+                return that;
+            },
+            /*
+             * rows select start
+            */
+            rowsSelectStart:function(startElement,startBlockIndex,startIndex){
+                var that         = this;
+                var rowSelector  = "._block > ._row";
+                var selectedRows = {};
+                var mouseenter   = function(e){
+                    Std.each(selectedRows,function(i,row){
+                        if(i in that._selectedRow){
+                            delete that._selectedRow[i];
+                        }
+                        row.removeClass($selected);
+                        delete selectedRows[i];
+                    });
+
+                    var current             = this;
+                    var current_index       = current.index();
+                    var current_blockIndex  = current.parent().index();
+                    var from_index          = startIndex;
+                    var from_blockIndex     = startBlockIndex;
+
+                    if(current_blockIndex < from_blockIndex || (current_blockIndex == from_blockIndex && current_index < from_index)){
+                        current_index      ^= from_index;
+                        from_index         ^= current_index;
+                        current_index      ^= from_index;
+
+                        from_blockIndex    ^= current_blockIndex;
+                        current_blockIndex ^= from_blockIndex;
+                        from_blockIndex    ^= current_blockIndex;
+                    }
+                    for(var i=from_blockIndex;i<=current_blockIndex;i++){
+                        var rows     = Std.dom(that._rowBlocks[i]).children();
+                        var length   = rows.length;
+                        var startPos = 0;
+                        var endPos   = length - 1;
+
+                        if(i === from_blockIndex){
+                            startPos = from_index;
+                            if(from_blockIndex === current_blockIndex){
+                                endPos = current_index;
+                            }
+                        }else if(i === current_blockIndex){
+                            startPos = 0;
+                            endPos   = current_index;
+                        }
+                        for(var y=startPos;y<=endPos;y++){
+                            selectedRows[i*10 + y] = rows[y];
+                        }
+                    }
+                    Std.each(selectedRows,function(i,row){
+                        row.addClass($selected);
+                    });
+                };
+
+                Std.dom(document).once("mouseup",function(){
+                    Std.each(selectedRows,function(i,row){
+                        that.selectRow(~~i,row);
+                    });
+                    that[2].off($mouseenter,rowSelector,mouseenter);
+                });
+                that[2].delegate($mouseenter,rowSelector,mouseenter);
+
+                return that;
+            },
+            /*
+             * cells select start
+            */
+            cellsSelectStart:function(startElement,startBlockIndex,startRowIndex,startIndex){
+                var that          = this;
+                var cellSelector  = "._block > ._row > ._cell";
+                var selectedCells = {};
+
+                var mouseenter = function(e){
+                    Std.each(selectedCells,function(i,cell){
+                        if(i in that._selectedCell){
+                            delete that._selectedCell[i];
+                        }
+                        cell.removeClass($selected);
+                        delete selectedCells[i];
+                    });
+
+                    var current             = this;
+                    var currentRow          = current.parent();
+                    var current_index       = current.index();
+                    var current_rowIndex    = currentRow.index();
+                    var current_blockIndex  = currentRow.parent().index();
+                    var from_index          = startIndex;
+                    var from_rowIndex       = startRowIndex;
+                    var from_blockIndex     = startBlockIndex;
+
+                    if(current_index < from_index){
+                        current_index      ^= from_index;
+                        from_index         ^= current_index;
+                        current_index      ^= from_index;
+                    }
+                    if(current_blockIndex < from_blockIndex || (current_blockIndex == from_blockIndex && current_rowIndex < from_rowIndex)){
+                        current_rowIndex   ^= from_rowIndex;
+                        from_rowIndex      ^= current_rowIndex;
+                        current_rowIndex   ^= from_rowIndex;
+
+                        from_blockIndex    ^= current_blockIndex;
+                        current_blockIndex ^= from_blockIndex;
+                        from_blockIndex    ^= current_blockIndex;
+                    }
+
+                    for(var i=from_blockIndex;i<=current_blockIndex;i++){
+                        var rows     = Std.dom(that._rowBlocks[i]).children();
+                        var length   = rows.length;
+                        var startPos = 0;
+                        var endPos   = length - 1;
+
+                        if(i === from_blockIndex){
+                            startPos = from_rowIndex;
+                            if(from_blockIndex === current_blockIndex){
+                                endPos = current_rowIndex;
+                            }
+                        }else if(i === current_blockIndex){
+                            startPos = 0;
+                            endPos   = current_rowIndex;
+                        }
+
+                        for(var y=startPos;y<=endPos;y++){
+                            var cells = rows[y].children();
+                            for(var z=from_index;z<=current_index;z++){
+                                selectedCells[i*10 + y + ":" + z] = cells[z];
+                            }
+                        }
+                    }
+                    Std.each(selectedCells,function(i,cell){
+                        cell.addClass($selected);
+                    });
+                };
+
+                Std.dom(document).once("mouseup",function(){
+                    Std.each(selectedCells,function(i,row){
+                        that.selectCell(i,row);
+                    });
+                    that[2].off($mouseenter,cellSelector,mouseenter);
+                });
+                that[2].delegate($mouseenter,cellSelector,mouseenter);
+
+                return that;
+            },
+            /*
+             * update row blocks
+            */
+            updateRowBlocks:function(){
+                var that      = this;
+                var rowCount  = that._rowCount;
+                var rowBlocks = that._rowBlocks;
+                var fragment  = document.createDocumentFragment();
+
+                for(var i=0,length=Math.ceil(rowCount / 10) - rowBlocks.length;i<length;i++){
+                    var block       = document.createElement("div");
+                    block.className = "_block _block"+i;
+
+                    fragment.appendChild(block);
+                    rowBlocks.push(block);
+                }
+                that[2].dom.appendChild(fragment);
+
+                if(that._lastRowBlock !== null){
+                    Std.dom(that._lastRowBlock).removeStyle("height");
+                }
+
+                var lastBlock = Std.dom(rowBlocks[rowBlocks.length-1]);
+
+                if(lastBlock !== null){
+                    that._lastRowBlock = lastBlock.height(
+                        (that._rowCount - (rowBlocks.length-1) * 10) * (that.opts.rowHeight)
+                    ).dom;
+                }
+                return that;
+            },
+            /*
+             * update style
+            */
+            updateStyle:function(){
+                var that            = this;
+                var opts            = that.opts;
+                var CSSData         = {};
+                var bodyWidth       = 0;
+                var gridWidth       = that.width() - that.boxSize.width;
+                var rowHeight       = opts.rowHeight - 1;
+                var blockHeight     = (rowHeight + 1) * 10 + "px";
+                var cellHeight      = rowHeight - opts.cellPadding * 2;
+                var columnWidth     = opts.columnWidth;
+                var headerHeight    = opts.headerHeight;
+                var rowNumbersWidth = that._rowNumbersWidth;
+                var columnData      = {
+                    "._defColumn":{
+                        height:headerHeight - 1 + "px"
+                    },
+                    "._column":{
+                        textAlign:opts.columnTextAlign,
+                        height:headerHeight - 1 + "px",
+                        lineHeight:headerHeight - 1 + "px",
+                        '>':{
+                            "._sortType":{
+                                marginTop:(headerHeight - 7) / 2 + "px"
+                            }
+                        }
+                    }
+                };
+                var cellData        = {
+                    "._cell":{
+                        padding:opts.cellPadding + "px",
+                        height:cellHeight + "px",
+                        lineHeight:cellHeight + "px",
+                        textAlign:opts.cellTextAlign
+                    }
+                };
+                if(opts.rowNumbers){
+                    cellData["._defCell._rowNumber"] = {
+                        height:opts.rowHeight + "px",
+                        width:rowNumbersWidth + 1 + "px"
+                    };
+                    columnData["._defColumn._rowNumbers"] = {
+                        height:headerHeight + "px",
+                        width:rowNumbersWidth + "px"
+                    };
+                    bodyWidth += rowNumbersWidth + 2;
+                }
+                if(opts.rowCheckable){
+                    cellData["._defCell._rowCheckbox"] = {
+                        height:opts.rowHeight + "px",
+                        width:opts.rowCheckboxWidth + 1 + "px"
+                    };
+                    columnData["._defColumn._rowCheckbox"] = {
+                        width:opts.rowCheckboxWidth + "px"
+                    };
+                    bodyWidth += opts.rowCheckboxWidth + 2;
+                }
+
+                for(var i=0,length=that._columnCount;i<length;i++){
+                    var column = that._columns[i];
+                    var width  = (column.width || columnWidth) - 1 + "px";
+
+                    columnData["._column" + i] = {
+                        width:width
+                    };
+                    cellData["._cell" + i] = {
+                        width:(column.width || columnWidth) - opts.cellPadding * 2 + "px"
+                    };
+                    bodyWidth += (column.width || columnWidth) + 1;
+                }
+
+                if(bodyWidth <= gridWidth){
+                    bodyWidth = "100%";
+                }else{
+                    bodyWidth += "px";
+                }
+
+                var rowStyles = {
+                    height:rowHeight + "px",
+                    lineHeight:rowHeight + "px",
+                    '>':cellData
+                };
+
+                CSSData[".StdUI_DataGrid.StdUI_" + that.objectName] = {
+                    '>':{
+                        "._header":{
+                            '>':{
+                                "._columns":{
+                                    '>':columnData
+                                }
+                            }
+                        },
+                        "._body":{
+                            '>':{
+                                "._block":{
+                                    width:bodyWidth,
+                                    height:blockHeight
+                                },
+                                "._block > ._row":rowStyles
+                            }
+                        }
+                    }
+                };
+
+                if(opts.cellBorder === false){
+                    cellData["._cell"].borderColor = rowStyles.borderColor = "transparent";
+                }
+                that._CSSStyle.clear().append(CSSData);
+                return that;
+            }
+        },
+        /*[#module option:public]*/
+        public:{
+            /*
+             * each
+            */
+            each:function(callback,makeReturn){
+                var that = this;
+
+                return Std.each(that._rows,function(i,row){
+                    if(isFunction(callback)){
+                        return callback.call(that,i,row);
+                    }
+                },makeReturn);
+            },
+            /*
+             * data source
+            */
+            dataSource:function(dataSource){
+                return this.opt("dataSource",dataSource,function(){
+                    this.reload();
+                });
+            },
+            /*
+             * columnResizable
+            */
+            columnResizable:function(state){
+                return this.opt("columnResizable",state);
+            },
+            /*
+             * selection mode
+            */
+            selectionMode:function(mode){
+                return this.opt("selectionMode",mode,function(){
+                    this.emit("selectionModeChange",mode);
+                });
+            },
+            /*
+             * value format
+            */
+            valueFormat:function(type){
+                return this.opt("valueFormat",type);
+            },
+            /*
+             * column draggable
+            */
+            columnDroppable:function(droppable){
+                return this.opt("columnDroppable",droppable);
+            },
+            /*
+             * column sortable
+            */
+            columnSortable:function(sortable){
+                return this.opt("columnSortable",sortable);
+            },
+            /*
+             * column text align
+            */
+            columnTextAlign:function(value){
+                return this.opt("columnTextAlign",value,function(){
+                    this.updateStyle();
+                });
+            },
+            /*
+             * query row by index
+            */
+            row:function(index){
+                return this.queryRowByIndex(index);
+            },
+            /*
+             * query row by index
+            */
+            queryRowByIndex:function(index){
+                return this._rows[this.rowIndex(index)] || null;
+            },
+            /*
+             * query row by id
+            */
+            queryRowByID:function(ID){
+                var that = this;
+                var rows = that._rows;
+
+                for(var i=0,length=rows.length;i<length;i++){
+                    if(rows[i].ID === ID){
+                        return rows[i];
+                    }
+                }
+                return null;
+            },
+            /*
+             * query cell by index
+            */
+            cell:function(row,index){
+                return this.queryCellByIndex(row,index);
+            },
+            /*
+             * query cell by column name
+            */
+            queryCellByColumnName:function(row,columnName){
+                var cells;
+
+                if(isObject(row)){
+                    cells = row.cells;
+                }else if(isNumber(row) || isString(row)){
+                    if((row = this.queryRowByIndex(row)) !== null){
+                        cells = row.cells;
+                    }
+                }
+
+                if(isArray(cells)){
+                    var columnIndex = this.queryColumnIndexByName(columnName);
+                    if(columnIndex !== -1 && cells[columnIndex] !== undefined){
+                        return cells[columnIndex];
+                    }
+                }else if(isObject(cells)){
+                    if(cells[columnName] !== undefined){
+                        return cells[columnName];
+                    }
+                }
+                return null;
+            },
+            /*
+             * query cell by index
+            */
+            queryCellByIndex:function(row,index){
+                var cells;
+
+                if(isObject(row)){
+                    cells = row.cells;
+                }else if(isNumber(row) || isString(row)){
+                    if((row = this.queryRowByIndex(row)) !== null){
+                        cells = row.cells;
+                    }
+                }
+
+                if(isArray(cells) && cells[index] !== undefined){
+                    return cells[index];
+                }else if(isObject(cells)){
+                    var column   = this.queryColumnByIndex(index);
+                    if(column && column.name && cells[column.name] !== undefined){
+                        return cells[column.name];
+                    }
+                }
+                return null;
+            },
+            /*
+             * column
+            */
+            column:function(pos){
+                var that = this;
+
+                if(isNumber(pos)){
+                    return that.queryColumnByIndex(pos);
+                }else if(isString(pos)){
+                    return that.queryColumnByName(pos);
+                }
+                return null;
+            },
+            /*
+             * query column by index
+            */
+            queryColumnByIndex:function(index){
+                return this._columns[index] || null;
+            },
+            /*
+             * query column index by name
+            */
+            queryColumnIndexByName:function(name){
+                for(var i=0;i<this._columnCount;i++){
+                    if(name === this._columns[i].name){
+                        return i;
+                    }
+                }
+                return -1;
+            },
+            /*
+             * query column by name
+            */
+            queryColumnByName:function(name){
+                var index = this.queryColumnIndexByName(name);
+
+                return index !== -1 ? this._columns[index] : null;
+            },
+            /*
+             * get row index
+            */
+            rowIndex:function(pos){
+                if(isString(pos)){
+                    var length = (pos = pos.split(':')).length;
+                    if(length == 1){
+                        pos = ~~pos[0];
+                    }else if(length == 2){
+                        pos = ~~pos[0] * 10 + ~~pos[1];
+                    }
+                }
+                return pos;
+            },
+            /*
+             * computeRowIndexByCell
+            */
+            computeRowIndexByCell:function(cellElement){
+                var row = cellElement.parent();
+
+                return row.parent().index() * 10 + row.index();
+            },
+            /*
+             * header visible
+            */
+            headerVisible:function(state){
+                var that = this;
+
+                return that.opt("headerVisible",state,function(){
+                    that[1].visible(state);
+                });
+            },
+            /*
+             * context menu plugin
+            */
+            contextMenu:function(menu){
+                var that = this;
+
+                that.plugin("contextMenu",Std.extend({
+                    handle:that[2]
+                },menu));
+
+                return that;
+            },
+            /*
+             * stripe rows
+             */
+            stripeRows:function(state){
+                return this.opt("stripeRows",state,function(){
+                    this.refresh();
+                });
+            },
+            /*
+             * row checkable
+            */
+            rowCheckable:function(state){
+                var that       = this;
+                var defColumns = that._defColumns;
+
+                return that.opt($rowCheckable,state,function(){
+                    if(state == true && !defColumns[$rowCheckable]){
+                        var checkboxColumn = defColumns[$rowCheckable] = newDiv("_defColumn _rowCheckbox").append(
+                            newDiv("_checkbox")
+                        );
+                        if(!that._checkboxInit){
+                            that.initCheckbox();
+                        }
+                        if(that.rowNumbers()){
+                            that.D.columns.insertAfter(checkboxColumn,defColumns[$rowNumbers]);
+                        }else{
+                            that.D.columns.prepend(checkboxColumn);
+                        }
+                        that._startAt++;
+                    }else if(state == false && $rowCheckable in defColumns){
+                        if(defColumns[$rowCheckable]){
+                            defColumns[$rowCheckable].remove();
+                        }
+                        delete defColumns[$rowCheckable];
+                        that._startAt--;
+                    }
+                    that.renderState && that.refresh().updateStyle();
+                });
+            },
+            /*
+             * row numbers
+            */
+            rowNumbers:function(state){
+                var that       = this;
+                var defColumns = that._defColumns;
+
+                return that.opt($rowNumbers,state,function(){
+                    if(state == true && !defColumns[$rowNumbers]){
+                        that.D.columns.prepend(
+                            defColumns[$rowNumbers] = newDiv("_defColumn _rowNumbers")
+                        );
+                        that._startAt++;
+                    }else if(state == false && $rowNumbers in defColumns){
+                        if(defColumns[$rowNumbers]){
+                            defColumns[$rowNumbers].remove();
+                        }
+                        that._startAt--;
+                        delete defColumns[$rowNumbers];
+                    }
+                    that.renderState && that.refresh().updateStyle();
+                });
+            },
+            /*
+             * select row
+            */
+            selectRow:function(pos,row){
+                var that        = this;
+                var rowIndex    = -1;
+                var selectedRow = that._selectedRow;
+
+                if(pos === undefined){
+                    return selectedRow;
+                }
+                if(isString(row) && pos === undefined){
+                    rowIndex = that.rowIndex(row);
+                }else if(isString(pos)){
+                    rowIndex = that.rowIndex(pos);
+                }else if(isNumber(row)){
+                    rowIndex = row;
+                }else{
+                    rowIndex = pos;
+                }
+
+                if(!isObject(row)){
+                    row = that._rowBlocks[Math.floor(rowIndex / 10)].children(rowIndex % 10);
+                }
+                if(row && !(rowIndex in selectedRow)){
+                    selectedRow[rowIndex] = row.addClass($selected);
+                }
+                return that;
+            },
+            /*
+             * selectedRow
+            */
+            selectedRow:function(){
+                var that          = this;
+                var selectedRow   = that._selectedRow;
+                var selectionMode = that.selectionMode();
+
+                if(selectionMode == "row"){
+                    for(var name in selectedRow){
+                        return name;
+                    }
+                }else if(selectionMode == "rows"){
+                    var list = [];
+                    for(var name in selectedRow){
+                        list.push(name);
+                    }
+                    return list;
+                }
+                return null;
+            },
+            /*
+             * select cell
+            */
+            selectCell:function(index,cell){
+                var that         = this;
+                var selectedCell = that._selectedCell;
+                var cellIndex    = -1;
+
+                if(index === undefined){
+                    if(that.selectionMode() == "cell"){
+                        for(var name in selectedCell){
+                            return selectedCell[name];
+                        }
+                    }
+                    return selectedCell;
+                }
+                if(isString(index)){
+                    cellIndex = index.split(':');
+                }
+                if(!isObject(cell)){
+                    var row = that._rowBlocks[Math.floor(cellIndex[0] / 10)].children(cellIndex[0] % 10);
+                    cell = row.children(cellIndex[1]);
+                }
+                if(cell && !(index in selectedCell)){
+                    selectedCell[index] = cell.addClass($selected);
+                }
+                return that;
+            },
+            /*
+             * selected cell
+            */
+            selectedCell:function(){
+                var that          = this;
+                var selectedCell  = that._selectedCell;
+                var selectionMode = that.selectionMode();
+
+                if(selectionMode == "cell"){
+                    for(var name in selectedCell){
+                        return selectedCell[name];
+                    }
+                }else if(selectionMode == "cells"){
+                    var list = [];
+                    for(var name in selectedCell){
+                        list.push(name);
+                    }
+                    return list;
+                }
+                return null;
+            },
+            /*
+             * select column
+            */
+            selectColumn:function(index){
+                var that           = this;
+                var columns        = that._columns;
+                var selectedColumn = that._selectedColumn;
+
+                if(!(index in selectedColumn)){
+                    selectedColumn[index] = columns[index];
+                    selectedColumn[index].element.addClass($selected);
+                }
+                return that;
+            },
+            /*
+             * update cell by column name
+            */
+            updateCellByColumnName:function(row,columnName,data){
+                var cells;
+
+                if(isObject(row)){
+                    cells = row.cells;
+                }else if(isNumber(row) || isString(row)){
+                   if((row = this.queryRowByIndex(row)) !== null){
+                       cells = row.cells;
+                   }
+                }
+                if(isArray(cells)){
+                    var columnIndex = this.queryColumnIndexByName(columnName);
+                    if(columnIndex !== -1 && cells[columnIndex] !== undefined){
+                        cells[columnIndex] = data;
+                    }
+                }else if(isObject(cells)){
+                    if(cells[columnName] !== undefined){
+                        cells[columnName] = data;
+                    }
+                }
+                return this;
+            },
+            /*
+             * update cell by index
+            */
+            updateCellByIndex:function(row,index,data){
+                var cells;
+
+                if(isObject(row)){
+                    cells = row.cells;
+                }else if(isNumber(row) || isString(row)){
+                    if((row = this.queryRowByIndex(row)) !== null){
+                        cells = row.cells;
+                    }
+                }
+
+                if(isArray(cells) && cells[index] !== undefined){
+                    cells[index] = data;
+                }else if(isObject(cells)){
+                    var column = this.queryColumnByIndex(index);
+                    if(column && column.name && cells[column.name] !== undefined){
+                        cells[column.name] = data;
+                    }
+                }
+                return this;
+            },
+            /*
+             * update row by index
+            */
+            updateRowByIndex:function(index,data){
+                var that = this;
+                var rows = that._rows;
+
+                if(isNumber(index) || isString(index)){
+                    if((index = that.rowIndex(index)) !== -1){
+                        rows[index] = data;
+                    }
+                }else if(isObject(index)){
+                    for(var currentIndex in index){
+                        if((currentIndex = that.rowIndex(currentIndex)) !== -1){
+                            rows[currentIndex] = index[currentIndex];
+                        }
+                    }
+                }
+                return that;
+            },
+            /*
+             * update row by ID
+            */
+            updateRowByID:function(ID,data){
+                var that   = this;
+                var rows   = that._rows;
+                var update = function(id,data){
+                    for(var i=0,length=that._rowCount;i<length;i++){
+                        if(rows[i].ID === id){
+                            rows[i] = data;
+                            break;
+                        }
+                    }
+                };
+                if(isNumber(ID) || isString(ID)){
+                    update(ID,data);
+                }else if(isObject(ID)){
+                    for(var id in ID){
+                        update(id,ID[id]);
+                    }
+                }
+                return that;
+            },
+            /*
+             * value
+            */
+            value:function(value){
+                var that        = this;
+                var valueFormat = that.valueFormat();
+
+                if(value !== undefined){
+                    return that;
+                }
+                for(var result=null,i=0;i<that._rowCount;i++){
+                    var row = that._rows[i];
+                    if(!result){
+                        if(valueFormat == "auto"){
+                            if(!result){
+                                result = "ID" in row ? {} : [];
+                            }
+                        }else if(valueFormat == "array"){
+                            result = [];
+                        }else if(valueFormat == "object"){
+                            result = {};
+                        }
+                    }
+                    if(isArray(result)){
+                        result.push(row.cells);
+                    }else if(isObject(result) && "ID" in row){
+                        result[row.ID] = row.cells;
+                    }
+                }
+                return result;
+            },
+            /*
+             * merge cell
+            */
+            mergeCells:function(rowIndex,cellIndex1,cellIndex2){
+                var that = this;
+
+                return that;
+            },
+            /*
+             * move column
+            */
+            moveColumn:function(from,to){
+                var that    = this;
+                var columns = that._columns;
+
+                if(to === columns.length){
+                    columns[from].element.insertAfter(columns[to-1].element);
+                }else{
+                    columns[from].element.insertBefore(columns[to].element);
+                }
+                columns.move(from,to > from ? --to : to);
+
+                for(var i=0;i<that._rowCount;i++){
+                    var cells = that._rows[i].cells;
+
+                    if(isArray(cells)){
+                        cells.move(from,to);
+                    }
+                }
+                return that.resetColumnClass().refresh();
+            },
+            /*
+             * swap column
+            */
+            swapColumn:function(sourceIndex,targetIndex){
+                var that    = this;
+                var columns = that._columns;
+
+                columns[sourceIndex].element.swap(columns[targetIndex].element);
+                columns.swap(sourceIndex,targetIndex);
+
+                for(var i=0;i<that._rowCount;i++){
+                    var cells = that._rows[i].cells;
+
+                    if(isArray(cells)){
+                        cells.swap(sourceIndex,targetIndex);
+                    }
+                }
+                return that.resetColumnClass().refresh();
+            },
+            /*
+             * insert column
+            */
+            insertColumn:function(column,index){
+                var that    = this;
+                var text    = "";
+                var name    = "";
+                var element = newDiv("_column _column" + that._columnCount);
+                var columns = that._columns;
+
+                if(isString(column)){
+                    text = column;
+                }else if(isObject(column)){
+                    text = column.text  || "column" + that._columnCount;
+                }
+
+                var columnData = {
+                    text:text,
+                    element:element.append([
+                        newDiv("_client").html(text),
+                        newDiv("_resizeHandle")
+                    ])
+                };
+                Std.each("ui name type width option template resizable",function(i,name){
+                    columnData[name] = column[name] === undefined ? null : column[name];
+                });
+                if(index != null && index < that._columnCount){
+                    columns.insert(columnData,index);
+                    that.D.columns.insert(element,index)
+
+                }else{
+                    that.D.columns.append(element);
+                    columns.push(columnData);
+                }
+                that._columnCount++;
+
+                if(that.renderState){
+                    that.updateStyle();
+                }
+                return that;
+            },
+            /*
+             * sort column
+            */
+            sortColumn:function(columnIndex,type){
+                var that     = this;
+                var column   = that._columns[columnIndex];
+                var getIndex = function(cells,index){
+                    if(isArray(cells)){
+                        return index;
+                    }
+                    return column.name;
+                };
+                if(that._sortHandle !== null){
+                    that._sortHandle.remove();
+                }
+                if(type === "desc"){
+                    that._rows.sort(function(x,y){
+                        return x.cells[getIndex(x.cells,columnIndex)] < y.cells[getIndex(y.cells,columnIndex)];
+                    });
+                }else if(type === "asc"){
+                    that._rows.sort(function(x,y){
+                        return x.cells[getIndex(x.cells,columnIndex)] > y.cells[getIndex(y.cells,columnIndex)];
+                    });
+                }
+                column.sortType = type;
+                column.element.append(
+                    that._sortHandle = newDiv("_sortType" + (type ? " _" + type : ""))
+                );
+                return that.refresh();
+            },
+            /*
+             * append column
+             */
+            appendColumn:Std.func(function(column){
+                return this.insertColumn(column);
+            },{
+                each:[isArray]
+            }),
+            /*
+             * insert row
+             */
+            insertRow:Std.func(function(row){
+
+            },{
+                each:[isArray]
+            }),
+            /*
+             * append row
+             */
+            appendRow:function(row){
+                var that  = this;
+
+                if(isArray(row)){
+                    that._rows.mergeArray(row);
+                    that._rowCount += row.length;
+                }else if(isObject(row) && "cells" in row){
+                    that._rows.push(row);
+                    that._rowCount++;
+                }
+                if(that.renderState){
+                    that.refresh();
+                }
+                return that;
+            },
+            /*
+             * refresh column class
+            */
+            resetColumnClass:function(startIndex){
+                var that    = this;
+                var columns = that._columns;
+
+                for(var i=startIndex || 0,length=columns.length;i<length;i++){
+                    columns[i].element.className("_column _column"+i);
+                }
+                return that;
+            },
+            /*
+             * refresh
+            */
+            refresh:function(){
+                var that = this;
+
+                that.clearCellWidgets();
+                that.clearRowBlocks();
+                that.updateRowBlocks();
+
+                return that.repaint();
+            },
+            /*
+             * reload
+            */
+            reload:function(data){
+                var that       = this;
+                var opts       = that.opts;
+                var dataSource = opts.dataSource;
+                var read       = dataSource.read;
+
+                if(dataSource && dataSource.type === "ajax" && isObject(read)){
+                    Std.ajax.json({
+                        url:read.url,
+                        data:Std.extend(read.data || {},data),
+                        type:read.type || "get",
+                        success:function(responseJSON){
+                            that.clear();
+                            that.appendRow(Std.mold.dataPath(responseJSON,read.dataPath));
+                            that.emit("dataSourceLoad",responseJSON);
+                        }
+                    });
+                }
+                return that;
+            },
+            /*
+             * repaint
+            */
+            repaint:function(){
+                var that        = this;
+                var opts        = that.opts;
+                var scrollTop   = that[2].dom.scrollTop;
+                var blockHeight = opts.rowHeight * 10;
+                var beginBlock  = Math.floor(scrollTop / blockHeight);
+                var blockNumber = Math.ceil((that.height() - that.boxSize.height - opts.headerHeight - 1) / blockHeight  + (scrollTop / blockHeight % 1));
+                var lastRowNum  = 0;
+
+                for(var i=0;i<blockNumber;i++){
+                    var blockID = beginBlock + i;
+                    var block   = that._rowBlocks[blockID];
+
+                    if(!block || block.childNodes.length !== 0){
+                        continue;
+                    }
+                    var rowCount  = block === that._lastRowBlock ? that._rowCount - blockID * 10 : 10;
+                    var blockHtml = that.createRowHtml(rowCount,that._columnCount);
+                    var fragment  = Std.dom.fragment(blockHtml);
+
+                    for(var y=0,rows=fragment.childNodes,length=rows.length;y<length;y++){
+                        that.paintRow(blockID * 10 + y,blockID,rows[y],that._rows[lastRowNum = blockID * 10 + y]);
+                    }
+                    block.appendChild(fragment);
+                }
+
+                if(opts.rowNumbers){
+                    var tester = newDom("span","_tester").html(that._rowCount).appendTo(that);
+                    if((that._rowNumbersWidth = tester.width() + 10) < 30){
+                        that._rowNumbersWidth = 30;
+                    }
+                    tester.remove();
+                }
+                return that.initCellWidgets();
+            },
+            /*
+             * clear selected
+            */
+            clearSelected:Std.func(function(type){
+                var that = this;
+
+                switch(type){
+                    case undefined:
+                        that.clearSelected("column row cell");
+                        break;
+                    case "column":
+                        Std.each(that._selectedColumn,function(i,column){
+                            column.element.removeClass($selected);
+                            delete that._selectedColumn[i];
+                        });
+                        break;
+                    case "row":
+                        Std.each(that._selectedRow,function(i,row){
+                            row.removeClass($selected);
+                            delete that._selectedRow[i];
+                        });
+                        break;
+                    case "cell":
+                        Std.each(that._selectedCell,function(i,cell){
+                            cell.removeClass($selected);
+                            delete that._selectedCell[i];
+                        });
+                        break;
+                }
+            },{
+                each:[isArray,isString]
+            }),
+            /*
+             * remove column
+            */
+            removeColumn:function(data){
+                var that    = this;
+                var columns = that._columns;
+
+                if(isString(data)){
+                    data = that.queryColumnIndexByName(data);
+                }
+                if(isNumber(data) && that._columnCount > data && data >= 0){
+                    var column = columns[data];
+                    var index  = columns.indexOf(column);
+
+                    for(var i=0;i<that._rowCount;i++){
+                        var cells = that._rows[i].cells;
+                        if(isArray(cells)){
+                            cells.remove(index);
+                        }else if(isObject(cells)){
+                            delete cells[column.name];
+                        }
+                    }
+                    column.element.remove();
+                    columns.remove(index);
+
+                    that.resetColumnClass(data);
+                }
+                that._columnCount = that._columns.length;
+
+                return that.refresh().emit("removeColumn",data);
+            },
+            /*
+             * remove row
+            */
+            removeRow:function(row){
+                var that = this;
+
+                if(isNumber(row) || isArray(row)){
+                    that._rows.remove(row);
+                }else if(row === "select"){
+                    var indexes = [];
+                    Std.each(that._selectedRow,function(index){
+                        indexes.push(~~index);
+                    });
+                    that._rows.remove(indexes);
+                }
+                that._rowCount = that._rows.length;
+
+                return that.refresh().emit("removeRow",row);
+            },
+            /*
+             * clear
+            */
+            clear:function(){
+                var that = this;
+
+                that._rowCount = 0;
+                that._rows.clear();
+                that.clearRowBlocks();
+                that.clearCellWidgets();
+
+                return that.emit("clear");
+            },
+            /*
+             * clear cell widgets
+            */
+            clearCellWidgets:function(){
+                var that = this;
+
+                Std.each(that._cellWidgets,function(i,widget){
+                    widget.remove();
+                });
+                that._cellWidgets.clear();
+
+                return that;
+            },
+            /*
+             * clear row blocks
+            */
+            clearRowBlocks:function(){
+                var that = this;
+
+                that._lastRowBlock = null;
+                that._rowBlocks.clear();
+                that.clearSelected();
+                that[2].clear();
+
+                return that;
+            }
+        },
+        /*[#module option:main]*/
+        main:function(that,opts,dom){
+            that.addClass("StdUI_" + that.objectName);
+            that.D               = {};
+            that._CSSStyle       = new Std.css;
+            that._rows           = [];
+            that._columns        = [];
+            that._rowBlocks      = [];
+            that._selectedColumn = {};
+            that._selectedRow    = {};
+            that._selectedCell   = {};
+            that._cellWidgets    = [];
+            that._defColumns     = {};
+
+            that.initHeader();
+            that.initBody();
+            that.call_opts({
+                rowNumbers:false,
+                rowCheckable:false,
+                dataSource:null
+            },true);
+
+            if(isArray(opts.items)){
+                that._rows.mergeArray(opts.items);
+                that._rowCount += opts.items.length;
+            }
+        }
+    }
+});

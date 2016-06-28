@@ -1,1 +1,86 @@
-.StdUI_SpinBox{font-size:12px;position:relative;border:1px solid #B1B3B0;background:#fff;overflow:hidden;border-radius:2px;transition:background .12s,border-color .2s;outline:0;height:24px;line-height:24px;padding:0 5px}.StdUI_SpinBox.hover{border-color:#6FD6FF}.StdUI_SpinBox.focus{border-color:#4AABDB}.StdUI_SpinBox.disabled{color:#ACA9A8;border-color:#C0BDBB;background:#EEE;cursor:not-allowed}.StdUI_SpinBox>input{font-size:12px;color:#2E2E2E;margin:0;padding:0;height:24px;line-height:24px;width:100%;border:0;resize:none;outline:0;background:0 0}.StdUI_SpinBox>._handles{position:absolute;top:0;right:0;width:18px;height:100%;background:#fff}.StdUI_SpinBox>._handles>._handle{width:18px;height:50%;background:url(images/StdUI_Global.png) no-repeat}.StdUI_SpinBox>._handles>._handle._add{background-position:-3px -436px}.StdUI_SpinBox>._handles>._handle._subtract{background-position:-25px -438px}.StdUI_SpinBox>._handles>._handle._add.hover{background-position:-89px -436px}.StdUI_SpinBox>._handles>._handle._subtract.hover{background-position:-111px -438px}.StdUI_SpinBox.disabled>._handles>._handle._add{background-position:-47px -436px}.StdUI_SpinBox.disabled>._handles>._handle._subtract{background-position:-68px -438px}.StdUI_SpinBox>._placeHolder{position:absolute;left:5px;top:0;z-index:1;background:0 0;color:#757575;cursor:text;width:3000px;height:24px;line-height:24px}
+
+/************ Global Edit State **************/
+.StdUI_SpinBox{
+    font-size: 12px;
+    position: relative;
+    border:1px solid #B1B3B0;
+    background: white;
+    overflow: hidden;
+    border-radius: 2px;
+    transition: background 0.12s,border-color 0.2s;
+    outline:none;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 5px 0 5px;
+}
+.StdUI_SpinBox.hover{
+    border-color: #6FD6FF;
+}
+.StdUI_SpinBox.focus{
+    border-color: #4AABDB;
+}
+.StdUI_SpinBox.disabled{
+    color: #ACA9A8;
+    border-color: #C0BDBB;
+    background: #EEEEEE;
+    cursor: not-allowed;
+}
+
+.StdUI_SpinBox > input{
+    font-size: 12px;
+    color: #2E2E2E;
+    margin: 0;
+    padding: 0;
+    height: 24px;
+    line-height: 24px;
+    width: 100%;
+    border: 0;
+    resize: none;
+    outline:none;
+    background: transparent;
+}
+.StdUI_SpinBox > ._handles{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 18px;
+    height: 100%;
+    background: white;
+}
+.StdUI_SpinBox > ._handles > ._handle{
+    width: 18px;
+    height: 50%;
+    background: url("images/StdUI_Global.png") no-repeat;
+}
+.StdUI_SpinBox > ._handles > ._handle._add{
+    background-position: -3px -436px;
+}
+.StdUI_SpinBox > ._handles > ._handle._subtract{
+    background-position: -25px -438px;
+}
+.StdUI_SpinBox > ._handles > ._handle._add.hover{
+    background-position: -89px -436px;
+}
+.StdUI_SpinBox > ._handles > ._handle._subtract.hover{
+    background-position: -111px -438px;
+}
+
+.StdUI_SpinBox.disabled > ._handles > ._handle._add{
+    background-position: -47px -436px;
+}
+.StdUI_SpinBox.disabled > ._handles > ._handle._subtract{
+    background-position: -68px -438px;
+}
+.StdUI_SpinBox > ._placeHolder{
+    position: absolute;
+    left: 5px;
+    top: 0;
+    z-index: 1;
+    background: transparent;
+    color: #757575;
+    cursor: text;
+    width: 3000px;
+    height: 24px;
+    line-height: 24px;
+}
+

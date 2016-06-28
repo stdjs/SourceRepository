@@ -1,1 +1,162 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("r",function(e){function t(e){for(var t=e.split(" "),n={},r=0;r<t.length;++r)n[t[r]]=!0;return n}function n(e,t){o=null;var n=e.next();if("#"==n)return e.skipToEnd(),"comment";if("0"==n&&e.eat("x"))return e.eatWhile(/[\da-f]/i),"number";if("."==n&&e.eat(/\d/))return e.match(/\d*(?:e[+\-]?\d+)?/),"number";if(/\d/.test(n))return e.match(/\d*(?:\.\d+)?(?:e[+\-]\d+)?L?/),"number";if("'"==n||'"'==n)return t.tokenize=r(n),"string";if("."==n&&e.match(/.[.\d]+/))return"keyword";if(/[\w\.]/.test(n)&&"_"!=n){e.eatWhile(/[\w\.]/);var i=e.current();return c.propertyIsEnumerable(i)?"atom":u.propertyIsEnumerable(i)?(f.propertyIsEnumerable(i)&&!e.match(/\s*if(\s+|$)/,!1)&&(o="block"),"keyword"):l.propertyIsEnumerable(i)?"builtin":"variable"}return"%"==n?(e.skipTo("%")&&e.next(),"variable-2"):"<"==n&&e.eat("-")?"arrow":"="==n&&t.ctx.argList?"arg-is":d.test(n)?"$"==n?"dollar":(e.eatWhile(d),"operator"):/[\(\){}\[\];]/.test(n)?(o=n,";"==n?"semi":null):null}function r(e){return function(t,r){if(t.eat("\\")){var i=t.next();return"x"==i?t.match(/^[a-f0-9]{2}/i):("u"==i||"U"==i)&&t.eat("{")&&t.skipTo("}")?t.next():"u"==i?t.match(/^[a-f0-9]{4}/i):"U"==i?t.match(/^[a-f0-9]{8}/i):/[0-7]/.test(i)&&t.match(/^[0-7]{1,2}/),"string-2"}for(var a;null!=(a=t.next());){if(a==e){r.tokenize=n;break}if("\\"==a){t.backUp(1);break}}return"string"}}function i(e,t,n){e.ctx={type:t,indent:e.indent,align:null,column:n.column(),prev:e.ctx}}function a(e){e.indent=e.ctx.indent,e.ctx=e.ctx.prev}var o,c=t("NULL NA Inf NaN NA_integer_ NA_real_ NA_complex_ NA_character_"),l=t("list quote bquote eval return call parse deparse"),u=t("if else repeat while function for in next break"),f=t("if else repeat while function for"),d=/[+\-*\/^<>=!&|~$:]/;return{startState:function(){return{tokenize:n,ctx:{type:"top",indent:-e.indentUnit,align:!1},indent:0,afterIdent:!1}},token:function(e,t){if(e.sol()&&(null==t.ctx.align&&(t.ctx.align=!1),t.indent=e.indentation()),e.eatSpace())return null;var n=t.tokenize(e,t);"comment"!=n&&null==t.ctx.align&&(t.ctx.align=!0);var r=t.ctx.type;return";"!=o&&"{"!=o&&"}"!=o||"block"!=r||a(t),"{"==o?i(t,"}",e):"("==o?(i(t,")",e),t.afterIdent&&(t.ctx.argList=!0)):"["==o?i(t,"]",e):"block"==o?i(t,"block",e):o==r&&a(t),t.afterIdent="variable"==n||"keyword"==n,n},indent:function(t,r){if(t.tokenize!=n)return 0;var i=r&&r.charAt(0),a=t.ctx,o=i==a.type;return"block"==a.type?a.indent+("{"==i?0:e.indentUnit):a.align?a.column+(o?0:1):a.indent+(o?0:e.indentUnit)},lineComment:"#"}}),e.defineMIME("text/x-rsrc","r")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("r", function(config) {
+  function wordObj(str) {
+    var words = str.split(" "), res = {};
+    for (var i = 0; i < words.length; ++i) res[words[i]] = true;
+    return res;
+  }
+  var atoms = wordObj("NULL NA Inf NaN NA_integer_ NA_real_ NA_complex_ NA_character_");
+  var builtins = wordObj("list quote bquote eval return call parse deparse");
+  var keywords = wordObj("if else repeat while function for in next break");
+  var blockkeywords = wordObj("if else repeat while function for");
+  var opChars = /[+\-*\/^<>=!&|~$:]/;
+  var curPunc;
+
+  function tokenBase(stream, state) {
+    curPunc = null;
+    var ch = stream.next();
+    if (ch == "#") {
+      stream.skipToEnd();
+      return "comment";
+    } else if (ch == "0" && stream.eat("x")) {
+      stream.eatWhile(/[\da-f]/i);
+      return "number";
+    } else if (ch == "." && stream.eat(/\d/)) {
+      stream.match(/\d*(?:e[+\-]?\d+)?/);
+      return "number";
+    } else if (/\d/.test(ch)) {
+      stream.match(/\d*(?:\.\d+)?(?:e[+\-]\d+)?L?/);
+      return "number";
+    } else if (ch == "'" || ch == '"') {
+      state.tokenize = tokenString(ch);
+      return "string";
+    } else if (ch == "." && stream.match(/.[.\d]+/)) {
+      return "keyword";
+    } else if (/[\w\.]/.test(ch) && ch != "_") {
+      stream.eatWhile(/[\w\.]/);
+      var word = stream.current();
+      if (atoms.propertyIsEnumerable(word)) return "atom";
+      if (keywords.propertyIsEnumerable(word)) {
+        // Block keywords start new blocks, except 'else if', which only starts
+        // one new block for the 'if', no block for the 'else'.
+        if (blockkeywords.propertyIsEnumerable(word) &&
+            !stream.match(/\s*if(\s+|$)/, false))
+          curPunc = "block";
+        return "keyword";
+      }
+      if (builtins.propertyIsEnumerable(word)) return "builtin";
+      return "variable";
+    } else if (ch == "%") {
+      if (stream.skipTo("%")) stream.next();
+      return "variable-2";
+    } else if (ch == "<" && stream.eat("-")) {
+      return "arrow";
+    } else if (ch == "=" && state.ctx.argList) {
+      return "arg-is";
+    } else if (opChars.test(ch)) {
+      if (ch == "$") return "dollar";
+      stream.eatWhile(opChars);
+      return "operator";
+    } else if (/[\(\){}\[\];]/.test(ch)) {
+      curPunc = ch;
+      if (ch == ";") return "semi";
+      return null;
+    } else {
+      return null;
+    }
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      if (stream.eat("\\")) {
+        var ch = stream.next();
+        if (ch == "x") stream.match(/^[a-f0-9]{2}/i);
+        else if ((ch == "u" || ch == "U") && stream.eat("{") && stream.skipTo("}")) stream.next();
+        else if (ch == "u") stream.match(/^[a-f0-9]{4}/i);
+        else if (ch == "U") stream.match(/^[a-f0-9]{8}/i);
+        else if (/[0-7]/.test(ch)) stream.match(/^[0-7]{1,2}/);
+        return "string-2";
+      } else {
+        var next;
+        while ((next = stream.next()) != null) {
+          if (next == quote) { state.tokenize = tokenBase; break; }
+          if (next == "\\") { stream.backUp(1); break; }
+        }
+        return "string";
+      }
+    };
+  }
+
+  function push(state, type, stream) {
+    state.ctx = {type: type,
+                 indent: state.indent,
+                 align: null,
+                 column: stream.column(),
+                 prev: state.ctx};
+  }
+  function pop(state) {
+    state.indent = state.ctx.indent;
+    state.ctx = state.ctx.prev;
+  }
+
+  return {
+    startState: function() {
+      return {tokenize: tokenBase,
+              ctx: {type: "top",
+                    indent: -config.indentUnit,
+                    align: false},
+              indent: 0,
+              afterIdent: false};
+    },
+
+    token: function(stream, state) {
+      if (stream.sol()) {
+        if (state.ctx.align == null) state.ctx.align = false;
+        state.indent = stream.indentation();
+      }
+      if (stream.eatSpace()) return null;
+      var style = state.tokenize(stream, state);
+      if (style != "comment" && state.ctx.align == null) state.ctx.align = true;
+
+      var ctype = state.ctx.type;
+      if ((curPunc == ";" || curPunc == "{" || curPunc == "}") && ctype == "block") pop(state);
+      if (curPunc == "{") push(state, "}", stream);
+      else if (curPunc == "(") {
+        push(state, ")", stream);
+        if (state.afterIdent) state.ctx.argList = true;
+      }
+      else if (curPunc == "[") push(state, "]", stream);
+      else if (curPunc == "block") push(state, "block", stream);
+      else if (curPunc == ctype) pop(state);
+      state.afterIdent = style == "variable" || style == "keyword";
+      return style;
+    },
+
+    indent: function(state, textAfter) {
+      if (state.tokenize != tokenBase) return 0;
+      var firstChar = textAfter && textAfter.charAt(0), ctx = state.ctx,
+          closing = firstChar == ctx.type;
+      if (ctx.type == "block") return ctx.indent + (firstChar == "{" ? 0 : config.indentUnit);
+      else if (ctx.align) return ctx.column + (closing ? 0 : 1);
+      else return ctx.indent + (closing ? 0 : config.indentUnit);
+    },
+
+    lineComment: "#"
+  };
+});
+
+CodeMirror.defineMIME("text/x-rsrc", "r");
+
+});

@@ -1,1 +1,399 @@
-Std.model("ui.Edit",{parent:"widget",action:{content:"value"},option:{value:"",echoMode:"text",boxSizing:"border-box",fontSize:null,maxLength:0,readOnly:!1,showState:!1,placeHolder:null},events:"focus blur change","private":{inputNodeName:"input",placeHolderState:!0},extend:{enable:function(e){var t=this,n=t.D.input,i="disabled";e===!1?n.attr(i,i):n.removeAttr(i)}},"protected":{initEvents:function(){var e=this,t=!1,n=function(){e.removeClass("focus"),e.showState()&&e.addClass(e.valid()?"_state _success":"_state _error")};return e[0].on("focusin",function(){0!=e.enable()&&(e.showState()&&e.removeClass("_state _success _error"),setTimeout(function(){e.addClass("focus").emit("focus").focus()},20),t!==!0&&(e.D.input.on("change",function(){e.emit("change")}),e[0].on("focusout",n),t=!0))}).mouse(),e},initPlaceHolder:function(){var e=this,t=e.opts;return e.D.placeHolder||(e.D.placeHolder=newDiv("_placeHolder").appendTo(e[0]).unselect(!0)),""!==t.value?e.placeHolderState(!1):e._placeHolderState=!0,e},initInput:function(e){var t=this,n=t.opts,i=t.D;return i.input="password"===n.echoMode?new Std.dom(t._inputNodeName+"[type='password']"):newDom(t._inputNodeName),isEmpty(e)||i.input.value(e),i.input.appendTo(t[0]).on("keydown keyup",Std.func(function(){t.placeHolderState(""===t.value())},5)),t}},"public":{showState:function(e){return this.opt("showState",e)},select:function(){var e=this;return e.D.input.select(),e},focus:function(){var e=this;return e.D.input.focus(),e},blur:function(){var e=this;return e.D.input.blur(),e},maxLength:function(e){var t=this;return t.opt("maxlength",e,function(){t.D.input.attr("maxlength",e)})},lineHeight:function(e){var t=this;return t.opt("lineHeight",e,function(){t.D.input.lineHeight(e)})},fontSize:function(e){var t=this;return void 0==e?t.D.input.css("font-size"):(t.D.input.css("font-size",e),t.D.placeHolder&&t.D.placeHolder.css("font-size",e),t)},value:function(e){var t=this,n=t.D;return void 0===e?n.input.value():(null==e&&(e=""),t.placeHolderState(""===e),n.input.value(e),t)},echoMode:function(e){var t=this;return t.opt("echoMode",e,function(){var e="";e=t.renderState?t.value():t.opts.value,t.D.input&&(t.D.input.remove(),delete t.D.input),t.initInput(e)})},readOnly:function(e){var t=this,n=t.D.input;return t.opt("readOnly",e,function(){e===!0?n.attr("readOnly","readOnly"):n.attr("readOnly","")})},placeHolder:function(e){var t=this,n=t.D;return t.opt("placeHolder",e,function(){n.placeHolder||t.initPlaceHolder(),n.placeHolder.html(e)})},placeHolderState:function(e){var t=this,n=t.D;return void 0===e?t._placeHolderState:e!==t._placeHolderState&&n.placeHolder?(n.placeHolder.visible(t._placeHolderState=e),t):t}},main:function(e,t){e.D={},e.echoMode(t.echoMode),e.call_opts({value:"",readOnly:!1,maxLength:0,placeHolder:null},!0),e.call_opts({fontSize:null},!0),e.initEvents()}}),Std.ui.module("LineEdit",{model:"ui.Edit",option:{level:3,dataList:null,minWidth:12,minHeight:12,defaultClass:"StdUI_LineEdit"},"private":{inputNodeName:"input"},extend:{height:function(e){var t=this;isNumber(e)||(e=t.height()),t.D.input.height(e-=t.boxSize.height),t.D.placeHolder&&t.D.placeHolder.css({height:e,lineHeight:e}),t.lineHeight(e)}},"public":{dataList:function(e){var t=this;return t.opt("dataList",e,function(){})}}}),Std.ui.module("TextEdit",{model:"ui.Edit",option:{level:4,minWidth:15,minHeight:20,defaultClass:"StdUI_TextEdit"},"private":{inputNodeName:"textarea"},extend:{height:function(e){var t=this;isNumber(e)&&t.D.input.height(e-=t.boxSize.height)},lineHeight:function(e){var t=this;t.D.placeHolder&&t.D.placeHolder.lineHeight(e)}}});
+/**
+ * ui: edit model
+*/
+Std.model("ui.Edit",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        value:"",
+        echoMode:"text",
+        boxSizing:"border-box",
+        fontSize:null,
+        maxLength:0,
+        readOnly:false,
+        showState:false,
+        placeHolder:null
+    },
+    /*[#module option:events]*/
+    events:"focus blur change",
+    /*[#module option:private]*/
+    private:{
+        /*
+         * input node name
+        */
+        inputNodeName:"input",
+        /*
+         * place holder state
+        */
+        placeHolderState:true
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend enable
+        */
+        enable:function(state){
+            var that      = this;
+            var input     = that.D.input;
+            var $disabled = "disabled";
+
+            if(state === false){
+                input.attr($disabled,$disabled);
+            }else{
+                input.removeAttr($disabled);
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that     = this;
+            var state    = false;
+            var focusout = function(){
+                that.removeClass("focus");
+
+                if(!that.showState()){
+                    return;
+                }
+                if(that.valid()){
+                    that.addClass("_state _success");
+                }else{
+                    that.addClass("_state _error");
+                }
+            };
+
+            that[0].on("focusin",function(){
+                if(that.enable() == false){
+                    return;
+                }
+                if(that.showState()){
+                    that.removeClass("_state _success _error");
+                }
+                setTimeout(function(){
+                    that.addClass("focus").emit("focus").focus()
+                },20);
+                if(state === true){
+                    return;
+                }
+                that.D.input.on("change",function(){
+                    that.emit("change");
+                });
+                that[0].on("focusout",focusout);
+                state = true;
+            }).mouse();
+
+            return that;
+        },
+        /*
+         * init place holder
+        */
+        initPlaceHolder:function(){
+            var that = this;
+            var opts = that.opts;
+
+            if(!that.D.placeHolder){
+                that.D.placeHolder = newDiv("_placeHolder").appendTo(that[0]).unselect(true);
+            }
+            if(opts.value !== ""){
+                that.placeHolderState(false);
+            }else{
+                that._placeHolderState = true;
+            }
+            return that;
+        },
+        /*
+         * init input
+        */
+        initInput:function(value){
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
+
+            if(opts.echoMode === "password"){
+                doms.input = new Std.dom(that._inputNodeName + "[type='password']");
+            }else{
+                doms.input = newDom(that._inputNodeName);
+            }
+
+            if(!isEmpty(value)){
+                doms.input.value(value);
+            }
+
+            doms.input.appendTo(that[0]).on("keydown keyup",Std.func(function(){
+                that.placeHolderState(that.value() === "");
+            },5));
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * show state
+        */
+        showState:function(state){
+            return this.opt("showState",state);
+        },
+        /*
+         * fixme: it's not work
+         * select text
+        */
+        select:function(){
+            var that = this;
+            that.D.input.select();
+
+            return that;
+        },
+        /*
+         * focus input
+        */
+        focus:function(){
+            var that = this;
+            that.D.input.focus();
+            return that;
+        },
+        /*
+         * blur input
+        */
+        blur:function(){
+            var that = this;
+            that.D.input.blur();
+            return that;
+        },
+        /*
+         * get or set max length
+        */
+        maxLength:function(length){
+            var that = this;
+
+            return that.opt("maxlength",length,function(){
+                that.D.input.attr("maxlength",length);
+            });
+        },
+        /*
+         * get or set input line height
+        */
+        lineHeight:function(lineHeight){
+            var that = this;
+
+            return that.opt("lineHeight",lineHeight,function(){
+                that.D.input.lineHeight(lineHeight);
+            });
+        },
+        /*
+         * get or set font size
+        */
+        fontSize:function(size){
+            var that = this;
+
+            if(size == undefined){
+                return that.D.input.css("font-size");
+            }
+            that.D.input.css("font-size",size);
+            that.D.placeHolder && that.D.placeHolder.css("font-size",size);
+
+            return that;
+        },
+        /*
+         * get or set value
+        */
+        value:function(value){
+            var that = this;
+            var doms = that.D;
+
+            if(value === undefined){
+                return doms.input.value();
+            }
+            if(value == null){
+                value = "";
+            }
+            that.placeHolderState(value === "");
+            doms.input.value(value);
+
+            return that;
+        },
+        /*
+         * input echoMode
+        */
+        echoMode:function(echoMode){
+            var that = this;
+            return that.opt("echoMode",echoMode,function(){
+                var value = "";
+                if(that.renderState){
+                    value = that.value();
+                }else{
+                    value = that.opts.value;
+                }
+                if(that.D.input){
+                    that.D.input.remove();
+                    delete that.D.input;
+                }
+                that.initInput(value);
+            });
+        },
+        /*
+         * get or set input is read only
+        */
+        readOnly:function(state){
+            var that      = this;
+            var dom_input = that.D.input;
+
+            return that.opt("readOnly",state,function(){
+                if(state === true){
+                    dom_input.attr("readOnly","readOnly");
+                }else{
+                    dom_input.attr("readOnly","");
+                }
+            });
+        },
+        /*
+         * get or set placeholder value
+        */
+        placeHolder:function(text){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("placeHolder",text,function(){
+                if(!doms.placeHolder){
+                    that.initPlaceHolder();
+                }
+                doms.placeHolder.html(text);
+            });
+        },
+        /*
+         * placeHolderState
+        */
+        placeHolderState:function(state){
+            var that = this;
+            var doms = that.D;
+
+            if(state === undefined){
+                return that._placeHolderState;
+            }
+            if(state === that._placeHolderState || !doms.placeHolder){
+                return that;
+            }
+            doms.placeHolder.visible(that._placeHolderState = state);
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        that.D = {};
+        that.echoMode(opts.echoMode);
+        that.call_opts({
+            value:"",
+            readOnly:false,
+            maxLength:0,
+            placeHolder:null
+        },true);
+
+        that.call_opts({
+            fontSize:null
+        },true);
+
+        that.initEvents();
+    }
+});
+
+/**
+ * LineEdit widget module
+*/
+Std.ui.module("LineEdit",{
+    /*[#module option:model]*/
+    model:"ui.Edit",
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        dataList:null,
+        minWidth:12,
+        minHeight:12,
+        defaultClass:"StdUI_LineEdit"
+    },
+    /*[#module option:private]*/
+    private:{
+        inputNodeName:"input"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend height
+        */
+        height:function(height){
+            var that = this;
+
+            if(!isNumber(height)){
+                height = that.height();
+            }
+            that.D.input.height(height = height - that.boxSize.height);
+            that.D.placeHolder && that.D.placeHolder.css({
+                height:height,
+                lineHeight:height
+            });
+            that.lineHeight(height);
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * data list
+        */
+        dataList:function(dataList){
+            var that = this;
+
+            return that.opt("dataList",dataList,function(){
+
+            });
+        }
+    }
+});
+
+/**
+ * TextEdit widget module
+*/
+Std.ui.module("TextEdit",{
+    /*[#module option:model]*/
+    model:"ui.Edit",
+    /*[#module option:option]*/
+    option:{
+        level:4,
+        minWidth:15,
+        minHeight:20,
+        defaultClass:"StdUI_TextEdit"
+    },
+    /*[#module option:private]*/
+    private:{
+        inputNodeName:"textarea"
+    },
+    /*[#module option:extend]*/
+    extend: {
+        /*
+         * extend height
+        */
+        height:function(n){
+            var that = this;
+
+            if(isNumber(n)){
+                that.D.input.height(n = n - that.boxSize.height);
+            }
+        },
+        /*
+         * extend line height
+        */
+        lineHeight:function(n){
+            var that = this;
+
+            if(that.D.placeHolder){
+                that.D.placeHolder.lineHeight(n);
+            }
+        }
+    }
+});

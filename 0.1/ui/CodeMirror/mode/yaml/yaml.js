@@ -1,1 +1,117 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("yaml",function(){var e=["true","false","on","off","yes","no"],i=new RegExp("\\b(("+e.join(")|(")+"))$","i");return{token:function(e,t){var r=e.peek(),n=t.escaped;if(t.escaped=!1,"#"==r&&(0==e.pos||/\s/.test(e.string.charAt(e.pos-1))))return e.skipToEnd(),"comment";if(e.match(/^('([^']|\\.)*'?|"([^"]|\\.)*"?)/))return"string";if(t.literal&&e.indentation()>t.keyCol)return e.skipToEnd(),"string";if(t.literal&&(t.literal=!1),e.sol()){if(t.keyCol=0,t.pair=!1,t.pairStart=!1,e.match(/---/))return"def";if(e.match(/\.\.\./))return"def";if(e.match(/\s*-\s+/))return"meta"}if(e.match(/^(\{|\}|\[|\])/))return"{"==r?t.inlinePairs++:"}"==r?t.inlinePairs--:"["==r?t.inlineList++:t.inlineList--,"meta";if(t.inlineList>0&&!n&&","==r)return e.next(),"meta";if(t.inlinePairs>0&&!n&&","==r)return t.keyCol=0,t.pair=!1,t.pairStart=!1,e.next(),"meta";if(t.pairStart){if(e.match(/^\s*(\||\>)\s*/))return t.literal=!0,"meta";if(e.match(/^\s*(\&|\*)[a-z0-9\._-]+\b/i))return"variable-2";if(0==t.inlinePairs&&e.match(/^\s*-?[0-9\.\,]+\s?$/))return"number";if(t.inlinePairs>0&&e.match(/^\s*-?[0-9\.\,]+\s?(?=(,|}))/))return"number";if(e.match(i))return"keyword"}return!t.pair&&e.match(/^\s*(?:[,\[\]{}&*!|>'"%@`][^\s'":]|[^,\[\]{}#&*!|>'"%@`])[^#]*?(?=\s*:($|\s))/)?(t.pair=!0,t.keyCol=e.indentation(),"atom"):t.pair&&e.match(/^:\s*/)?(t.pairStart=!0,"meta"):(t.pairStart=!1,t.escaped="\\"==r,e.next(),null)},startState:function(){return{pair:!1,pairStart:!1,keyCol:0,inlinePairs:0,inlineList:0,literal:!1,escaped:!1}}}}),e.defineMIME("text/x-yaml","yaml")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("yaml", function() {
+
+  var cons = ['true', 'false', 'on', 'off', 'yes', 'no'];
+  var keywordRegex = new RegExp("\\b(("+cons.join(")|(")+"))$", 'i');
+
+  return {
+    token: function(stream, state) {
+      var ch = stream.peek();
+      var esc = state.escaped;
+      state.escaped = false;
+      /* comments */
+      if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
+        stream.skipToEnd();
+        return "comment";
+      }
+
+      if (stream.match(/^('([^']|\\.)*'?|"([^"]|\\.)*"?)/))
+        return "string";
+
+      if (state.literal && stream.indentation() > state.keyCol) {
+        stream.skipToEnd(); return "string";
+      } else if (state.literal) { state.literal = false; }
+      if (stream.sol()) {
+        state.keyCol = 0;
+        state.pair = false;
+        state.pairStart = false;
+        /* document start */
+        if(stream.match(/---/)) { return "def"; }
+        /* document end */
+        if (stream.match(/\.\.\./)) { return "def"; }
+        /* array list item */
+        if (stream.match(/\s*-\s+/)) { return 'meta'; }
+      }
+      /* inline pairs/lists */
+      if (stream.match(/^(\{|\}|\[|\])/)) {
+        if (ch == '{')
+          state.inlinePairs++;
+        else if (ch == '}')
+          state.inlinePairs--;
+        else if (ch == '[')
+          state.inlineList++;
+        else
+          state.inlineList--;
+        return 'meta';
+      }
+
+      /* list seperator */
+      if (state.inlineList > 0 && !esc && ch == ',') {
+        stream.next();
+        return 'meta';
+      }
+      /* pairs seperator */
+      if (state.inlinePairs > 0 && !esc && ch == ',') {
+        state.keyCol = 0;
+        state.pair = false;
+        state.pairStart = false;
+        stream.next();
+        return 'meta';
+      }
+
+      /* start of value of a pair */
+      if (state.pairStart) {
+        /* block literals */
+        if (stream.match(/^\s*(\||\>)\s*/)) { state.literal = true; return 'meta'; };
+        /* references */
+        if (stream.match(/^\s*(\&|\*)[a-z0-9\._-]+\b/i)) { return 'variable-2'; }
+        /* numbers */
+        if (state.inlinePairs == 0 && stream.match(/^\s*-?[0-9\.\,]+\s?$/)) { return 'number'; }
+        if (state.inlinePairs > 0 && stream.match(/^\s*-?[0-9\.\,]+\s?(?=(,|}))/)) { return 'number'; }
+        /* keywords */
+        if (stream.match(keywordRegex)) { return 'keyword'; }
+      }
+
+      /* pairs (associative arrays) -> key */
+      if (!state.pair && stream.match(/^\s*(?:[,\[\]{}&*!|>'"%@`][^\s'":]|[^,\[\]{}#&*!|>'"%@`])[^#]*?(?=\s*:($|\s))/)) {
+        state.pair = true;
+        state.keyCol = stream.indentation();
+        return "atom";
+      }
+      if (state.pair && stream.match(/^:\s*/)) { state.pairStart = true; return 'meta'; }
+
+      /* nothing found, continue */
+      state.pairStart = false;
+      state.escaped = (ch == '\\');
+      stream.next();
+      return null;
+    },
+    startState: function() {
+      return {
+        pair: false,
+        pairStart: false,
+        keyCol: 0,
+        inlinePairs: 0,
+        inlineList: 0,
+        literal: false,
+        escaped: false
+      };
+    }
+  };
+});
+
+CodeMirror.defineMIME("text/x-yaml", "yaml");
+
+});

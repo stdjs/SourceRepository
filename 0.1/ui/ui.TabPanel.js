@@ -1,1 +1,1078 @@
-Std.ui.module("TabButton",{parent:"Button",option:{height:30,level:4,closable:!1,styleType:"text",defaultClass:"StdUI_TabButton"},"private":{selected:!1},"protected":{initClosableElement:function(){var t=this,e=t.D;return e.tr1.append(e.closeTD=newDom("td","_close").append(e.closeButton=newDiv("_closeButton").mouse({down:function(t){t.stopPropagation()},click:function(){var e=t.parent();e&&e.remove()}}))),t}},"public":{closable:function(t){var e=this;return e.opt("closable",t,function(){t===!0?e.D.closeTD||e.initClosableElement():(e.D.closeButton.remove(),e.D.closeTD.remove())})},select:function(t){var e=this;return void 0===t?e._selected:(e.toggleClass("selected",e._selected=t),e)}},main:function(t,e){e.closable&&t.initClosableElement()}}),Std.ui.module("TabPanel",function(){var t=Std.module({option:{button:null,content:null,value:null},"public":{value:function(t){return this.opt("value",t)},index:function(){return this.parent.items.indexOf(this)},select:function(){return this.parent.select(this.index()),this},remove:function(){return this.parent.removeTab(this.index()),this}},main:function(t,e){var n=this,o=n.init_opts(t),i=null,a=null;if(isString(o.button))i=Std.ui("TabButton",{parent:n,text:o.button,height:e.opts.tabButtonHeight,closable:e.opts.tabClosable});else if(isObject(o.button)){var r=o.button;r.parent=n,r.height=e.opts.tabButtonHeight,"closable"in r||(r.closable=e.opts.tabClosable),i=Std.ui("TabButton",o.button)}isString(o.content)?a=Std.ui("widget",{tabIndex:null,defaultClass:"StdUI_TabContent",html:o.content}):isWidget(o.content)?a=Std.ui("widget",{tabIndex:null,defaultClass:"StdUI_TabContent",layout:{ui:"VBoxLayout",items:[o.content]}}):isLayout(o.content)?a=Std.ui("widget",{tabIndex:null,defaultClass:"StdUI_TabContent",layout:o.content}):isPlainObject(o.content)&&(a=Std.ui(o.content.ui||"widget",Std.extend({tabIndex:null,defaultClass:"StdUI_TabContent"},o.content))),n.parent=e,n.button=i,n.content=a}});return{parent:"widget",option:{defaultClass:"StdUI_TabPanel",level:4,height:300,tabButtonHeight:32,tabButtonSpacing:2,tabClosable:!1,tabDroppable:!1,maxTabButtonWidth:"50%",contentPadding:5,deferRender:!0,activeIndex:0,items:null,tabAlign:"left",tabPosition:"top"},events:"removeTab selectTab","private":{activeIndex:null,tabBarOverflowed:!1,lastWidth:null,lastHeight:null,direction:null,timer1:null,dropDownMenu:null},extend:{render:function(){var t=this,e=t.opts;t.items.each(function(t,n){n.button.render(),e.deferRender||n.content.render()}),t.initEvents(),t.initKeyboard(),t.select(e.activeIndex),t.tabBarOverflowCheck()},width:function(){this.updateLayout()},height:function(){var t=this,e=t.D,n=t.computeContentHeight();t.items.each(function(t,e){e.content.height(n)}),e.contents.height(n)},remove:function(t){var e=this,n=e.items;return void 0===t?(e._dropDownMenu&&e._dropDownMenu.remove(),n.each(function(t,e){e.button.remove(),e.content.remove()}),void n.clear()):(isObject(t)&&(t=n.indexOf(t)),void(-1!==t&&n[t]&&e.removeTab(~~t)))}},"protected":{initKeyboard:function(){var t=this;return t},initData:function(){var t=this,e=t.opts;return t.items=[],null!==e.items&&t.append(e.items),t.call_opts({contentPadding:0},!0)},initElements:function(){var t=this,e=t.D={};return t[0].append([e.contents=newDiv("_contents")]),t},initEvents:function(){var t=this;return t.D.buttons.delegate("mousedown",".StdUI_TabButton",function(e){var n=this.index(),o=t.items[n].button;1===e.which&&(t.select(n),"vertical"===t._direction?t.verticalTabButtonClick(n,o):t.horizontalTabButtonClick(n,o))}),t},initTabBar:function(){var t=this,e=t.D;return t[0].append(e.tabBar=newDiv("_tabBar").height(t.opts.tabButtonHeight).append([e.leftTools=newDiv("_tools _left"),e.line=newDiv("_line"),e.tabs=newDiv("_tabs").append(e.buttons=newDiv("_buttons")),e.rightTools=newDiv("_tools _right")])),t},initClient:function(){var t=this,e=t.D;switch(e.contents=newDiv("_contents"),t.opts.tabPosition){case"right":case"bottom":t[0].prepend(e.contents);break;case"left":case"top":t[0].append(e.contents)}return t.addClass("_"+t.opts.tabPosition),e},initScrollButtons:function(t,e,n){var o=this,i=o.opts,a=o.D,r={down:t,delay:10,interval:3};return a.leftTools.append(a.prevBtn=newDiv("_scrollButton _backward").height(i.tabButtonHeight-1).mouse(Std.extend(r,{longpress:e})).append(newDiv("_icon"))),a.rightTools.append([a.nextButton=newDiv("_scrollButton _forward").height(i.tabButtonHeight-1).mouse(Std.extend(r,{longpress:n})).append(newDiv("_icon")),a.controlHand=newDiv("_controlHand").height(i.tabButtonHeight-1).mouse({down:function(t){1===t.which&&(o._dropDownMenu?o._dropDownMenu.remove():(this.addClass("selected"),o.initDropDownMenu()))}}).append(newDiv("_icon"))]),o._tabBarOverflowed=!0,o},initHScrollButtons:function(){if(this._tabBarOverflowed)return this;var t=this,e=t.opts,n=t.D,o=0,i=0,a=0,r=e.tabButtonSpacing,s=n.tabBar.width()-r;return t.initScrollButtons(function(){o=0,a=n.buttons.css("margin-top"),i=n.tabs.height(),Std.each(t.items,function(t,e){o+=e.button.height()+r})},function(){r>a&&n.buttons.css("margin-top",a+=3)},function(){o+a>i&&n.buttons.css("margin-top",a-=3)}),Std.dom.united([n.prevBtn,n.nextButton,n.controlHand]).css({height:25,width:s}),n.buttons.css("margin-top",r),t.updateTabsHeight()},initVScrollButtons:function(){if(this._tabBarOverflowed)return this;var t=this,e=t.opts,n=t.D,o=0,i=0,a=0,r=e.tabButtonHeight-1,s=e.tabButtonSpacing;return t.initScrollButtons(function(){o=0,a=n.buttons.css("margin-left"),i=n.tabs.width(),Std.each(t.items,function(t,e){o+=e.button.width()+s})},function(){s>a&&n.buttons.css("margin-left",a+=3)},function(){o+a>i&&n.buttons.css("margin-left",a-=3)}),n.prevBtn.height(r),n.nextButton.height(r),n.buttons.css("margin-left",s),t.updateTabsWidth()},initDropDownMenu:function(){var t=this,e=t.D,n=t.opts.tabButtonHeight;if(t._dropDownMenu)return t;var o=function(t){var n=t.target;i[0].contains(n)||e.controlHand.contains(n)||i.remove()},i=t._dropDownMenu=Std.ui("Menu",{renderTo:t,maxHeight:t.height()-n,css:{position:"absolute",boxShadow:"none"},items:[{text:"Close All",click:function(){for(var e=t.items.length-1;e>=0;e--){var n=t.items[e];n&&n.button.closable()&&t.remove(n)}t.tabBarOverflowCheck()}},{text:"First Page",click:function(){t.activeIndex(0).updateTabScroll()}},{text:"Last Page",click:function(){t.activeIndex(t.items.length-1).updateTabScroll()}},{ui:"sep"}],on:{itemPress:function(){i.remove()},visible:function(t){e.controlHand.toggleClass("selected",t)},remove:function(){e.controlHand.removeClass("selected"),t._dropDownMenu=null,Std.dom(document).off("mousedown",o)}}}).toForeground();switch(t.opts.tabPosition){case"top":i[0].css({right:0,top:n-1});break;case"right":i[0].css({right:0,bottom:e.controlHand.outerHeight()-1});break;case"bottom":i[0].css({right:0,bottom:n});break;case"left":i[0].css({left:0,bottom:e.controlHand.outerHeight()-1})}return Std.each(t.items,function(e,n){var o=n.button,a=o.text(),r=o.icon(),s=o.iconClass();i.append({text:a,icon:r,iconClass:s,checked:t._activeItem===n,click:function(){t.activeItem(n).updateTabScroll()}})}),Std.dom(document).on("mousedown",o),t},computeContentHeight:function(){var t=this,e=t.opts,n=t.D,o=t.height(),i=o-2*e.contentPadding-2;switch(e.tabPosition){case"left":case"right":n.tabBar.height(o-t.boxSize.height),t._tabBarOverflowed&&t.updateTabsHeight();break;case"top":n.line.css("top",e.tabButtonHeight-1);case"bottom":i-=e.tabButtonHeight}return i},verticalTabButtonClick:function(t,e){var n=this,o=e.width(),i=n.D.tabs.width(),a=e[0].position().x,r=n.opts.tabButtonSpacing;return a+o>i?n.D.buttons.animate("end").animate({to:{"margin-left[+]":i-(a+o)-r}},100):0>a&&n.D.buttons.animate("end").animate({to:{"margin-left[-]":a-r}},100),n},horizontalTabButtonClick:function(t,e){var n=this,o=e.height(),i=n.D.tabs.height(),a=e[0].position().y,r=n.opts.tabButtonSpacing;return a+o>i?n.D.buttons.animate("end").animate({to:{"margin-top[+]":i-(a+o)-r}},100):0>a&&n.D.buttons.animate("end").animate({to:{"margin-top[-]":a-r}},100),n},tabBarOverflowCheck:function(){var t=this,e=0,n=t.opts.tabButtonSpacing;switch(t._direction){case"horizontal":Std.each(t.items,function(t,o){e+=o.button.height()+n}),e>t.height()?t.initHScrollButtons():t._tabBarOverflowed&&t.removeScrollButtons();break;case"vertical":Std.each(t.items,function(t,o){e+=o.button.width()+n}),e>t.width()?t.initVScrollButtons():t._tabBarOverflowed&&t.removeScrollButtons()}return t},removeScrollButtons:function(){var t=this,e=t.D;return e.buttons.css({marginTop:0,marginLeft:0}),Std.dom.united([e.prevBtn,e.nextButton,e.controlHand]).remove(),t._dropDownMenu&&t._dropDownMenu.remove(),t._tabBarOverflowed=!1,t.updateTabsWidth()},updateTabsWidth:function(){var t=this,e=t.D;return e.tabs.width(t.width()-e.leftTools.width()-e.rightTools.width()),t},updateTabsHeight:function(){var t=this,e=t.D;return e.tabs.height(t.height()-e.leftTools.height()-e.rightTools.height()),t},updateTabScroll:function(){var t=this,e=t.activeIndex();return t["horizontal"===t._direction?"horizontalTabButtonClick":"verticalTabButtonClick"](e,t.items[e].button),t},updateHorizontalLayout:function(){var t=this,e=t.D,n=t.width(),o=e.tabBar.width();switch(t.opts.tabPosition){case"left":e.line.css("left",o-1);case"right":e.contents.width(n-2*t.opts.contentPadding-o-2)}return t.items.each(function(e,i){i.content.width(n-2*t.opts.contentPadding-o-2)}),t},updateVerticalLayout:function(){var t=this,e=t.opts,n=t.width()-2*e.contentPadding-t.boxSize.width-2;return t.tabBarOverflowCheck(),t._tabBarOverflowed&&t.updateTabsWidth(),t.items.each(function(t,e){e.content.width(n)}),t},updateLayout:function(){var t=this;return null!==t._timer1&&clearTimeout(t._timer1),t._timer1=setTimeout(function(){"horizontal"===t._direction?t.updateHorizontalLayout():t.updateVerticalLayout()},0),t},convertIndex:function(t,e){var n=this,o=-1,i=n.items;if("first"===t)o=0;else if("last"===t)o=i.length-1;else if("beside"===t){var a=i.length;a-1>e?o=e:a>1?o=e-1:1===a&&(o=0)}return o}},"public":{appendTab:function(t,e){return this.insertTab(t,-1,e)},contentPadding:function(t){var e=this;return e.D.contents.css("padding",t+"px"),e},select:function(t,e){var n=this;return isString(t)&&(t=n.convertIndex(t,e)),-1!==t&&t<n.items.length&&(n.activeIndex(t),n.emit("selectTab",[t,n.items[t]],!0)),n},activeIndex:function(t){var e=this,n=e.items;return void 0===t?n.indexOf(e._activeItem):(n[t]&&e.activeItem(n[t]),e)},activeItem:function(t){var e=this,n=e.items;if(void 0===t){var o=e.activeIndex();return-1==o?null:n[o]}var i=e._activeItem;return i&&(i.button.select(!1),i.content.removeClass("_visible")),t.button.select(!0),t.content.addClass("_visible"),e._activeItem=t,e.updateLayout(),t.content.renderState||(t.content.height(e.computeContentHeight()),t.content.render()),e},insert:function(t,e,n){return this.insertTab(t,e,n)},append:function(t){var e=this;return isArray(t)?Std.each(t,function(t,n){e.appendTab(n,!1)}):isObject(t)&&e.appendTab(t,!1),e.renderState&&(e.tabBarOverflowCheck(),e.updateLayout()),e},insertTab:function(e,n,o){var i=this,a=i.opts,r=i.D,s=new t(e,this);return-1===n?(r.buttons.append(s.button[0]),r.contents.append(s.content[0]),i.items.push(s)):(r.buttons.insert(s.button[0],n),r.contents.insert(s.content[0],n),i.items.insert(s,n)),i.renderState&&(s.button.render(),o!==!1&&(i.tabBarOverflowCheck(),i.updateLayout()),a.deferRender||(s.content.height(i.computeContentHeight()),s.content.render())),s},removeTab:function(t){var e=this,n=e.items,o=n[t],i=e.activeIndex();return n[t].button.remove(),n[t].content.remove(),e.items.remove(t),t===i&&e.select("beside",t),e.tabBarOverflowCheck().emit("removeTab",[t,o],!0)},clear:function(){var t=this;return t.items.each(function(t,e){e.button.remove(),e.content.remove()}),t.items.clear(),t._activeItem=null,t}},main:function(t,e){switch(e.tabPosition){case"left":case"right":t._direction="horizontal";break;case"top":case"bottom":t._direction="vertical"}t.D={},t.initTabBar(),t.initClient(),t.initData()}}});
+/**
+ *  TabButton widget
+*/
+Std.ui.module("TabButton",{
+    /*[#module option:parent]*/
+    parent:"Button",
+    /*[#module option:option]*/
+    option:{
+        height:30,
+        level:4,
+        closable:false,
+        styleType:"text",    //text,icon,textBesideIcon
+        defaultClass:"StdUI_TabButton"
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * selected states
+        */
+        selected:false
+    },
+    protected:{
+        /*
+         * init closable element
+        */
+        initClosableElement:function(){
+            var that = this;
+            var doms = that.D;
+
+            doms.tr1.append(
+                doms.closeTD = newDom("td","_close").append(
+                    doms.closeButton = newDiv("_closeButton").mouse({
+                        down:function(e){
+                            e.stopPropagation();
+                        },
+                        click:function(e){
+                            var parent = that.parent();
+                            parent && parent.remove();
+                        }
+                    })
+                )
+            );
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * closable
+        */
+        closable:function(state){
+            var that = this;
+
+            return that.opt("closable",state,function(){
+                if(state === true){
+                    if(!that.D.closeTD){
+                        that.initClosableElement();
+                    }
+                }else{
+                    that.D.closeButton.remove();
+                    that.D.closeTD.remove();
+                }
+            });
+        },
+        /*
+         * select
+        */
+        select:function(state){
+            var that = this;
+
+            if(state === undefined){
+                return that._selected;
+            }
+            that.toggleClass("selected",that._selected = state);
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        if(opts.closable){
+            that.initClosableElement();
+        }
+    }
+});
+
+/**
+ *  TabPanel widget
+*/
+Std.ui.module("TabPanel",function(){
+    var itemModule = Std.module({
+        /*[#module option:option]*/
+        option:{
+            button:null,
+            content:null,
+            value:null
+        },
+        /*[#module option:public]*/
+        public:{
+            /*
+             * value
+            */
+            value:function(value){
+                return this.opt("value",value);
+            },
+            /*
+             * index
+            */
+            index:function(){
+                return this.parent.items.indexOf(this);
+            },
+            /*
+             * select
+            */
+            select:function(){
+                this.parent.select(this.index());
+
+                return this;
+            },
+            /*
+             * remove
+            */
+            remove:function(){
+                this.parent.removeTab(this.index());
+
+                return this;
+            }
+        },
+        /*[#module option:main]*/
+        main:function(option,parent){
+            var that    = this;
+            var opts    = that.init_opts(option);
+            var button  = null;
+            var content = null;
+
+            if(isString(opts.button)){
+                button = Std.ui("TabButton",{
+                    parent:that,
+                    text:opts.button,
+                    height:parent.opts.tabButtonHeight,
+                    closable:parent.opts.tabClosable
+                });
+            }else if(isObject(opts.button)){
+                var buttonOption    = opts.button;
+
+                buttonOption.parent = that;
+                buttonOption.height = parent.opts.tabButtonHeight;
+
+                if(!("closable" in buttonOption)){
+                    buttonOption.closable = parent.opts.tabClosable;
+                }
+                button = Std.ui("TabButton",opts.button);
+            }
+
+            if(isString(opts.content)){
+                content = Std.ui("widget",{
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent",
+                    html:opts.content
+                });
+            }else if(isWidget(opts.content)){
+                content = Std.ui("widget",{
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent",
+                    layout:{
+                        ui:"VBoxLayout",
+                        items:[opts.content]
+                    }
+                });
+            }else if(isLayout(opts.content)){
+                content = Std.ui("widget",{
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent",
+                    layout:opts.content
+                });
+            }else if(isPlainObject(opts.content)){
+                content = Std.ui(opts.content.ui || "widget",Std.extend({
+                    tabIndex:null,
+                    defaultClass:"StdUI_TabContent"
+                },opts.content));
+            }
+
+            that.parent  = parent;
+            that.button  = button;
+            that.content = content;
+        }
+    });
+
+    return {
+        /*[#module option:parent]*/
+        parent:"widget",
+        /*[#module option:option]*/
+        option:{
+            defaultClass:"StdUI_TabPanel",
+            level:4,
+            height:300,
+            tabButtonHeight:32,
+            tabButtonSpacing:2,
+            tabClosable:false,
+            tabDroppable:false,
+            maxTabButtonWidth:"50%",
+            contentPadding:5,
+            deferRender:true,
+            activeIndex:0,
+            items:null,
+            tabAlign:"left",
+            tabPosition:"top"
+        },
+        /*[#module option:events]*/
+        events:"removeTab selectTab",
+        /*[#module option:private]*/
+        private:{
+            /*
+             * active index
+            */
+            activeIndex:null,
+            /*
+             * tab bar overflowed
+            */
+            tabBarOverflowed:false,
+            /*
+             * last width
+            */
+            lastWidth:null,
+            /*
+             * last height
+            */
+            lastHeight:null,
+            /*
+             * direction
+            */
+            direction:null,
+            /*
+             * timer1
+            */
+            timer1:null,
+            /*
+             * drop down menu
+            */
+            dropDownMenu:null
+        },
+        /*[#module option:extend]*/
+        extend:{
+            /*
+             * extend render
+            */
+            render:function(){
+                var that = this;
+                var opts = that.opts;
+
+                that.items.each(function(i,item){
+                    item.button.render();
+                    if(!opts.deferRender){
+                        item.content.render();
+                    }
+                });
+                that.initEvents();
+                that.initKeyboard();
+                that.select(opts.activeIndex);
+                that.tabBarOverflowCheck();
+            },
+            /*
+             * width
+            */
+            width:function(){
+                this.updateLayout();
+            },
+            /*
+             * extend height
+            */
+            height:function(){
+                var that          = this;
+                var doms          = that.D;
+                var contentHeight = that.computeContentHeight();
+
+                that.items.each(function(i,item){
+                    item.content.height(contentHeight);
+                });
+                doms.contents.height(contentHeight);
+            },
+            /*
+             * extend remove
+            */
+            remove:function(data){
+                var that  = this;
+                var items = that.items;
+
+                if(data === undefined){
+                    if(that._dropDownMenu){
+                        that._dropDownMenu.remove();
+                    }
+                    items.each(function(i,item){
+                        item.button.remove();
+                        item.content.remove();
+                    });
+                    items.clear();
+                    return;
+                }
+                if(isObject(data)){
+                    data = items.indexOf(data);
+                }
+                if(data !== -1 && items[data]){
+                    that.removeTab(~~data);
+                }
+            }
+        },
+        /*[#module option:protected]*/
+        protected:{
+            /*
+             * init keyboard
+            */
+            initKeyboard:function(){
+                var that = this;
+
+
+                return that;
+            },
+            /*
+             * init data
+            */
+            initData:function(){
+                var that = this;
+                var opts = that.opts;
+
+                that.items = [];
+
+                if(opts.items !== null){
+                    that.append(opts.items);
+                }
+                return that.call_opts({contentPadding:0},true);
+            },
+            /*
+             * init DOMTree
+            */
+            initElements:function(){
+                var that = this;
+                var doms = that.D = {};
+
+                that[0].append([
+                    doms.contents = newDiv("_contents")
+                ]);
+                return that;
+            },
+            /*
+             * init events
+            */
+            initEvents:function(){
+                var that = this;
+
+                that.D.buttons.delegate("mousedown",".StdUI_TabButton",function(e){
+                    var index  = this.index();
+                    var button = that.items[index].button;
+
+                    if(e.which === 1){
+                        that.select(index);
+
+                        if(that._direction === "vertical"){
+                            that.verticalTabButtonClick(index,button);
+                        }else{
+                            that.horizontalTabButtonClick(index,button);
+                        }
+                    }
+                });
+                return that;
+            },
+            /*
+             * init tabBar
+             */
+            initTabBar:function(){
+                var that = this;
+                var doms = that.D;
+
+                that[0].append(
+                    doms.tabBar = newDiv("_tabBar").height(that.opts.tabButtonHeight).append([
+                        doms.leftTools   = newDiv("_tools _left"),
+                        doms.line        = newDiv("_line"),
+                        doms.tabs        = newDiv("_tabs").append(
+                            doms.buttons = newDiv("_buttons")
+                        ),
+                        doms.rightTools  = newDiv("_tools _right")
+                    ])
+                );
+                return that;
+            },
+            /*
+             * init client
+             */
+            initClient:function(){
+                var that = this;
+                var doms = that.D;
+
+                doms.contents = newDiv("_contents");
+
+                switch(that.opts.tabPosition){
+                    case "right":
+                    case "bottom":
+                        that[0].prepend(doms.contents);
+                        break;
+                    case "left":
+                    case "top":
+                        that[0].append(doms.contents);
+                        break;
+                }
+                that.addClass("_"+that.opts.tabPosition);
+
+                return doms;
+            },
+            /*
+             * init scroll buttons
+             */
+            initScrollButtons:function(loadSize,longpress1,longpress2){
+                var that      = this;
+                var opts      = that.opts;
+                var doms      = that.D;
+                var mouseOpts = {
+                    down:loadSize,
+                    delay:10,
+                    interval:3
+                };
+                doms.leftTools.append(
+                    doms.prevBtn = newDiv("_scrollButton _backward").height(opts.tabButtonHeight - 1).mouse(Std.extend(mouseOpts,{
+                        longpress:longpress1
+                    })).append(newDiv("_icon"))
+                );
+                doms.rightTools.append([
+                    doms.nextButton  = newDiv("_scrollButton _forward").height(opts.tabButtonHeight - 1).mouse(Std.extend(mouseOpts,{
+                        longpress:longpress2
+                    })).append(newDiv("_icon")),
+                    doms.controlHand = newDiv("_controlHand").height(opts.tabButtonHeight - 1).mouse({
+                        down:function(e){
+                            if(e.which !== 1){
+                                return;
+                            }
+                            if(that._dropDownMenu){
+                                that._dropDownMenu.remove();
+                            }else{
+                                this.addClass("selected");
+                                that.initDropDownMenu();
+                            }
+                        }
+                    }).append(newDiv("_icon"))
+                ]);
+                that._tabBarOverflowed = true;
+
+                return that;
+            },
+            /*
+             * init horizontal scroll buttons
+            */
+            initHScrollButtons:function(){
+                if(this._tabBarOverflowed){
+                    return this;
+                }
+                var that             = this;
+                var opts             = that.opts;
+                var doms             = that.D;
+                var height           = 0;
+                var tabsHeight       = 0;
+                var marginTop        = 0;
+                var tabButtonSpacing = opts.tabButtonSpacing;
+                var tabBarWidth      = doms.tabBar.width() - tabButtonSpacing;
+
+                that.initScrollButtons(function(){
+                    height     = 0;
+                    marginTop  = doms.buttons.css("margin-top");
+                    tabsHeight = doms.tabs.height();
+
+                    Std.each(that.items,function(i,item){
+                        height += item.button.height() + tabButtonSpacing;
+                    });
+                },function(){
+                    if(marginTop < tabButtonSpacing){
+                        doms.buttons.css("margin-top",marginTop+=3);
+                    }
+                },function(){
+                    if(tabsHeight < height + marginTop){
+                        doms.buttons.css("margin-top",marginTop-=3);
+                    }
+                });
+
+                Std.dom.united([
+                    doms.prevBtn,
+                    doms.nextButton,
+                    doms.controlHand
+                ]).css({
+                    height:25,
+                    width:tabBarWidth
+                });
+
+                doms.buttons.css("margin-top",tabButtonSpacing);
+
+                return that.updateTabsHeight();
+            },
+            /*
+             * init vertical scroll buttons
+             */
+            initVScrollButtons:function(){
+                if(this._tabBarOverflowed){
+                    return this;
+                }
+
+                var that             = this;
+                var opts             = that.opts;
+                var doms             = that.D;
+                var width            = 0;
+                var tabsWidth        = 0;
+                var marginLeft       = 0;
+                var tabButtonHeight  = opts.tabButtonHeight - 1;
+                var tabButtonSpacing = opts.tabButtonSpacing;
+
+                that.initScrollButtons(function(){
+                    width      = 0;
+                    marginLeft = doms.buttons.css("margin-left");
+                    tabsWidth  = doms.tabs.width();
+
+                    Std.each(that.items,function(i,item){
+                        width += item.button.width() + tabButtonSpacing;
+                    });
+                },function(){
+                    if(marginLeft < tabButtonSpacing){
+                        doms.buttons.css("margin-left",marginLeft+=3);
+                    }
+                },function(){
+                    if(tabsWidth < width + marginLeft){
+                        doms.buttons.css("margin-left",marginLeft-=3);
+                    }
+                });
+                doms.prevBtn.height(tabButtonHeight);
+                doms.nextButton.height(tabButtonHeight);
+                doms.buttons.css("margin-left",tabButtonSpacing);
+
+                return that.updateTabsWidth();
+            },
+            /*
+             * init drop down menu
+            */
+            initDropDownMenu:function(){
+                var that            = this;
+                var doms            = that.D;
+                var tabButtonHeight = that.opts.tabButtonHeight;
+
+                if(that._dropDownMenu){
+                    return that;
+                }
+                var documentClick = function(e){
+                    var target = e.target;
+                    if(!dropDownMenu[0].contains(target) && !doms.controlHand.contains(target)){
+                        dropDownMenu.remove();
+                    }
+                };
+                var dropDownMenu  = that._dropDownMenu = Std.ui("Menu",{
+                    renderTo:that,
+                    maxHeight:that.height() - tabButtonHeight,
+                    css:{
+                        position:"absolute",
+                        boxShadow:"none"
+                    },
+                    items:[
+                        {
+                            text:"Close All",
+                            click:function(){
+                                for(var i=that.items.length-1;i>=0;i--){
+                                    var item = that.items[i];
+                                    if(item && item.button.closable()){
+                                        that.remove(item);
+                                    }
+                                }
+                                that.tabBarOverflowCheck();
+                            }
+                        },{
+                            text:"First Page",
+                            click:function(){
+                                that.activeIndex(0).updateTabScroll()
+                            }
+                        },{
+                            text:"Last Page",
+                            click:function(){
+                                that.activeIndex(that.items.length - 1).updateTabScroll();
+                            }
+                        },{
+                            ui:"sep"
+                        }
+                    ],
+                    on:{
+                        itemPress:function(){
+                            dropDownMenu.remove();
+                        },
+                        visible:function(state){
+                            doms.controlHand.toggleClass("selected",state);
+                        },
+                        remove:function(){
+                            doms.controlHand.removeClass("selected");
+                            that._dropDownMenu = null;
+                            Std.dom(document).off("mousedown",documentClick);
+                        }
+                    }
+                }).toForeground();
+
+                switch(that.opts.tabPosition){
+                    case "top":
+                        dropDownMenu[0].css({right:0,top:tabButtonHeight - 1});
+                        break;
+                    case "right":
+                        dropDownMenu[0].css({right:0,bottom:doms.controlHand.outerHeight() - 1});
+                        break;
+                    case "bottom":
+                        dropDownMenu[0].css({right:0,bottom:tabButtonHeight});
+                        break;
+                    case "left":
+                        dropDownMenu[0].css({left:0,bottom:doms.controlHand.outerHeight() - 1});
+                        break;
+                }
+
+                Std.each(that.items,function(i,item){
+                    var button    = item.button;
+                    var text      = button.text();
+                    var icon      = button.icon();
+                    var iconClass = button.iconClass();
+
+                    dropDownMenu.append({
+                        text:text,
+                        icon:icon,
+                        iconClass:iconClass,
+                        checked:that._activeItem === item,
+                        click:function(){
+                            that.activeItem(item).updateTabScroll();
+                        }
+                    });
+                });
+                Std.dom(document).on("mousedown",documentClick);
+
+                return that;
+            },
+            /*
+             * compute content height
+            */
+            computeContentHeight:function(){
+                var that          = this;
+                var opts          = that.opts;
+                var doms          = that.D;
+                var height        = that.height();
+                var contentHeight = height - opts.contentPadding * 2 - 2;
+
+                switch(opts.tabPosition){
+                    case "left":
+                    case "right":
+                        doms.tabBar.height(height - that.boxSize.height);
+                        if(that._tabBarOverflowed){
+                            that.updateTabsHeight();
+                        }
+                        break;
+                    case "top":
+                        doms.line.css("top",opts.tabButtonHeight - 1);
+                    case "bottom":
+                        contentHeight -= opts.tabButtonHeight;
+                        break;
+                }
+                return contentHeight;
+            },
+            /*
+             * vertical tab button click
+            */
+            verticalTabButtonClick:function(index,button){
+                var that             = this;
+                var width            = button.width();
+                var tabWidth         = that.D.tabs.width();
+                var positionX        = button[0].position().x;
+                var tabButtonSpacing = that.opts.tabButtonSpacing;
+
+                if(positionX + width > tabWidth){
+                    that.D.buttons.animate("end").animate({
+                        to:{
+                            "margin-left[+]": tabWidth - (positionX + width) - tabButtonSpacing
+                        }
+                    },100);
+                }else if(positionX < 0){
+                    that.D.buttons.animate("end").animate({
+                        to:{
+                            "margin-left[-]": positionX - tabButtonSpacing
+                        }
+                    },100);
+                }
+                return that;
+            },
+            /*
+             * horizontal tab button click
+            */
+            horizontalTabButtonClick:function(index,button){
+                var that             = this;
+                var height           = button.height();
+                var tabHeight        = that.D.tabs.height();
+                var positionY        = button[0].position().y;
+                var tabButtonSpacing = that.opts.tabButtonSpacing;
+
+                if(positionY + height > tabHeight){
+                    that.D.buttons.animate("end").animate({
+                        to:{
+                            "margin-top[+]":tabHeight - (positionY + height) - tabButtonSpacing
+                        }
+                    },100);
+                }else if(positionY < 0){
+                    that.D.buttons.animate("end").animate({
+                        to:{
+                            "margin-top[-]": positionY - tabButtonSpacing
+                        }
+                    },100);
+                }
+                return that;
+            },
+            /*
+             * tab bar overflow check
+             */
+            tabBarOverflowCheck:function(){
+                var that             = this;
+                var size             = 0;
+                var tabButtonSpacing = that.opts.tabButtonSpacing;
+
+                switch(that._direction){
+                    case "horizontal":
+                        Std.each(that.items,function(i,item){
+                            size += item.button.height() + tabButtonSpacing;
+                        });
+                        if(size > that.height()){
+                            that.initHScrollButtons();
+
+                        }else if(that._tabBarOverflowed){
+                            that.removeScrollButtons();
+                        }
+                        break;
+                    case "vertical":
+                        Std.each(that.items,function(i,item){
+                            size += item.button.width() + tabButtonSpacing;
+                        });
+                        if(size > that.width()){
+                            that.initVScrollButtons();
+                        }else if(that._tabBarOverflowed){
+                            that.removeScrollButtons();
+                        }
+                        break;
+                }
+                return that;
+            },
+            /*
+             * remove scroll buttons
+             */
+            removeScrollButtons:function(){
+                var that = this;
+                var doms = that.D;
+
+                doms.buttons.css({
+                    marginTop:0,
+                    marginLeft:0
+                });
+                Std.dom.united([
+                    doms.prevBtn,
+                    doms.nextButton,
+                    doms.controlHand
+                ]).remove();
+
+                if(that._dropDownMenu){
+                    that._dropDownMenu.remove();
+                }
+                that._tabBarOverflowed = false;
+
+                return that.updateTabsWidth();
+            },
+            /*
+             * update tabs width
+             */
+            updateTabsWidth:function(){
+                var that = this;
+                var doms = that.D;
+
+                doms.tabs.width(
+                    that.width() - doms.leftTools.width() - doms.rightTools.width()
+                );
+                return that;
+            },
+            /*
+             * reset tabs height
+             */
+            updateTabsHeight:function(){
+                var that = this;
+                var doms = that.D;
+
+                doms.tabs.height(
+                    that.height() - doms.leftTools.height() - doms.rightTools.height()
+                );
+                return that;
+            },
+            /*
+             * update tab scroll
+            */
+            updateTabScroll:function(){
+                var that        = this;
+                var activeIndex = that.activeIndex();
+
+                that[that._direction === "horizontal" ? "horizontalTabButtonClick" : "verticalTabButtonClick"](
+                    activeIndex,
+                    that.items[activeIndex].button
+                );
+                return that;
+            },
+            /*
+             * update Horizontal layout
+            */
+            updateHorizontalLayout:function(){
+                var that        = this;
+                var doms        = that.D;
+                var width       = that.width();
+                var tabBarWidth = doms.tabBar.width();
+
+                switch(that.opts.tabPosition){
+                    case "left":
+                        doms.line.css("left",tabBarWidth-1);
+                    case "right":
+                        doms.contents.width(width - that.opts.contentPadding * 2  - tabBarWidth - 2);
+                        break;
+                }
+                that.items.each(function(i,item){
+                    item.content.width(width - that.opts.contentPadding * 2  - tabBarWidth - 2);
+                });
+                return that;
+            },
+            /*
+             * update vertical layout
+             */
+            updateVerticalLayout:function(){
+                var that         = this;
+                var opts         = that.opts;
+                var contentWidth = that.width() - opts.contentPadding * 2 - that.boxSize.width - 2;
+
+                that.tabBarOverflowCheck();
+
+                if(that._tabBarOverflowed){
+                    that.updateTabsWidth();
+                }
+                that.items.each(function(i,item){
+                    item.content.width(contentWidth);
+                });
+                return that;
+            },
+            /*
+             * update layout
+             */
+            updateLayout:function(){
+                var that = this;
+
+                if(that._timer1 !== null){
+                    clearTimeout(that._timer1);
+                }
+                that._timer1 = setTimeout(function(){
+                    if(that._direction === "horizontal"){
+                        that.updateHorizontalLayout();
+                    }else{
+                        that.updateVerticalLayout();
+                    }
+                },0);
+
+                return that;
+            },
+            /*
+             * query index
+             */
+            convertIndex:function(type,reference){
+                var that  = this;
+                var index = -1;
+                var items = that.items;
+
+                if(type === "first"){
+                    index = 0;
+                }else if(type === "last"){
+                    index = items.length - 1;
+                }else if(type === "beside"){
+                    var length = items.length;
+
+                    if(reference < length - 1){
+                        index = reference;
+                    }else if(length > 1){
+                        index = reference - 1;
+                    }else if(length === 1){
+                        index = 0;
+                    }
+                }
+
+                return index;
+            }
+        },
+        /*[#module option:public]*/
+        public:{
+            /*
+             * append tab
+             */
+            appendTab:function(data,checksum){
+                return this.insertTab(data,-1,checksum);
+            },
+            /*
+             * content padding
+             */
+            contentPadding:function(padding){
+                var that = this;
+
+                that.D.contents.css("padding",padding + "px");
+
+                return that;
+            },
+            /*
+             * select
+             */
+            select:function(index,reference){
+                var that = this;
+
+                if(isString(index)){
+                    index = that.convertIndex(index,reference);
+                }
+                if(index !== -1 && index < that.items.length){
+                    that.activeIndex(index);
+                    that.emit("selectTab",[index,that.items[index]],true);
+                }
+                return that;
+            },
+            /*
+             * active index
+            */
+            activeIndex:function(index){
+                var that  = this;
+                var items = that.items;
+
+                if(index === undefined){
+                    return items.indexOf(that._activeItem);
+                }
+                if(items[index]){
+                    that.activeItem(items[index]);
+                }
+                return that;
+            },
+            /*
+             * active Item
+            */
+            activeItem:function(item){
+                var that  = this;
+                var items = that.items;
+
+                if(item === undefined){
+                    var index = that.activeIndex();
+                    if(index == -1){
+                        return null;
+                    }
+                    return items[index];
+                }
+                var activeItem = that._activeItem;
+                if(activeItem){
+                    activeItem.button.select(false);
+                    activeItem.content.removeClass("_visible");
+                }
+                item.button.select(true);
+                item.content.addClass("_visible");
+                that._activeItem = item;
+                that.updateLayout();
+
+                if(!item.content.renderState){
+                    item.content.height(that.computeContentHeight());
+                    item.content.render();
+                }
+                return that;
+            },
+            /*
+             * insert
+            */
+            insert:function(itemOption,index,checksum){
+                return this.insertTab(itemOption,index,checksum);
+            },
+            /*
+             * append
+            */
+            append:function(data){
+                var that = this;
+
+                if(isArray(data)){
+                    Std.each(data,function(i,tab){
+                        that.appendTab(tab,false);
+                    });
+                }else if(isObject(data)){
+                    that.appendTab(data,false);
+                }
+
+                if(that.renderState){
+                    that.tabBarOverflowCheck();
+                    that.updateLayout();
+                }
+                return that;
+            },
+            /*
+             * insert
+            */
+            insertTab:function(itemOption,index,checksum){
+                var that = this;
+                var opts = that.opts;
+                var doms = that.D;
+                var item = new itemModule(itemOption,this);
+
+                if(index === -1){
+                    doms.buttons.append(item.button[0]);
+                    doms.contents.append(item.content[0]);
+                    that.items.push(item);
+                }else{
+                    doms.buttons.insert(item.button[0],index);
+                    doms.contents.insert(item.content[0],index);
+                    that.items.insert(item,index);
+                }
+
+                if(that.renderState){
+                    item.button.render();
+                    if(checksum !== false){
+                        that.tabBarOverflowCheck();
+                        that.updateLayout();
+                    }
+                    if(!opts.deferRender){
+                        item.content.height(that.computeContentHeight());
+                        item.content.render();
+                    }
+                }
+                return item;
+            },
+            /*
+             * remove tab
+            */
+            removeTab:function(index){
+                var that        = this;
+                var items       = that.items;
+                var item        = items[index];
+                var activeIndex = that.activeIndex();
+
+                items[index].button.remove();
+                items[index].content.remove();
+                that.items.remove(index);
+
+                if(index === activeIndex){
+                    that.select("beside",index);
+                }
+                return that.tabBarOverflowCheck().emit("removeTab",[index,item],true);
+            },
+            /*
+             * clear
+             */
+            clear:function(){
+                var that = this;
+
+                that.items.each(function(i,item){
+                    item.button.remove();
+                    item.content.remove();
+                });
+                that.items.clear();
+                that._activeItem = null;
+
+                return that;
+            }
+        },
+        /*[#module option:main]*/
+        main:function(that,opts){
+            switch(opts.tabPosition){
+                case "left":
+                case "right":
+                    that._direction = "horizontal";
+                    break;
+                case "top":
+                case "bottom":
+                    that._direction = "vertical";
+                    break;
+            }
+
+            that.D = {};
+            that.initTabBar();
+            that.initClient();
+            that.initData();
+        }
+    }
+});

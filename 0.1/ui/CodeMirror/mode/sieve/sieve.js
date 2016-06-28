@@ -1,1 +1,193 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("sieve",function(e){function n(e){for(var n={},t=e.split(" "),r=0;r<t.length;++r)n[t[r]]=!0;return n}function t(e,n){var t=e.next();if("/"==t&&e.eat("*"))return n.tokenize=i,i(e,n);if("#"===t)return e.skipToEnd(),"comment";if('"'==t)return n.tokenize=o(t),n.tokenize(e,n);if("("==t)return n._indent.push("("),n._indent.push("{"),null;if("{"===t)return n._indent.push("{"),null;if(")"==t&&(n._indent.pop(),n._indent.pop()),"}"===t)return n._indent.pop(),null;if(","==t)return null;if(";"==t)return null;if(/[{}\(\),;]/.test(t))return null;if(/\d/.test(t))return e.eatWhile(/[\d]/),e.eat(/[KkMmGg]/),"number";if(":"==t)return e.eatWhile(/[a-zA-Z_]/),e.eatWhile(/[a-zA-Z0-9_]/),"operator";e.eatWhile(/\w/);var f=e.current();return"text"==f&&e.eat(":")?(n.tokenize=r,"string"):u.propertyIsEnumerable(f)?"keyword":l.propertyIsEnumerable(f)?"atom":null}function r(e,n){return n._multiLineString=!0,e.sol()?("."==e.next()&&e.eol()&&(n._multiLineString=!1,n.tokenize=t),"string"):(e.eatSpace(),"#"==e.peek()?(e.skipToEnd(),"comment"):(e.skipToEnd(),"string"))}function i(e,n){for(var r,i=!1;null!=(r=e.next());){if(i&&"/"==r){n.tokenize=t;break}i="*"==r}return"comment"}function o(e){return function(n,r){for(var i,o=!1;null!=(i=n.next())&&(i!=e||o);)o=!o&&"\\"==i;return o||(r.tokenize=t),"string"}}var u=n("if elsif else stop require"),l=n("true false not"),f=e.indentUnit;return{startState:function(e){return{tokenize:t,baseIndent:e||0,_indent:[]}},token:function(e,n){return e.eatSpace()?null:(n.tokenize||t)(e,n)},indent:function(e,n){var t=e._indent.length;return n&&"}"==n[0]&&t--,0>t&&(t=0),t*f},electricChars:"}"}}),e.defineMIME("application/sieve","sieve")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("sieve", function(config) {
+  function words(str) {
+    var obj = {}, words = str.split(" ");
+    for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+    return obj;
+  }
+
+  var keywords = words("if elsif else stop require");
+  var atoms = words("true false not");
+  var indentUnit = config.indentUnit;
+
+  function tokenBase(stream, state) {
+
+    var ch = stream.next();
+    if (ch == "/" && stream.eat("*")) {
+      state.tokenize = tokenCComment;
+      return tokenCComment(stream, state);
+    }
+
+    if (ch === '#') {
+      stream.skipToEnd();
+      return "comment";
+    }
+
+    if (ch == "\"") {
+      state.tokenize = tokenString(ch);
+      return state.tokenize(stream, state);
+    }
+
+    if (ch == "(") {
+      state._indent.push("(");
+      // add virtual angel wings so that editor behaves...
+      // ...more sane incase of broken brackets
+      state._indent.push("{");
+      return null;
+    }
+
+    if (ch === "{") {
+      state._indent.push("{");
+      return null;
+    }
+
+    if (ch == ")")  {
+      state._indent.pop();
+      state._indent.pop();
+    }
+
+    if (ch === "}") {
+      state._indent.pop();
+      return null;
+    }
+
+    if (ch == ",")
+      return null;
+
+    if (ch == ";")
+      return null;
+
+
+    if (/[{}\(\),;]/.test(ch))
+      return null;
+
+    // 1*DIGIT "K" / "M" / "G"
+    if (/\d/.test(ch)) {
+      stream.eatWhile(/[\d]/);
+      stream.eat(/[KkMmGg]/);
+      return "number";
+    }
+
+    // ":" (ALPHA / "_") *(ALPHA / DIGIT / "_")
+    if (ch == ":") {
+      stream.eatWhile(/[a-zA-Z_]/);
+      stream.eatWhile(/[a-zA-Z0-9_]/);
+
+      return "operator";
+    }
+
+    stream.eatWhile(/\w/);
+    var cur = stream.current();
+
+    // "text:" *(SP / HTAB) (hash-comment / CRLF)
+    // *(multiline-literal / multiline-dotstart)
+    // "." CRLF
+    if ((cur == "text") && stream.eat(":"))
+    {
+      state.tokenize = tokenMultiLineString;
+      return "string";
+    }
+
+    if (keywords.propertyIsEnumerable(cur))
+      return "keyword";
+
+    if (atoms.propertyIsEnumerable(cur))
+      return "atom";
+
+    return null;
+  }
+
+  function tokenMultiLineString(stream, state)
+  {
+    state._multiLineString = true;
+    // the first line is special it may contain a comment
+    if (!stream.sol()) {
+      stream.eatSpace();
+
+      if (stream.peek() == "#") {
+        stream.skipToEnd();
+        return "comment";
+      }
+
+      stream.skipToEnd();
+      return "string";
+    }
+
+    if ((stream.next() == ".")  && (stream.eol()))
+    {
+      state._multiLineString = false;
+      state.tokenize = tokenBase;
+    }
+
+    return "string";
+  }
+
+  function tokenCComment(stream, state) {
+    var maybeEnd = false, ch;
+    while ((ch = stream.next()) != null) {
+      if (maybeEnd && ch == "/") {
+        state.tokenize = tokenBase;
+        break;
+      }
+      maybeEnd = (ch == "*");
+    }
+    return "comment";
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      var escaped = false, ch;
+      while ((ch = stream.next()) != null) {
+        if (ch == quote && !escaped)
+          break;
+        escaped = !escaped && ch == "\\";
+      }
+      if (!escaped) state.tokenize = tokenBase;
+      return "string";
+    };
+  }
+
+  return {
+    startState: function(base) {
+      return {tokenize: tokenBase,
+              baseIndent: base || 0,
+              _indent: []};
+    },
+
+    token: function(stream, state) {
+      if (stream.eatSpace())
+        return null;
+
+      return (state.tokenize || tokenBase)(stream, state);;
+    },
+
+    indent: function(state, _textAfter) {
+      var length = state._indent.length;
+      if (_textAfter && (_textAfter[0] == "}"))
+        length--;
+
+      if (length <0)
+        length = 0;
+
+      return length * indentUnit;
+    },
+
+    electricChars: "}"
+  };
+});
+
+CodeMirror.defineMIME("application/sieve", "sieve");
+
+});

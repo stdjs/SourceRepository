@@ -1,1 +1,162 @@
-Std.ui.module("DateTimeView",{parent:"widget",option:{type:"dateTime",width:100,height:30,minWidth:32,minHeight:20,fontSize:13,tabIndex:null,defaultClass:"StdUI_DateTimeView",boxSizing:"border-box",dateFormat:"yyyy-MM-dd",timeFormat:"hh:mm:ss"},"private":{picker:null,timer:null},extend:{render:function(){var t=this;t.initEvents(),t.initTimer(),t.update()},height:function(t){var e=this;e[0].lineHeight(isNumber(t)?t:e.height())},remove:function(){var t=this;t._timer&&clearInterval(t._timer)}},"protected":{initEvents:function(){{var t=this;t.opts}},initTimer:function(){var t=this;return t._timer=setInterval(function(){t.update()},1e3),t},update:function(){var t=this,e=t.D;return e.date&&e.date.html((new Date).format(t.dateFormat())),e.time&&e.time.html((new Date).format(t.timeFormat())),t}},"public":{fontSize:function(t){return this.opt("fontSize",t,function(){this[0].css("fontSize",t+"px")})},dateFormat:function(t){return this.opt("dateFormat",t,function(){this.renderState&&this.update()})},timeFormat:function(t){return this.opt("timeFormat",t,function(){this.renderState&&this.update()})},type:function(t){var e=this;return e.opt("type",t,function(){e[0].clear(),"dateTime"===t?e[0].append([e.D.date=newDiv("_date"),e.D.time=newDiv("_time")]):"date"===t?e[0].append(e.D.date=newDiv("_date")):"time"===t&&e[0].append(e.D.time=newDiv("_time")),e.renderState&&e.update()})}},main:function(t){t.D={},t.call_opts({type:"",fontSize:13},!0)}});
+/**
+ *  DateTime View
+ */
+Std.ui.module("DateTimeView",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:option]*/
+    option:{
+        type:"dateTime",  //date,time,dateTime
+        width:100,
+        height:30,
+        minWidth:32,
+        minHeight:20,
+        fontSize:13,
+        tabIndex:null,
+        defaultClass:"StdUI_DateTimeView",
+        boxSizing:"border-box",
+        dateFormat:"yyyy-MM-dd",
+        timeFormat:"hh:mm:ss"
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * date time picker
+        */
+        picker:null,
+        /*
+         * timer
+        */
+        timer:null
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that.initEvents();
+            that.initTimer();
+            that.update();
+        },
+        /*
+         * height
+        */
+        height:function(height){
+            var that = this;
+
+            that[0].lineHeight((isNumber(height) ? height : that.height()))
+        },
+        /*
+         * remove
+        */
+        remove:function(){
+            var that = this;
+
+            if(that._timer){
+                clearInterval(that._timer);
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var opts = that.opts;
+
+        },
+        /*
+         * init timer
+        */
+        initTimer:function(){
+            var that = this;
+
+            that._timer = setInterval(function(){
+                that.update();
+            },1000);
+
+            return that;
+        },
+        /*
+         * update
+        */
+        update:function(){
+            var that = this;
+            var doms = that.D;
+
+            if(doms.date){
+                doms.date.html(new Date().format(that.dateFormat()))
+            }
+            if(doms.time){
+                doms.time.html(new Date().format(that.timeFormat()));
+            }
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * fontSize
+        */
+        fontSize:function(fontSize){
+            return this.opt("fontSize",fontSize,function(){
+                this[0].css("fontSize",fontSize + "px");
+            });
+        },
+        /*
+         * date format
+        */
+        dateFormat:function(format){
+            return this.opt("dateFormat",format,function(){
+                this.renderState && this.update();
+            })
+        },
+        /*
+         * time format
+         */
+        timeFormat:function(format){
+            return this.opt("timeFormat",format,function(){
+                this.renderState && this.update();
+            })
+        },
+        /*
+         * type
+        */
+        type:function(type){
+            var that = this;
+
+            return that.opt("type",type,function(){
+                that[0].clear();
+
+                if(type === "dateTime"){
+                    that[0].append([
+                        that.D.date = newDiv("_date"),
+                        that.D.time = newDiv("_time")
+                    ]);
+
+                }else if(type === "date"){
+                    that[0].append(that.D.date = newDiv("_date"));
+                }else if(type === "time"){
+                    that[0].append(that.D.time = newDiv("_time"));
+                }
+                if(that.renderState){
+                    that.update();
+                }
+            });
+        }
+    },
+    /*[#module option:private]*/
+    main:function(that){
+        that.D = {};
+        that.call_opts({
+            type:"",
+            fontSize:13
+        },true);
+    }
+});
+

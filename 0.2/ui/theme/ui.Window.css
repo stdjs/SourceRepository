@@ -1,0 +1,2 @@
+/************* Window *************/
+.StdUI_Window{ position:absolute;box-sizing:content-box;box-shadow:1px 1px 2px #B1AEAC,0 0 1px #EFEFEF inset;width:500px}.StdUI_Window.focused{ box-shadow:1px 1px 3px rgba(74,171,219,0.6),0 0 1px #E1DEDB inset}.StdUI_Window > ._title > ._icon._default{ background:url("images/StdUI_Global.png") -352px -5px no-repeat}

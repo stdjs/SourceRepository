@@ -1,1 +1,71 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";function t(e){for(var t=0;t<e.state.activeLines.length;t++)e.removeLineClass(e.state.activeLines[t],"wrap",o),e.removeLineClass(e.state.activeLines[t],"background",a)}function n(e,t){if(e.length!=t.length)return!1;for(var n=0;n<e.length;n++)if(e[n]!=t[n])return!1;return!0}function i(e,i){for(var r=[],s=0;s<i.length;s++){var c=i[s];if(c.empty()){var f=e.getLineHandleVisualStart(c.head.line);r[r.length-1]!=f&&r.push(f)}}n(e.state.activeLines,r)||e.operation(function(){t(e);for(var n=0;n<r.length;n++)e.addLineClass(r[n],"wrap",o),e.addLineClass(r[n],"background",a);e.state.activeLines=r})}function r(e,t){i(e,t.ranges)}var o="CodeMirror-activeline",a="CodeMirror-activeline-background";e.defineOption("styleActiveLine",!1,function(n,o,a){var s=a&&a!=e.Init;o&&!s?(n.state.activeLines=[],i(n,n.listSelections()),n.on("beforeSelectionChange",r)):!o&&s&&(n.off("beforeSelectionChange",r),t(n),delete n.state.activeLines)})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+// Because sometimes you need to style the cursor's line.
+//
+// Adds an option 'styleActiveLine' which, when enabled, gives the
+// active line's wrapping <div> the CSS class "CodeMirror-activeline",
+// and gives its background <div> the class "CodeMirror-activeline-background".
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+  var WRAP_CLASS = "CodeMirror-activeline";
+  var BACK_CLASS = "CodeMirror-activeline-background";
+
+  CodeMirror.defineOption("styleActiveLine", false, function(cm, val, old) {
+    var prev = old && old != CodeMirror.Init;
+    if (val && !prev) {
+      cm.state.activeLines = [];
+      updateActiveLines(cm, cm.listSelections());
+      cm.on("beforeSelectionChange", selectionChange);
+    } else if (!val && prev) {
+      cm.off("beforeSelectionChange", selectionChange);
+      clearActiveLines(cm);
+      delete cm.state.activeLines;
+    }
+  });
+
+  function clearActiveLines(cm) {
+    for (var i = 0; i < cm.state.activeLines.length; i++) {
+      cm.removeLineClass(cm.state.activeLines[i], "wrap", WRAP_CLASS);
+      cm.removeLineClass(cm.state.activeLines[i], "background", BACK_CLASS);
+    }
+  }
+
+  function sameArray(a, b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++)
+      if (a[i] != b[i]) return false;
+    return true;
+  }
+
+  function updateActiveLines(cm, ranges) {
+    var active = [];
+    for (var i = 0; i < ranges.length; i++) {
+      var range = ranges[i];
+      if (!range.empty()) continue;
+      var line = cm.getLineHandleVisualStart(range.head.line);
+      if (active[active.length - 1] != line) active.push(line);
+    }
+    if (sameArray(cm.state.activeLines, active)) return;
+    cm.operation(function() {
+      clearActiveLines(cm);
+      for (var i = 0; i < active.length; i++) {
+        cm.addLineClass(active[i], "wrap", WRAP_CLASS);
+        cm.addLineClass(active[i], "background", BACK_CLASS);
+      }
+      cm.state.activeLines = active;
+    });
+  }
+
+  function selectionChange(cm, sel) {
+    updateActiveLines(cm, sel.ranges);
+  }
+});

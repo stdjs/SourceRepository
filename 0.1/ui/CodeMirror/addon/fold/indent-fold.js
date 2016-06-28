@@ -1,1 +1,44 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.registerHelper("fold","indent",function(t,n){var i=t.getOption("tabSize"),o=t.getLine(n.line);if(/\S/.test(o)){for(var r=function(t){return e.countColumn(t,null,i)},f=r(o),l=null,u=n.line+1,c=t.lastLine();c>=u;++u){var d=t.getLine(u),s=r(d);if(s>f)l=u;else if(/\S/.test(d))break}return l?{from:e.Pos(n.line,o.length),to:e.Pos(l,t.getLine(l).length)}:void 0}})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.registerHelper("fold", "indent", function(cm, start) {
+  var tabSize = cm.getOption("tabSize"), firstLine = cm.getLine(start.line);
+  if (!/\S/.test(firstLine)) return;
+  var getIndent = function(line) {
+    return CodeMirror.countColumn(line, null, tabSize);
+  };
+  var myIndent = getIndent(firstLine);
+  var lastLineInFold = null;
+  // Go through lines until we find a line that definitely doesn't belong in
+  // the block we're folding, or to the end.
+  for (var i = start.line + 1, end = cm.lastLine(); i <= end; ++i) {
+    var curLine = cm.getLine(i);
+    var curIndent = getIndent(curLine);
+    if (curIndent > myIndent) {
+      // Lines with a greater indent are considered part of the block.
+      lastLineInFold = i;
+    } else if (!/\S/.test(curLine)) {
+      // Empty lines might be breaks within the block we're trying to fold.
+    } else {
+      // A non-empty line at an indent equal to or less than ours marks the
+      // start of another block.
+      break;
+    }
+  }
+  if (lastLineInFold) return {
+    from: CodeMirror.Pos(start.line, firstLine.length),
+    to: CodeMirror.Pos(lastLineInFold, cm.getLine(lastLineInFold).length)
+  };
+});
+
+});

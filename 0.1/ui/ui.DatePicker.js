@@ -1,1 +1,538 @@
-Std.ui.module("DatePicker",{parent:"widget",events:"dateClick",action:{content:"value"},option:{defaultClass:"StdUI_DatePicker",editable:!0,value:"",minWidth:233,maxWidth:233,boxSizing:"border-box",format:"yyyy-MM-dd hh:mm:ss",footer:!0,position:"none"},extend:{render:function(){var e=this,t=e.opts;e.value(t.value),e.initEvents()}},"protected":{dateCount:function(e,t){var n=this;return void 0==e?new Date(n.year(),n.month(),0).getDate():new Date(e,t,0).getDate()},clearDates:function(){var e=this,t=e.D.dates;for(var n in t)t[n].remove(),delete t[n];return e},refreshTime:function(){var e=this,t=new Date;return e.hour(t.getHours()),e.minute(t.getMinutes()),e.second(t.getSeconds()),e},updateDates:function(){var e=this,t=e.D,n=t.dates,a=e.dateCount(),o=e.year(),r=e.month(),i=new Date(o,r-1).getDay();e.clearDates();for(var d=1,u=e.dateCount(1>r?o-1:o,1>r?12:r-1);i>=d;d++)t.dateBox.append(n["l"+d]=newDom("span","_date _lastMonthDate").html(u-i+d));for(var d=1;a>=d;d++)t.dateBox.append(n[d]=newDom("span",d===e.date()?"_date selected":"_date").html(d));for(var d=1,s=new Date(e.year(),e.month()).getDay();7-s>=d;d++)t.dateBox.append(n["n"+d]=newDom("span","_date _nextMonthDate").html(d));return e},editValue:function(e,t){var n,a=this;if(!a.editable())return a;"year"===e?n=a.D.year:"month"===e&&(n=a.D.month);var o=newDom("input").insertAfter(n.hide());return o.width(n.outerWidth()-o.boxSize().width).on({focus:function(){var e=function(t){13===t.keyCode&&o.blur().off("keydown",e)},t=function(e){o.is(e.target)||(o.blur(),a[0].off("mousedown",t))};o.on("keydown",e),o.value(n.text()),a[0].on("mousedown",t)},blur:function(){var e=o.value();e.isNumber()&&t.call(n,~~e)&&n.html(e),this.remove(),n.show()}}).focus().select(),a},initFooter:function(){var e=this,t=e.D,n=function(e){return newDom("input",e).contentEditable(!0).attr("maxlength",2).value("00")};return e[0].append(t.footer=newDiv("_footer").append([newDom("span","_label").html("time:"),newDiv("_time").append([t.hour=n("_hour"),newDiv("_and").html(":"),t.minute=n("_minute"),newDiv("_and").html(":"),t.second=n("_second")]),t.refresh=newDiv("_refresh").mouse({click:function(){e.refreshTime()}}),t.today=newDiv("_today").html("Today").mouse({click:function(){var t=new Date;e.year(t.getFullYear()),e.month(t.getMonth()+1),e.date(t.getDate())}})])),t.footer.delegate("keydown keyup","input",function(e){var t=this,n=t.value();if("keydown"===e.name){if(!(e.keyCode>=48&&e.keyCode<=57||e.keyCode>=96&&e.keyCode<=105))return!1}else"keyup"===e.name&&(~~n>23&&0===t.index()?t.value("00"):~~n>59&&t.value("59"))}),e},initEvents:function(){var e=this,t=e.D;return t.prevYear.on("click",function(){e.year(e.year()-1)}),t.nextYear.on("click",function(){e.year(e.year()+1)}),t.prevMonth.on("click",function(){var t=e.month()-1;1>t?(e.year(e.year()-1),e.month(12)):e.month(t)}),t.nextMonth.on("click",function(){var t=e.month()+1;t>12?(e.year(e.year()+1),e.month(1)):e.month(t)}),t.year.on("click",function(){e.editValue("year",function(t){return t>1e3&&1e4>t?(e.year(t),!0):void 0})}),t.month.on("click",function(){e.editValue("month",function(t){return t>0&&13>t?(e.month(t),!0):void 0})}),t.dateBox.on("click",function(t){var n,a=Std.dom(t.target);return this.is(a)?!1:(a.hasClass("_lastMonthDate")?e.month()-1<1?e.year(e.year()-1).month(12):e.month(e.month()-1):a.hasClass("_nextMonthDate")&&(e.month()+1>12?e.year(e.year()+1).month(1):e.month(e.month()+1)),e.date(n=~~a.text()),void e.emit("dateClick",n))}),e}},"public":{format:function(e){return this.opt("format",e)},day:function(){return this._date.getDay()},editable:function(e){return this.opt("editable",e)},year:function(e){var t=this,n=t._date;return void 0===e?~~n.getFullYear():(n.setFullYear(e),t.D.year.html(e),t.renderState&&t.updateDates(),t)},month:function(e){var t=this,n=t._date;return void 0===e?~~n.getMonth()+1:(e>12?e=12:1>e&&(e=1),t.date()>t.dateCount(t.year(),e)&&t.date(1),n.setMonth(e-1),t.D.month.html(e),t.renderState&&t.updateDates(),t)},date:function(e){var t=this;if(void 0===e)return t._date.getDate();var n=t.D.dates,a=t.date();return t._date.setDate(e),n[a]&&n[a].className("_date"),e in n&&n[e].className("_date selected"),t},hour:function(e){var t=this;return void 0===e?t._date.getHours():(t._date.setHours(e),t.opts.footer&&t.D.hour.value(e),t)},minute:function(e){var t=this;return void 0===e?t._date.getMinutes():(t._date.setMinutes(e),t.opts.footer&&t.D.minute.value(e),t)},second:function(e){var t=this;return void 0===e?t._date.getSeconds():(t._date.setSeconds(e),t.opts.footer&&t.D.second.value(e),t)},value:function(e){var t=this,n=t.opts;if(void 0===e)return t._date.format(n.format);var a=t._date=new Date;return""!==(e=e.trim())&&a.format(n.format,e),t.year(a.getFullYear()),t.month(a.getMonth()+1),t.date(a.getDate()),t.hour(a.getHours()),t.minute(a.getMinutes()),t.second(a.getSeconds()),t.updateDates(),t}},main:function(e,t,n){var a=e.D={dates:{}};n.unselect(!0).append([a.header=newDiv("_header").append([a.prevYear=newDiv("_btn _prevYear"),a.year=newDiv("_value _year"),a.nextYear=newDiv("_btn _nextYear"),a.prevMonth=newDiv("_btn _prevMonth"),a.month=newDiv("_value _month"),a.nextMonth=newDiv("_btn _nextMonth")]),newDiv("_body").append([a.dayBox=newDiv("_dayBox"),a.dateBox=newDiv("_dateBox")])]),Std.each(["Su","Mo","Tu","We","Th","Fr","Sa"],function(e,t){a.dayBox.append(newDom("span","_day").html(t))}),t.footer===!0&&e.initFooter()}}),Std.plugin.module("DatePicker",{events:"apply dateClick",option:{value:"",editable:!0,format:"yyyy-MM-dd h:m:s"},"public":{value:function(e){var t=this;return void 0===e?t.datePicker.value():(t.datePicker.value(e),t)},remove:function(){this.datePicker.remove()}},main:function(e,t,n){var a=e.datePicker=Std.ui("DatePicker",Std.extend({renderTo:"body",visible:!1},t));a.on({dateClick:function(){a.hide(),e.emit("apply",e.value()),n.value(e.value())}})[0].css("position","absolute"),Std.dom(n).on("click",function(){var e=this.offset();a.show()[0].css({top:e.y+Std.dom(n).outerHeight(),left:e.x,zIndex:Std.ui.status.zIndex++})})}});
+/**
+ *  date picker widget
+*/
+Std.ui.module("DatePicker",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"dateClick",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_DatePicker",
+        editable:true,
+        value:"",
+        minWidth:233,
+        maxWidth:233,
+        boxSizing:"border-box",
+        format:"yyyy-MM-dd hh:mm:ss",
+        footer:true,
+        position:"none"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.value(opts.value);
+            that.initEvents();
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * date count
+        */
+        dateCount:function(year,month){
+            var that = this;
+
+            if(year == undefined){
+                return new Date(that.year(),that.month(),0).getDate();
+            }
+            return new Date(year,month,0).getDate();
+        },
+        /*
+         * clear dates
+        */
+        clearDates:function(){
+            var that       = this;
+            var doms_dates = that.D.dates;
+
+            for(var i in doms_dates){
+                doms_dates[i].remove();
+                delete doms_dates[i];
+            }
+            return that;
+        },
+        /*
+         * refresh time
+        */
+        refreshTime:function(){
+            var that        = this;
+            var currentDate = new Date();
+
+            that.hour(currentDate.getHours());
+            that.minute(currentDate.getMinutes());
+            that.second(currentDate.getSeconds());
+
+            return that;
+        },
+        /*
+         * update dates
+        */
+        updateDates:function(){
+            var that       = this;
+            var doms       = that.D;
+            var doms_dates = doms.dates;
+
+            //-------
+            var maxDay     = that.dateCount();
+            var year       = that.year();
+            var month      = that.month();
+            var day        = new Date(year,month - 1).getDay();
+
+            //-------
+            that.clearDates();
+
+            //-------
+            for(var i=1,dateCount=that.dateCount(month < 1 ? year -1 : year,month < 1 ? 12 : month - 1);i<=day;i++){
+                doms.dateBox.append(
+                    doms_dates["l"+i] = newDom("span","_date _lastMonthDate").html(dateCount - day + i)
+                );
+            }
+            for(var i=1;i<=maxDay;i++){
+                doms.dateBox.append(
+                    doms_dates[i] = newDom("span",i === that.date() ? "_date selected" : "_date").html(i)
+                );
+            }
+            for(var i=1,nextDay=new Date(that.year(),that.month()).getDay();i<=7-nextDay;i++){
+                doms.dateBox.append(
+                    doms_dates["n"+i] = newDom("span","_date _nextMonthDate").html(i)
+                );
+            }
+            return that;
+        },
+        /*
+         * edit value
+         */
+        editValue:function(key,blur){
+            var target;
+            var that = this;
+
+            if(!that.editable()){
+                return that;
+            }
+            if(key === "year"){
+                target = that.D.year;
+            }else if(key === "month"){
+                target = that.D.month;
+            }
+
+            var input = newDom("input").insertAfter(target.hide());
+            input.width(target.outerWidth() - input.boxSize().width).on({
+                focus:function(){
+                    var keydown   = function(e){
+                        if(e.keyCode === 13){
+                            input.blur().off("keydown",keydown);
+                        }
+                    };
+                    var mousedown = function(e){
+                        if(!input.is(e.target)){
+                            input.blur();
+                            that[0].off("mousedown",mousedown);
+                        }
+                    };
+                    input.on("keydown",keydown);
+                    input.value(target.text());
+                    that[0].on("mousedown",mousedown);
+                },
+                blur:function(){
+                    var value = input.value();
+
+                    if(value.isNumber() && blur.call(target,~~value)){
+                        target.html(value);
+                    }
+                    this.remove();
+                    target.show();
+                }
+            }).focus().select();
+
+            return that;
+        },
+        /*
+         * init footer
+        */
+        initFooter:function(){
+            var that        = this;
+            var doms        = that.D;
+            var createInput = function(className){
+                return newDom("input",className).contentEditable(true).attr("maxlength",2).value("00");
+            };
+
+            that[0].append(doms.footer = newDiv("_footer").append([
+                newDom("span","_label").html("time:"),
+                newDiv("_time").append([
+                    doms.hour    = createInput("_hour"),
+                    newDiv("_and").html(":"),
+                    doms.minute  = createInput("_minute"),
+                    newDiv("_and").html(":"),
+                    doms.second  = createInput("_second")
+                ]),
+                doms.refresh = newDiv("_refresh").mouse({
+                    click:function(){
+                        that.refreshTime();
+                    }
+                }),
+                doms.today   = newDiv("_today").html("Today").mouse({
+                    click:function(){
+                        var date = new Date();
+                        that.year(date.getFullYear());
+                        that.month(date.getMonth() + 1);
+                        that.date(date.getDate());
+                    }
+                })
+            ]));
+
+            doms.footer.delegate("keydown keyup","input",function(e){
+                var input = this;
+                var value = input.value();
+
+                if(e.name === "keydown"){
+                    if(!((e.keyCode>=48 && e.keyCode<=57) || (e.keyCode>=96 && e.keyCode<=105))){
+                        return false;
+                    }
+                }else if(e.name === "keyup"){
+                    if(~~value > 23 && input.index() === 0){
+                        input.value("00");
+                    }else if(~~value > 59){
+                        input.value("59");
+                    }
+                }
+            });
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that  = this;
+            var doms  = that.D;
+
+            doms.prevYear.on("click",function(){
+                that.year(that.year() - 1);
+            });
+
+            doms.nextYear.on("click",function(){
+                that.year(that.year() + 1);
+            });
+
+            doms.prevMonth.on("click",function(){
+                var month = that.month() - 1;
+                if(month < 1){
+                    that.year(that.year() - 1);
+                    that.month(12);
+                }else{
+                    that.month(month);
+                }
+            });
+
+            doms.nextMonth.on("click",function(){
+                var month = that.month() + 1;
+                if(month > 12){
+                    that.year(that.year() + 1);
+                    that.month(1);
+                }else{
+                    that.month(month);
+                }
+            });
+
+            doms.year.on("click",function(e){
+                that.editValue("year",function(value){
+                    if(value > 1000 && value < 10000){
+                        that.year(value);
+                        return true;
+                    }
+                });
+            });
+
+            doms.month.on("click",function(){
+                that.editValue("month",function(value){
+                    if(value > 0 && value < 13){
+                        that.month(value);
+                        return true;
+                    }
+                });
+            });
+
+            doms.dateBox.on("click",function(e){
+                var dateText;
+                var target = Std.dom(e.target);
+
+                if(this.is(target)){
+                    return false;
+                }
+                if(target.hasClass("_lastMonthDate")){
+                    if(that.month() - 1 < 1){
+                        that.year(that.year() - 1).month(12);
+                    }else{
+                        that.month(that.month() - 1);
+                    }
+                }else if(target.hasClass("_nextMonthDate")){
+                    if(that.month() + 1 > 12){
+                        that.year(that.year() + 1).month(1);
+                    }else{
+                        that.month(that.month() + 1);
+                    }
+                }
+
+                that.date(dateText = ~~target.text());
+                that.emit("dateClick",dateText);
+            });
+
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * format
+        */
+        format:function(format){
+            return this.opt("format",format);
+        },
+        /*
+         * get day
+        */
+        day:function(){
+            return this._date.getDay();
+        },
+        /*
+         * editable
+        */
+        editable:function(state){
+            return this.opt("editable",state);
+        },
+        /*
+         * get or set year
+        */
+        year:function(year){
+            var that = this;
+            var date = that._date;
+
+            if(year === undefined){
+                return ~~date.getFullYear();
+            }
+
+            date.setFullYear(year);
+            that.D.year.html(year);
+            that.renderState && that.updateDates();
+
+            return that;
+        },
+        /*
+         * get or set month
+        */
+        month:function(month){
+            var that = this;
+            var date = that._date;
+
+            if(month === undefined){
+                return ~~date.getMonth() + 1;
+            }
+
+            if(month > 12){
+                month = 12;
+            }else if(month < 1){
+                month = 1;
+            }
+
+            if(that.date() > that.dateCount(that.year(),month)){
+                that.date(1)
+            }
+
+            date.setMonth(month - 1);
+            that.D.month.html(month);
+            that.renderState && that.updateDates();
+
+            return that;
+        },
+        /*
+         * get or set date
+        */
+        date:function(date){
+            var that = this;
+
+            if(date === undefined){
+                return that._date.getDate();
+            }
+            var doms_dates = that.D.dates;
+            var dateToday  = that.date();
+
+            that._date.setDate(date);
+
+            if(doms_dates[dateToday]){
+                doms_dates[dateToday].className("_date");
+            }
+            if(date in doms_dates){
+                doms_dates[date].className("_date selected");
+            }
+            return that;
+        },
+        /*
+         * hour
+        */
+        hour:function(hour){
+            var that = this;
+
+            if(hour === undefined){
+                return that._date.getHours();
+            }
+            that._date.setHours(hour);
+            that.opts.footer && that.D.hour.value(hour);
+
+            return that;
+        },
+        /*
+         * minute
+        */
+        minute:function(minute){
+            var that = this;
+
+            if(minute === undefined){
+                return that._date.getMinutes();
+            }
+            that._date.setMinutes(minute);
+            that.opts.footer && that.D.minute.value(minute);
+
+            return that;
+        },
+        /*
+         * second
+        */
+        second:function(second){
+            var that = this;
+
+            if(second === undefined){
+                return that._date.getSeconds();
+            }
+            that._date.setSeconds(second);
+            that.opts.footer && that.D.second.value(second);
+
+            return that;
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+            var opts = that.opts;
+
+            if(value === undefined){
+                return that._date.format(opts.format);
+            }
+            var date = that._date = new Date();
+
+            if((value = value.trim()) !== ""){
+                date.format(opts.format,value);
+            }
+
+            that.year(date.getFullYear());
+            that.month(date.getMonth() + 1);
+            that.date(date.getDate());
+            that.hour(date.getHours());
+            that.minute(date.getMinutes());
+            that.second(date.getSeconds());
+            that.updateDates();
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        var doms = that.D = {
+            dates:{}
+        };
+
+        dom.unselect(true).append([
+            doms.header = newDiv("_header").append([
+                doms.prevYear  = newDiv("_btn _prevYear"),
+                doms.year      = newDiv("_value _year"),
+                doms.nextYear  = newDiv("_btn _nextYear"),
+
+                doms.prevMonth = newDiv("_btn _prevMonth"),
+                doms.month     = newDiv("_value _month"),
+                doms.nextMonth = newDiv("_btn _nextMonth")
+            ]),
+            newDiv("_body").append([
+                doms.dayBox  = newDiv("_dayBox"),
+                doms.dateBox = newDiv("_dateBox")
+            ])
+        ]);
+
+        //---------
+        Std.each(["Su","Mo","Tu","We","Th","Fr","Sa"],function(i,value){
+            doms.dayBox.append(newDom("span","_day").html(value));
+        });
+
+        if(opts.footer === true){
+            that.initFooter();
+        }
+    }
+});
+
+/**
+ *  date picker plugin,base on datePicker widget,or dom element
+*/
+Std.plugin.module("DatePicker",{
+    /*[#module option:events]*/
+    events:"apply dateClick",
+    /*[#module option:option]*/
+    option:{
+        value:"",
+        editable:true,
+        format:"yyyy-MM-dd h:m:s"
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+
+            if(value === undefined){
+                return that.datePicker.value();
+            }
+            that.datePicker.value(value);
+            return that;
+        },
+        /*
+         * remove
+        */
+        remove:function(){
+            this.datePicker.remove();
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,owner){
+        var datePicker = that.datePicker = Std.ui("DatePicker",Std.extend({
+            renderTo:"body",
+            visible:false
+        },opts));
+
+        datePicker.on({
+            dateClick:function(){
+                datePicker.hide();
+                that.emit("apply",that.value());
+                owner.value(that.value());
+            }
+        })[0].css("position","absolute");
+
+        Std.dom(owner).on("click",function(e){
+            var offset = this.offset();
+
+            datePicker.show()[0].css({
+                top    : offset.y + Std.dom(owner).outerHeight(),
+                left   : offset.x,
+                zIndex : Std.ui.status.zIndex++
+            });
+        });
+    }
+});

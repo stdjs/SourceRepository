@@ -1,1 +1,229 @@
-.StdUI_DataGrid{font-size:12px;position:relative;overflow:hidden;border:1px solid #B2AFAC;outline:0;transition:border-color .2s;background:#E5DFDD}.StdUI_DataGrid.hover{border-color:#6FD6FE}.StdUI_DataGrid.focus{border-color:#3aa7dd}.StdUI_DataGrid>._resizer{position:absolute;top:0;background:#3aa7dd;opacity:.4;filter:alpha(opacity=40);cursor:col-resize}.StdUI_DataGrid>._header{position:relative;overflow:hidden;width:200000px;border-bottom:1px solid #ccc9c7;background:#dfdcd9}.StdUI_DataGrid>._header>._columns{float:left;border-bottom:1px solid #DBDBDB}.StdUI_DataGrid>._header>._columns>._column,.StdUI_DataGrid>._header>._columns>._defColumn{float:left;position:relative;overflow:hidden;color:#6D6D6D;border-left:1px solid transparent;border-right:1px solid #b9b6b4;border-bottom:1px solid #DBDBDB}.StdUI_DataGrid>._header>._columns>._column.hover{cursor:pointer;background:#c9dbe1}.StdUI_DataGrid>._header>._columns>._column.selected{background:#B5D7E8;border-bottom-color:#B5D7E8}.StdUI_DataGrid>._header>._columns>._column>._client{display:inline-block;overflow:hidden;word-break:keep-all;white-space:nowrap;text-overflow:ellipsis;padding:0 5px}.StdUI_DataGrid>._header>._columns>._column>._resizeHandle{position:absolute;right:0;top:0;height:100%;width:4px;cursor:col-resize}.StdUI_DataGrid>._header>._columns>._column>._sortType{display:inline-block;width:8px;height:6px;background:red;vertical-align:top}.StdUI_DataGrid>._header>._columns>._column>._sortType._desc{background:url(images/StdUI_Global.png) -9px -399px no-repeat}.StdUI_DataGrid>._header>._columns>._column>._sortType._asc{background:url(images/StdUI_Global.png) -32px -394px no-repeat}.StdUI_DataGrid>._body{overflow:auto;position:relative;background:#FCFCFC}.StdUI_DataGrid>._body>._block >._row{color:#5E5E5E;overflow:hidden;border-bottom:1px solid #DADADA;transition:background .15s}.StdUI_DataGrid>._body>._block >._row._odd{background-color:#F1F1F1}.StdUI_DataGrid>._body>._block>._row.hover{background:#DFEFF7;border-bottom-color:#DADADA}.StdUI_DataGrid>._body>._block>._row.hover>._cell{border-right-color:#DADADA}.StdUI_DataGrid>._body>._block>._row.selected{background:#43ace8}.StdUI_DataGrid>._body>._block>._row.selected>._cell{color:#fff}.StdUI_DataGrid>._body>._block>._row>._cell,.StdUI_DataGrid>._body>._block>._row>._defCell{float:left;cursor:default;position:relative;overflow:hidden;word-break:keep-all;white-space:nowrap;text-overflow:ellipsis;border-right:1px solid #DADADA}.StdUI_DataGrid>._body>._block>._row>._cell.hover{background-color:#FFF0DC}.StdUI_DataGrid>._body>._block>._row>._cell.selected{color:#fff;background-color:#43ace8}.StdUI_DataGrid>._body>._block>._row>._defCell._rowNumber,.StdUI_DataGrid>._tester{font-size:13px;font-weight:700;text-align:center;border-right-color:#C8C8C8;background-color:#DDD}.StdUI_DataGrid>._body>._input,.StdUI_DataGrid>._header>._input{position:absolute;font-size:13px;overflow:hidden;padding:3px;margin:0;border:2px solid #009CE6;resize:none;outline:0}.StdUI_DataGrid_ColumnPosition{position:absolute;width:12px;height:10px;background:url(images/StdUI_Global.png) no-repeat}.StdUI_DataGrid_ColumnPosition._top{background-position:-7px -395px}.StdUI_DataGrid_ColumnPosition._bottom{background-position:-30px -394px}.StdUI_DataGrid>._body>._block>._row>._defCell._rowCheckbox>._checkbox,.StdUI_DataGrid>._header>._columns>._defColumn._rowCheckbox>._checkbox{width:16px;height:16px;margin:7px auto;box-shadow:0 0 1px #fff inset;background:url(images/StdUI_Global.png) -11px -249px no-repeat}.StdUI_DataGrid>._body>._block>._row>._defCell._rowCheckbox>._checkbox.hover,.StdUI_DataGrid>._header>._columns>._defColumn._rowCheckbox>._checkbox.hover{background-position:-180px -249px}.StdUI_DataGrid>._body>._block>._row>._defCell._rowCheckbox>._checkbox.press,.StdUI_DataGrid>._header>._columns>._defColumn._rowCheckbox>._checkbox.press{box-shadow:none}.StdUI_DataGrid>._body>._block>._row>._defCell._rowCheckbox>._checkbox.checked,.StdUI_DataGrid>._header>._columns>._defColumn._rowCheckbox>._checkbox.checked{background-position:-270px -248px}.StdUI_DataGrid>._body>._block>._row>._defCell._rowCheckbox>._checkbox.checked.hover,.StdUI_DataGrid>._header>._columns>._defColumn._rowCheckbox>._checkbox.checked.hover{background-position:-362px -248px}.StdUI_DataGrid>._body>._block>._row.selected>._defCell._rowCheckbox>._checkbox{background-color:#fff;background-position:-544px -249px}.StdUI_DataGrid>._body>._block>._row.selected>._defCell._rowCheckbox>._checkbox.checked{background-color:#fff;background-position:-453px -249px}
+
+/******* grid *********/
+.StdUI_DataGrid{
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+    border:1px solid #B2AFAC;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #E5DFDD;
+}
+.StdUI_DataGrid.hover{
+    border-color: #6FD6FE;
+}
+.StdUI_DataGrid.focus{
+    border-color: #3aa7dd;
+}
+
+/******* header > resizer********/
+.StdUI_DataGrid > ._resizer{
+    position: absolute;
+    top:0;
+    background: #3aa7dd;
+    opacity:0.4;
+    filter:alpha(opacity=40);
+    cursor: col-resize;
+}
+
+/******* header > header********/
+.StdUI_DataGrid > ._header{
+    position: relative;
+    overflow: hidden;
+    width: 200000px;
+    border-bottom: 1px solid #ccc9c7;
+    background: #dfdcd9;
+}
+
+/******* header > columns********/
+.StdUI_DataGrid > ._header > ._columns{
+    float: left;
+    border-bottom: 1px solid #DBDBDB;
+}
+
+/******* header > columns > column********/
+.StdUI_DataGrid > ._header > ._columns > ._column,
+.StdUI_DataGrid > ._header > ._columns > ._defColumn{
+    float: left;
+    position: relative;
+    overflow: hidden;
+    color: #6D6D6D;
+    border-left: 1px solid transparent;
+    border-right: 1px solid #b9b6b4;
+    border-bottom: 1px solid #DBDBDB;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column.hover{
+    cursor: pointer;
+    background: #c9dbe1;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column.selected{
+    background: #B5D7E8;
+    border-bottom-color: #B5D7E8;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column > ._client{
+    display: inline-block;*display: inline;*zoom: 1;
+    overflow: hidden;
+    word-break:keep-all;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    padding: 0 5px 0 5px;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column > ._resizeHandle{
+    position: absolute;
+    right: 0;
+    top:0;
+    height: 100%;
+    width:4px;
+    cursor: col-resize;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column > ._sortType{
+    display: inline-block;*display: inline;*zoom: 1;
+    width: 8px;
+    height: 6px;
+    background: red;
+    vertical-align: top;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column > ._sortType._desc{
+    background: url("images/StdUI_Global.png") -9px -399px no-repeat;
+}
+.StdUI_DataGrid > ._header > ._columns > ._column > ._sortType._asc{
+    background: url("images/StdUI_Global.png") -32px -394px no-repeat;
+}
+
+/******* body ********/
+.StdUI_DataGrid > ._body{
+    overflow: auto;
+    position: relative;
+    background: #FCFCFC;
+}
+
+/******* body > block > block  ********/
+.StdUI_DataGrid > ._body > ._block{
+
+}
+
+/******* body > block > row  ********/
+.StdUI_DataGrid > ._body > ._block >._row{
+    color: #5E5E5E;
+    overflow: hidden;
+    border-bottom: 1px solid #DADADA;
+    transition: background 0.15s;
+}
+.StdUI_DataGrid > ._body > ._block >._row._odd{
+    background-color: #F1F1F1;
+}
+/*
+.StdUI_DataGrid > ._body > ._block > ._row:nth-child(odd){
+    background: #F9F7F5;
+}
+*/
+
+/******* body > block > row:hover ********/
+.StdUI_DataGrid > ._body > ._block > ._row.hover{
+    background: #DFEFF7;
+    border-bottom-color: #DADADA;
+}
+.StdUI_DataGrid > ._body > ._block > ._row.hover > ._cell{
+    border-right-color: #DADADA;
+}
+
+/******* body > block > row.selected ********/
+.StdUI_DataGrid > ._body > ._block > ._row.selected{
+    background: #43ace8;
+}
+.StdUI_DataGrid > ._body > ._block > ._row.selected > ._cell{
+    color: white;
+}
+
+/******* body > row > cells > cell ********/
+.StdUI_DataGrid > ._body > ._block > ._row > ._cell,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell{
+    float: left;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+    word-break:keep-all;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    border-right: 1px solid #DADADA;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._cell.hover{
+    background-color: #FFF0DC;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._cell.selected{
+    color: white;
+    background-color: #43ace8;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowNumber,
+.StdUI_DataGrid > ._tester{
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    border-right-color: #C8C8C8;
+    background-color: #DDDDDD;
+}
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox{
+
+}
+
+/******* body > header,body > input********/
+.StdUI_DataGrid > ._header > ._input,
+.StdUI_DataGrid > ._body > ._input{
+    position: absolute;
+    font-size: 13px;
+    overflow: hidden;
+    padding: 3px;
+    margin: 0;
+    border: 2px solid #009CE6;
+    resize: none;
+    outline:none;
+}
+
+/******* column position *******/
+.StdUI_DataGrid_ColumnPosition{
+    position: absolute;
+    width: 12px;
+    height: 10px;
+    background: url("images/StdUI_Global.png") no-repeat;
+}
+.StdUI_DataGrid_ColumnPosition._top{
+    background-position: -7px -395px;
+}
+.StdUI_DataGrid_ColumnPosition._bottom{
+    background-position: -30px -394px;
+}
+
+/******* grid checkbox *******/
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox{
+    width: 16px;
+    height: 16px;
+    margin: 7px auto;
+    box-shadow: 0 0 1px white inset;
+    background: url("images/StdUI_Global.png") -11px -249px no-repeat;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.hover,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.hover{
+    background-position: -180px -249px;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.press,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.press{
+    box-shadow: none;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.checked,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.checked{
+    background-position: -270px -248px;
+}
+.StdUI_DataGrid > ._header > ._columns > ._defColumn._rowCheckbox   > ._checkbox.checked.hover,
+.StdUI_DataGrid > ._body > ._block > ._row > ._defCell._rowCheckbox > ._checkbox.checked.hover{
+    background-position: -362px -248px;
+}
+
+.StdUI_DataGrid > ._body > ._block > ._row.selected > ._defCell._rowCheckbox > ._checkbox{
+    background-color: white;
+    background-position: -544px -249px;
+}
+.StdUI_DataGrid > ._body > ._block > ._row.selected > ._defCell._rowCheckbox > ._checkbox.checked{
+    background-color: white;
+    background-position: -453px -249px;
+}

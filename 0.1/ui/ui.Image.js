@@ -1,1 +1,131 @@
-Std.css({".StdUI_Image":{outline:"none",overflow:"hidden",">":{img:{"float":"left",width:"100%",height:"100%",border:0}}}}),Std.ui.module("Image",{parent:"widget",action:{content:"value"},option:{defaultClass:"StdUI_Image",level:1,width:22,height:22,type:"stretch",value:"",zoom:!0,gray:!1},"public":{zoom:function(t){var e=this,i=e.D;return e.opt("zoom",t,function(){i.img&&i.img&&i.img.css(t?{width:"100%",height:"100%"}:{width:"auto",height:"auto"})})},toBase64:function(){var t=this,e=newDom("canvas").dom,i=e.getContext("2d");e.width=t._image.width,e.height=t._image.height,i.drawImage(t._image,0,0);var a=i.getImageData(0,0,e.width,e.height);return i.putImageData(a,0,0,0,0,a.width,a.height),e.toDataURL()},value:function(t){var e=this,i=e.D;return this.opt("value",t,function(){e._image=null,i.img||(e[0].append(i.img=newDom("img")),e.zoom(e.opts.zoom)),Std.loader.image(t,function(a,o){a!==!1&&(i.img.attr("src",t).show(),e.emit("load",e._image=o).gray(e.opts.gray))})})},gray:function(t){var e=this;return e.opt("gray",t,function(){var i=e.opts.value;isEmpty(i)||null===e._image||t!==!1&&(Std.is.ie()?e[0].css("filter","grayscale(100%)"):e[0].css("filter",t?"progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)":""),e.emit("gray",t))})}},main:function(t){t.D={},t.call_opts("value",!0)}});
+/**
+ * init image module base style
+*/
+Std.css({
+    ".StdUI_Image":{
+        outline:"none",
+        overflow:"hidden",
+        '>':{
+            img:{
+                float:"left",
+                width:"100%",
+                height:"100%",
+                border:0
+            }
+        }
+    }
+});
+
+/**
+ * image widget module
+*/
+Std.ui.module("Image",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:action]*/
+    action:{
+        content:"value"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_Image",
+        level:1,
+        width:22,
+        height:22,
+        type:"stretch", //stretch,repeat
+        value:"",
+        zoom:true,
+        gray:false
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * zoom
+        */
+        zoom:function(state){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("zoom",state,function(){
+                if(!doms.img){
+                    return;
+                }
+                doms.img && doms.img.css(state ? {
+                    width:"100%",
+                    height:"100%"
+                }:{
+                    width:"auto",
+                    height:"auto"
+                });
+            });
+        },
+        /*
+         * to base64
+        */
+        toBase64:function(){
+            var that      = this;
+            var canvas    = newDom("canvas").dom;
+            var context   = canvas.getContext("2d");
+
+            canvas.width  = that._image.width;
+            canvas.height = that._image.height;
+            context.drawImage(that._image,0,0);
+
+            var imgPixels = context.getImageData(0,0,canvas.width,canvas.height);
+
+            context.putImageData(imgPixels,0,0,0,0,imgPixels.width,imgPixels.height);
+
+            return canvas.toDataURL();
+        },
+        /*
+         * get or set image address
+        */
+        value:function(value){
+            var that = this;
+            var doms = that.D;
+
+            return this.opt("value",value,function(){
+                that._image = null;
+
+                if(!doms.img){
+                    that[0].append(doms.img = newDom("img"));
+                    that.zoom(that.opts.zoom);
+                }
+                Std.loader.image(value,function(state,imageObject){
+                    if(state !== false){
+                        doms.img.attr("src",value).show();
+                        that.emit("load",that._image = imageObject).gray(that.opts.gray);
+                    }
+                });
+            });
+        },
+        /*
+         * gray image
+        */
+        gray:function(state){
+            var that = this;
+
+            return that.opt("gray",state,function(){
+                var imageSrc = that.opts.value;
+
+                if(isEmpty(imageSrc) || that._image === null){
+                    return;
+                }
+                if(state === false){
+                    return;
+                }
+                if(!Std.is.ie()){
+                    that[0].css("filter",state ? "progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)" : "");
+                }else{
+                    that[0].css("filter","grayscale(100%)");
+                }
+                that.emit("gray",state);
+            });
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        that.D = {};
+        that.call_opts("value",true);
+    }
+});

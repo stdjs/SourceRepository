@@ -1,1 +1,169 @@
-Std.ui.module("video",{parent:"widget",action:{content:"src"},option:{defaultClass:"StdUI_Video",autoplay:!1,preload:!0,src:null,loop:!1},events:"statusChange",extend:{render:function(){var t=this,o=t.opts;o.autoplay&&t.play()},width:function(t){var o=this,e=o.dom,i=-o.outerSize.width;i+=isNumber(t)?t:o.width(),e.video.width(i)},height:function(t){var o=this,e=o.dom,i=-o.outerSize.height;i+=isNumber(t)?t:o.height(),e.video.height(i)}},"public":{autoplay:function(t){return this.opt("autoplay",t)},preload:function(t){return this.opt("preload",t)},src:function(t){return this.opt("src",t)},loop:function(t){return this.opt("loop",t)},status:function(t){var o=this,e=o.D.video.dom;switch(t){case"play":e.play();break;case"pause":e.pause();break;case"stop":e.stop()}return o.emit("statusChange",t)},play:function(t){var o=this;return void 0==t?"play"==o.status():(o.status(1==t?"play":"stop"),o)},pause:function(t){var o=this;return void 0==t?"pause"==o.status():(o.status(1==t?"pause":"play"),o)},stop:function(t){var o=this;return void 0==t?"stop"==o.status():(o.status(1==t?"stop":"play"),o)}},main:function(t,o,e){t.D={},e.appendChild(t.D.video=newDom("video"))}});
+/**
+ * video widget module
+*/
+Std.ui.module("video",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*#module option:action]*/
+    action:{
+        content:"src"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_Video",
+        autoplay:false,
+        preload:true,
+        src:null,   //this src address can be a string or array
+        loop:false
+    },
+    /*[#module option:events]*/
+    events:"statusChange",
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            if(opts.autoplay){
+                that.play();
+            }
+        },
+        /*
+         * extend width
+        */
+        width:function(n){
+            var that  = this;
+            var doms  = that.dom;
+            var width = -that.outerSize.width;
+
+            if(isNumber(n)){
+                width += n;
+            }else{
+                width += that.width();
+            }
+            doms.video.width(width);
+        },
+        /*
+         * extend height
+        */
+        height:function(n){
+            var that   = this;
+            var doms   = that.dom;
+            var height = -that.outerSize.height;
+
+            if(isNumber(n)){
+                height += n;
+            }else{
+                height += that.height();
+            }
+            doms.video.height(height);
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * auto play video
+        */
+        autoplay:function(value){
+            return this.opt("autoplay",value);
+        },
+        /*
+         * get or set video preload state
+        */
+        preload:function(value){
+            return this.opt("preload",value);
+        },
+        /*
+         * get or set video url address
+        */
+        src:function(src){
+            return this.opt("src",src);
+        },
+        /*
+         * get or set loop
+        */
+        loop:function(value){
+            return this.opt("loop",value);
+        },
+        /*
+         * change video status
+        */
+        status:function(status){
+            var that      = this;
+            var dom_video = that.D.video.dom;
+
+            switch(status){
+                case "play":
+                    dom_video.play();
+                    break;
+                case "pause":
+                    dom_video.pause();
+                    break;
+                case "stop":
+                    dom_video.stop();
+                    break;
+            }
+
+            return that.emit("statusChange",status);
+        },
+        /*
+         * start play video
+        */
+        play:function(bValue){
+            var that = this;
+
+            if(bValue == undefined){
+                return that.status() == "play";
+            }
+            if(bValue == true){
+                that.status("play");
+            }else{
+                that.status("stop");
+            }
+            return that;
+        },
+        /*
+         * pause video
+        */
+        pause:function(bValue){
+            var that = this;
+
+            if(bValue == undefined){
+                return that.status() == "pause";
+            }
+            if(bValue == true){
+                that.status("pause");
+            }else{
+                that.status("play");
+            }
+            return that;
+        },
+        /*
+         * stop video
+        */
+        stop:function(bValue){
+            var that = this;
+
+            if(bValue == undefined){
+                return that.status() == "stop";
+            }
+            if(bValue == true){
+                that.status("stop");
+            }else{
+                that.status("play");
+            }
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.D = {};
+        dom.appendChild(
+            that.D.video = newDom("video")
+        );
+
+    }
+});

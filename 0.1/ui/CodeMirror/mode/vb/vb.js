@@ -1,1 +1,276 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("vb",function(n,t){function r(e){return new RegExp("^(("+e.join(")|(")+"))\\b","i")}function i(e,n){n.currentIndent++}function o(e,n){n.currentIndent--}function c(e,n){if(e.eatSpace())return null;var t=e.peek();if("'"===t)return e.skipToEnd(),"comment";if(e.match(/^((&H)|(&O))?[0-9\.a-f]/i,!1)){var r=!1;if(e.match(/^\d*\.\d+F?/i)?r=!0:e.match(/^\d+\.\d*F?/)?r=!0:e.match(/^\.\d+F?/)&&(r=!0),r)return e.eat(/J/i),"number";var c=!1;if(e.match(/^&H[0-9a-f]+/i)?c=!0:e.match(/^&O[0-7]+/i)?c=!0:e.match(/^[1-9]\d*F?/)?(e.eat(/J/i),c=!0):e.match(/^0(?![\dx])/i)&&(c=!0),c)return e.eat(/L/i),"number"}return e.match(L)?(n.tokenize=a(e.current()),n.tokenize(e,n)):e.match(s)||e.match(h)?null:e.match(m)||e.match(l)||e.match(g)?"operator":e.match(f)?null:e.match(M)?(i(e,n),n.doInCurrentLine=!0,"keyword"):e.match(z)?(n.doInCurrentLine?n.doInCurrentLine=!1:i(e,n),"keyword"):e.match(C)?"keyword":e.match(F)?(o(e,n),o(e,n),"keyword"):e.match(R)?(o(e,n),"keyword"):e.match(E)?"keyword":e.match(I)?"keyword":e.match(p)?"variable":(e.next(),d)}function a(e){var n=1==e.length,r="string";return function(i,o){for(;!i.eol();){if(i.eatWhile(/[^'"]/),i.match(e))return o.tokenize=c,r;i.eat(/['"]/)}if(n){if(t.singleLineStringErrors)return d;o.tokenize=c}return r}}function u(e,n){var t=n.tokenize(e,n),r=e.current();if("."===r)return t=n.tokenize(e,n),r=e.current(),"variable"===t?"variable":d;var c="[({".indexOf(r);return-1!==c&&i(e,n),"dedent"===O&&o(e,n)?d:(c="])}".indexOf(r),-1!==c&&o(e,n)?d:t)}var d="error",l=new RegExp("^[\\+\\-\\*/%&\\\\|\\^~<>!]"),f=new RegExp("^[\\(\\)\\[\\]\\{\\}@,:`=;\\.]"),m=new RegExp("^((==)|(<>)|(<=)|(>=)|(<>)|(<<)|(>>)|(//)|(\\*\\*))"),h=new RegExp("^((\\+=)|(\\-=)|(\\*=)|(%=)|(/=)|(&=)|(\\|=)|(\\^=))"),s=new RegExp("^((//=)|(>>=)|(<<=)|(\\*\\*=))"),p=new RegExp("^[_A-Za-z][_A-Za-z0-9]*"),b=["class","module","sub","enum","select","while","if","function","get","set","property","try"],k=["else","elseif","case","catch"],v=["next","loop"],x=["and","or","not","xor","in"],g=r(x),w=["as","dim","break","continue","optional","then","until","goto","byval","byref","new","handles","property","return","const","private","protected","friend","public","shared","static","true","false"],y=["integer","string","double","decimal","boolean","short","char","float","single"],I=r(w),E=r(y),L='"',z=r(b),C=r(k),R=r(v),F=r(["end"]),M=r(["do"]),O=null;e.registerHelper("hintWords","vb",b.concat(k).concat(v).concat(x).concat(w).concat(y));var T={electricChars:"dDpPtTfFeE ",startState:function(){return{tokenize:c,lastToken:null,currentIndent:0,nextLineIndent:0,doInCurrentLine:!1}},token:function(e,n){e.sol()&&(n.currentIndent+=n.nextLineIndent,n.nextLineIndent=0,n.doInCurrentLine=0);var t=u(e,n);return n.lastToken={style:t,content:e.current()},t},indent:function(e,t){var r=t.replace(/^\s+|\s+$/g,"");return r.match(R)||r.match(F)||r.match(C)?n.indentUnit*(e.currentIndent-1):e.currentIndent<0?0:e.currentIndent*n.indentUnit},lineComment:"'"};return T}),e.defineMIME("text/x-vb","vb")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("vb", function(conf, parserConf) {
+    var ERRORCLASS = 'error';
+
+    function wordRegexp(words) {
+        return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
+    }
+
+    var singleOperators = new RegExp("^[\\+\\-\\*/%&\\\\|\\^~<>!]");
+    var singleDelimiters = new RegExp('^[\\(\\)\\[\\]\\{\\}@,:`=;\\.]');
+    var doubleOperators = new RegExp("^((==)|(<>)|(<=)|(>=)|(<>)|(<<)|(>>)|(//)|(\\*\\*))");
+    var doubleDelimiters = new RegExp("^((\\+=)|(\\-=)|(\\*=)|(%=)|(/=)|(&=)|(\\|=)|(\\^=))");
+    var tripleDelimiters = new RegExp("^((//=)|(>>=)|(<<=)|(\\*\\*=))");
+    var identifiers = new RegExp("^[_A-Za-z][_A-Za-z0-9]*");
+
+    var openingKeywords = ['class','module', 'sub','enum','select','while','if','function',  'get','set','property', 'try'];
+    var middleKeywords = ['else','elseif','case', 'catch'];
+    var endKeywords = ['next','loop'];
+
+    var operatorKeywords = ['and', 'or', 'not', 'xor', 'in'];
+    var wordOperators = wordRegexp(operatorKeywords);
+    var commonKeywords = ['as', 'dim', 'break',  'continue','optional', 'then',  'until',
+                          'goto', 'byval','byref','new','handles','property', 'return',
+                          'const','private', 'protected', 'friend', 'public', 'shared', 'static', 'true','false'];
+    var commontypes = ['integer','string','double','decimal','boolean','short','char', 'float','single'];
+
+    var keywords = wordRegexp(commonKeywords);
+    var types = wordRegexp(commontypes);
+    var stringPrefixes = '"';
+
+    var opening = wordRegexp(openingKeywords);
+    var middle = wordRegexp(middleKeywords);
+    var closing = wordRegexp(endKeywords);
+    var doubleClosing = wordRegexp(['end']);
+    var doOpening = wordRegexp(['do']);
+
+    var indentInfo = null;
+
+    CodeMirror.registerHelper("hintWords", "vb", openingKeywords.concat(middleKeywords).concat(endKeywords)
+                                .concat(operatorKeywords).concat(commonKeywords).concat(commontypes));
+
+    function indent(_stream, state) {
+      state.currentIndent++;
+    }
+
+    function dedent(_stream, state) {
+      state.currentIndent--;
+    }
+    // tokenizers
+    function tokenBase(stream, state) {
+        if (stream.eatSpace()) {
+            return null;
+        }
+
+        var ch = stream.peek();
+
+        // Handle Comments
+        if (ch === "'") {
+            stream.skipToEnd();
+            return 'comment';
+        }
+
+
+        // Handle Number Literals
+        if (stream.match(/^((&H)|(&O))?[0-9\.a-f]/i, false)) {
+            var floatLiteral = false;
+            // Floats
+            if (stream.match(/^\d*\.\d+F?/i)) { floatLiteral = true; }
+            else if (stream.match(/^\d+\.\d*F?/)) { floatLiteral = true; }
+            else if (stream.match(/^\.\d+F?/)) { floatLiteral = true; }
+
+            if (floatLiteral) {
+                // Float literals may be "imaginary"
+                stream.eat(/J/i);
+                return 'number';
+            }
+            // Integers
+            var intLiteral = false;
+            // Hex
+            if (stream.match(/^&H[0-9a-f]+/i)) { intLiteral = true; }
+            // Octal
+            else if (stream.match(/^&O[0-7]+/i)) { intLiteral = true; }
+            // Decimal
+            else if (stream.match(/^[1-9]\d*F?/)) {
+                // Decimal literals may be "imaginary"
+                stream.eat(/J/i);
+                // TODO - Can you have imaginary longs?
+                intLiteral = true;
+            }
+            // Zero by itself with no other piece of number.
+            else if (stream.match(/^0(?![\dx])/i)) { intLiteral = true; }
+            if (intLiteral) {
+                // Integer literals may be "long"
+                stream.eat(/L/i);
+                return 'number';
+            }
+        }
+
+        // Handle Strings
+        if (stream.match(stringPrefixes)) {
+            state.tokenize = tokenStringFactory(stream.current());
+            return state.tokenize(stream, state);
+        }
+
+        // Handle operators and Delimiters
+        if (stream.match(tripleDelimiters) || stream.match(doubleDelimiters)) {
+            return null;
+        }
+        if (stream.match(doubleOperators)
+            || stream.match(singleOperators)
+            || stream.match(wordOperators)) {
+            return 'operator';
+        }
+        if (stream.match(singleDelimiters)) {
+            return null;
+        }
+        if (stream.match(doOpening)) {
+            indent(stream,state);
+            state.doInCurrentLine = true;
+            return 'keyword';
+        }
+        if (stream.match(opening)) {
+            if (! state.doInCurrentLine)
+              indent(stream,state);
+            else
+              state.doInCurrentLine = false;
+            return 'keyword';
+        }
+        if (stream.match(middle)) {
+            return 'keyword';
+        }
+
+        if (stream.match(doubleClosing)) {
+            dedent(stream,state);
+            dedent(stream,state);
+            return 'keyword';
+        }
+        if (stream.match(closing)) {
+            dedent(stream,state);
+            return 'keyword';
+        }
+
+        if (stream.match(types)) {
+            return 'keyword';
+        }
+
+        if (stream.match(keywords)) {
+            return 'keyword';
+        }
+
+        if (stream.match(identifiers)) {
+            return 'variable';
+        }
+
+        // Handle non-detected items
+        stream.next();
+        return ERRORCLASS;
+    }
+
+    function tokenStringFactory(delimiter) {
+        var singleline = delimiter.length == 1;
+        var OUTCLASS = 'string';
+
+        return function(stream, state) {
+            while (!stream.eol()) {
+                stream.eatWhile(/[^'"]/);
+                if (stream.match(delimiter)) {
+                    state.tokenize = tokenBase;
+                    return OUTCLASS;
+                } else {
+                    stream.eat(/['"]/);
+                }
+            }
+            if (singleline) {
+                if (parserConf.singleLineStringErrors) {
+                    return ERRORCLASS;
+                } else {
+                    state.tokenize = tokenBase;
+                }
+            }
+            return OUTCLASS;
+        };
+    }
+
+
+    function tokenLexer(stream, state) {
+        var style = state.tokenize(stream, state);
+        var current = stream.current();
+
+        // Handle '.' connected identifiers
+        if (current === '.') {
+            style = state.tokenize(stream, state);
+            current = stream.current();
+            if (style === 'variable') {
+                return 'variable';
+            } else {
+                return ERRORCLASS;
+            }
+        }
+
+
+        var delimiter_index = '[({'.indexOf(current);
+        if (delimiter_index !== -1) {
+            indent(stream, state );
+        }
+        if (indentInfo === 'dedent') {
+            if (dedent(stream, state)) {
+                return ERRORCLASS;
+            }
+        }
+        delimiter_index = '])}'.indexOf(current);
+        if (delimiter_index !== -1) {
+            if (dedent(stream, state)) {
+                return ERRORCLASS;
+            }
+        }
+
+        return style;
+    }
+
+    var external = {
+        electricChars:"dDpPtTfFeE ",
+        startState: function() {
+            return {
+              tokenize: tokenBase,
+              lastToken: null,
+              currentIndent: 0,
+              nextLineIndent: 0,
+              doInCurrentLine: false
+
+
+          };
+        },
+
+        token: function(stream, state) {
+            if (stream.sol()) {
+              state.currentIndent += state.nextLineIndent;
+              state.nextLineIndent = 0;
+              state.doInCurrentLine = 0;
+            }
+            var style = tokenLexer(stream, state);
+
+            state.lastToken = {style:style, content: stream.current()};
+
+
+
+            return style;
+        },
+
+        indent: function(state, textAfter) {
+            var trueText = textAfter.replace(/^\s+|\s+$/g, '') ;
+            if (trueText.match(closing) || trueText.match(doubleClosing) || trueText.match(middle)) return conf.indentUnit*(state.currentIndent-1);
+            if(state.currentIndent < 0) return 0;
+            return state.currentIndent * conf.indentUnit;
+        },
+
+        lineComment: "'"
+    };
+    return external;
+});
+
+CodeMirror.defineMIME("text/x-vb", "vb");
+
+});

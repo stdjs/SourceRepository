@@ -1,1 +1,435 @@
-Std.ui.module("ImageCutterView",{parent:"widget",events:"dragStart dragStop dblclick",option:{level:4,pickerWidth:150,pickerHeight:150,image:null,scale:1,lockerOpacity:.4},"protected":{positionX:0,positionY:0,imageData:null},extend:{render:function(){var t=this;t.initPicker(),t.initDrag()}},"private":{initPicker:function(){var t=this,i=t.opts;return Std.dom(t.D.picker).css({width:i.pickerWidth,height:i.pickerHeight}),t},initDrag:function(){var t=this,i=t.opts,e=0,a=0,o=null,c=null,n=function(n){var r=t.D.picker.getContext("2d"),s=n.pageX-c.x-e+o.left,l=n.pageY-c.y-a+o.top;0>s?s=0:s>o.width-i.pickerWidth-2&&(s=o.width-i.pickerWidth-2),0>l?l=0:l>o.height-i.pickerHeight-2&&(l=o.height-i.pickerHeight-2),Std.dom(t.D.picker).css({top:l,left:s}),r.clearRect(0,0,i.pickerWidth,i.pickerHeight),r.drawImage(t._imageData,-++s,-++l,t._imageData.width*t.scale(),t._imageData.height*t.scale()),t._positionX=s+1,t._positionY=l+1};return Std.dom(t.D.picker).mouse({dblclick:function(){t.emit("dblclick")},up:function(i){t.emit("dragStop",i),t[0].off("mousemove",n),t[0].removeStyle("cursor")},down:function(i){var r=Std.dom(t.D.picker).position();t._imageData&&(c=t[0].offset(),o=Std.dom(t.D.image).css(["width","height"]),e=i.pageX-c.x-r.x,a=i.pageY-c.y-r.y,o.top=t[0].scrollTop(),o.left=t[0].scrollLeft(),t.emit("dragStart",i),t[0].on("mousemove",n),t[0].css("cursor","move"))}}),t}},"public":{lockerOpacity:function(t){return this.opt("lockerOpacity",t,function(){this.D.locker.opacity(t)})},imageSize:function(){var t=this,i=t._imageData;return null===i?i:{width:i.width,height:i.height}},attribute:function(){var t=this,i=t.opts;return{width:i.pickerWidth,height:i.pickerHeight,positionX:t._positionX,positionY:t._positionY}},scale:function(t){var i=this,e=i.opts;return this.opt("scale",t,function(){var t=i._imageData,a=i.D.image,o=i.D.picker,c=i.D.locker;a&&t&&(a.width=t.width*i.scale(),a.height=t.height*i.scale(),a.getContext("2d").drawImage(t,0,0,t.width*i.scale(),t.height*i.scale()),o.width=e.pickerWidth,o.height=e.pickerHeight,o.getContext("2d").drawImage(t,-1,-1,t.width*i.scale(),t.height*i.scale()),c.css({width:t.width*i.scale(),height:t.height*i.scale()}),Std.dom(o).css({left:0,top:0}))})},toBase64:function(){var t=this,i=t.opts,e=t._imageData,a=document.createElement("canvas"),o=a.getContext("2d");return null===e?e:(a.width=i.pickerWidth,a.height=i.pickerHeight,o.drawImage(e,-t._positionX,-t._positionY,e.width*t.scale(),e.height*t.scale()),a.toDataURL())},image:function(t){var i=this,e=function(t){i._imageData=t,i.scale(i.opts.scale)};return isObject(t)?e(t):"data:"===t.substr(0,5)?Std.loader.image(t,function(t,i){e(i)}):Std.loader(t,function(t){(t=t.data)&&e(t)}),i}},main:function(t,i,e){t.D={image:newDom("canvas","_image").dom,locker:newDiv("_locker").css({position:"absolute",left:0,top:0,width:"100%",height:"100%",background:"black"}),picker:newDom("canvas","_picker").css({position:"absolute",left:0,top:0,border:"1px dashed rgba(196,17,17,0.5)"}).dom},e.css({position:"relative",overflow:"auto",background:"white"}).append([t.D.image,t.D.locker,t.D.picker]),t.call_opts("image",!0),t.lockerOpacity(i.lockerOpacity)}}),Std.ui.module("ImageCutter",{parent:"widget",events:"submit",option:{level:4,pickerWidth:150,pickerHeight:150,boxSizing:"border-box",image:null,scale:1,lockerOpacity:.4},"private":{initEvents:function(){var t=this,i=t.widgets.view;return t.widgets.slider.on("change",function(t){i.scale(t/100)}),t.widgets.OK.on("click",function(){t.emit("submit",[i.toBase64(),i.attribute()],!0)}),t},initSelect:function(){var t=this,i=new Std.dom("input[type='file']",t.widgets.select).css({left:0,top:0,opacity:0,position:"absolute",width:"100%",height:"100%"});return i.on("change",function(){var e=i.dom.files;if(!(e.length<0)&&Std.url.suffix.img(Std.url(e[0].name).suffix)){var a=new FileReader;a.readAsDataURL(e[0]),a.onload=function(){t._fileSize=e[0].size,t._fileName=e[0].name,t.widgets.view.image(a.result)}}}),t},initWidgets:function(){var t=this,i=t.opts;return t.widgets=Std.ui({view:{ui:"ImageCutterView",scale:i.scale,image:i.image,pickerWidth:i.pickerWidth,pickerHeight:i.pickerHeight,lockerOpacity:i.lockerOpacity},slider:{ui:"HSlider",min:10,max:200,value:100},select:{ui:"Button",text:"select"},OK:{ui:"Button",text:"OK"}}),t}},"public":{image:function(t){var i=this;return i.widgets.view.image(t),i},fileName:function(){return this._fileName},fileSize:function(){return this._fileSize}},main:function(t){t.initWidgets(),t.initEvents(),t.initSelect(),t.layout({ui:"VBoxLayout",items:[t.widgets.view,{ui:"HBoxLayout",items:[t.widgets.slider,t.widgets.select,t.widgets.OK]}]})}});
+/**
+ *  ImageCutterView widget module
+*/
+Std.ui.module("ImageCutterView",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"dragStart dragStop dblclick",
+    /*[#module option:option]*/
+    option:{
+        level:4,
+        pickerWidth:150,
+        pickerHeight:150,
+        image:null,
+        scale:1,
+        lockerOpacity:0.4
+    },
+    protected:{
+        positionX : 0,
+        positionY : 0,
+        imageData : null
+    },
+    extend:{
+        /*
+         *
+        */
+        render:function(){
+            var that = this;
+
+            that.initPicker();
+            that.initDrag();
+        }
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * init picker
+         */
+        initPicker:function(){
+            var that = this;
+            var opts = that.opts;
+
+            Std.dom(that.D.picker).css({
+                width  : opts.pickerWidth,
+                height : opts.pickerHeight
+            });
+
+            return that;
+        },
+        /*
+         * init events
+         */
+        initDrag:function(){
+            var that   = this;
+            var opts   = that.opts;
+            var posX   = 0;
+            var posY   = 0;
+            var rect   = null;
+            var offset = null;
+
+            var moving = function(e){
+                var context   = that.D.picker.getContext("2d");
+                var positionX = e.pageX - offset.x - posX + rect.left;
+                var positionY = e.pageY - offset.y - posY + rect.top;
+
+                if(positionX < 0){
+                    positionX = 0;
+                }else if(positionX > rect.width - opts.pickerWidth - 2){
+                    positionX = rect.width - opts.pickerWidth - 2;
+                }
+
+                if(positionY < 0){
+                    positionY = 0;
+                }else if(positionY > rect.height - opts.pickerHeight - 2){
+                    positionY = rect.height - opts.pickerHeight - 2;
+                }
+
+                Std.dom(that.D.picker).css({
+                    top  : positionY,
+                    left : positionX
+                });
+
+                context.clearRect(0,0,opts.pickerWidth,opts.pickerHeight);
+                context.drawImage(
+                    that._imageData,
+                    -++positionX,
+                    -++positionY,
+                    that._imageData.width  * that.scale(),
+                    that._imageData.height * that.scale()
+                );
+                that._positionX = positionX + 1;
+                that._positionY = positionY + 1;
+            };
+
+            Std.dom(that.D.picker).mouse({
+                dblclick:function(){
+                    that.emit("dblclick");
+                },
+                up:function(e){
+                    that.emit("dragStop",e);
+                    that[0].off("mousemove",moving);
+                    that[0].removeStyle("cursor");
+                },
+                down:function(e){
+                    var pos = Std.dom(that.D.picker).position();
+
+                    if(!that._imageData){
+                        return;
+                    }
+
+                    offset  = that[0].offset();
+                    rect    = Std.dom(that.D.image).css(["width","height"]);
+                    posX    = e.pageX - offset.x - pos.x;
+                    posY    = e.pageY - offset.y - pos.y;
+
+                    rect.top  = that[0].scrollTop();
+                    rect.left = that[0].scrollLeft();
+
+                    that.emit("dragStart",e);
+                    that[0].on("mousemove",moving);
+                    that[0].css("cursor","move");
+                }
+            });
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * locker opacity
+        */
+        lockerOpacity:function(opacity){
+            return this.opt("lockerOpacity",opacity,function(){
+                this.D.locker.opacity(opacity);
+            });
+        },
+        /*
+         * image size
+        */
+        imageSize:function(){
+            var that = this;
+            var data = that._imageData;
+
+            return data === null ? data : {
+                width  : data.width,
+                height : data.height
+            };
+        },
+        /*
+         * attribute
+        */
+        attribute:function(){
+            var that = this;
+            var opts = that.opts;
+
+            return {
+                width     : opts.pickerWidth,
+                height    : opts.pickerHeight,
+                positionX : that._positionX,
+                positionY : that._positionY
+            };
+        },
+        /*
+         * scale
+         */
+        scale:function(n){
+            var that = this;
+            var opts = that.opts;
+
+            return this.opt("scale",n,function(){
+                var image      = that._imageData;
+                var dom_image  = that.D.image;
+                var dom_picker = that.D.picker;
+                var dom_locker = that.D.locker;
+
+                if(!dom_image || !image){
+                    return;
+                }
+
+                dom_image.width  = image.width  * that.scale();
+                dom_image.height = image.height * that.scale();
+                dom_image.getContext("2d").drawImage(
+                    image,0,0,
+                    image.width  * that.scale(),
+                    image.height * that.scale()
+                );
+
+                dom_picker.width  = opts.pickerWidth;
+                dom_picker.height = opts.pickerHeight;
+                dom_picker.getContext("2d").drawImage(
+                    image,-1,-1,
+                    image.width  * that.scale(),
+                    image.height * that.scale()
+                );
+
+                dom_locker.css({
+                    width:image.width  * that.scale(),
+                    height:image.height * that.scale()
+                });
+                Std.dom(dom_picker).css({left:0,top:0});
+            });
+        },
+        /*
+         * to base64
+        */
+        toBase64:function(){
+            var that    = this;
+            var opts    = that.opts;
+            var data    = that._imageData;
+            var canvas  = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+
+            if(data === null){
+                return data;
+            }
+
+            canvas.width  = opts.pickerWidth;
+            canvas.height = opts.pickerHeight;
+            context.drawImage(
+                data,-that._positionX,-that._positionY,
+                data.width * that.scale(),
+                data.height * that.scale()
+            );
+
+            return canvas.toDataURL();
+        },
+        /*
+         * load image
+         */
+        image:function(url){
+            var that = this;
+            var load = function(image){
+                that._imageData = image;
+                that.scale(that.opts.scale);
+            };
+
+            if(isObject(url)){
+                load(url);
+            }else if(url.substr(0,5) === "data:"){
+                Std.loader.image(url,function(state,imageData){
+                    load(imageData)
+                });
+            }else{
+                Std.loader(url,function(image){
+                    if(image = image.data){
+                        load(image);
+                    }
+                });
+            }
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.D = {
+            image  : newDom("canvas","_image").dom,
+            locker : newDiv("_locker").css({
+                position:"absolute",
+                left:0,
+                top:0,
+                width:"100%",
+                height:"100%",
+                background:"black"
+            }),
+            picker : newDom("canvas","_picker").css({
+                position:"absolute",
+                left:0,
+                top:0,
+                border:"1px dashed rgba(196,17,17,0.5)"
+            }).dom
+        };
+
+        dom.css({
+            position:"relative",
+            overflow:"auto",
+            background:"white"
+        }).append([
+            that.D.image,
+            that.D.locker,
+            that.D.picker
+        ]);
+
+        that.call_opts("image",true);
+        that.lockerOpacity(opts.lockerOpacity);
+    }
+});
+
+/**
+ *  ImageCutter widget module
+*/
+Std.ui.module("ImageCutter",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"submit",
+    /*[#module option:option]*/
+    option:{
+        level:4,
+        pickerWidth:150,
+        pickerHeight:150,
+        boxSizing:"border-box",
+        image:null,
+        scale:1,
+        lockerOpacity:0.4
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var view = that.widgets.view;
+
+            that.widgets.slider.on("change",function(pos){
+                view.scale(pos / 100);
+            });
+            that.widgets.OK.on("click",function(){
+                that.emit("submit",[
+                    view.toBase64(),
+                    view.attribute()
+                ],true);
+            });
+            return that;
+        },
+        /*
+         * init select
+        */
+        initSelect:function(){
+            var that   = this;
+            var input  = new Std.dom("input[type='file']",that.widgets.select).css({
+                left:0,
+                top:0,
+                opacity:0,
+                position:"absolute",
+                width:"100%",
+                height:"100%"
+            });
+
+            input.on("change",function(){
+                var files = input.dom.files;
+
+                if(files.length < 0 || !Std.url.suffix.img(Std.url(files[0].name).suffix)){
+                    return;
+                }
+                var reader  = new FileReader;
+                reader.readAsDataURL(files[0]);
+                reader.onload = function(){
+                    that._fileSize = files[0].size;
+                    that._fileName = files[0].name;
+                    that.widgets.view.image(reader.result)
+                };
+            });
+            return that;
+        },
+        /*
+         * init widgets
+        */
+        initWidgets:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.widgets = Std.ui({
+                view:{
+                    ui:"ImageCutterView",
+                    scale:opts.scale,
+                    image:opts.image,
+                    pickerWidth:opts.pickerWidth,
+                    pickerHeight:opts.pickerHeight,
+                    lockerOpacity:opts.lockerOpacity
+                },
+                slider:{
+                    ui:"HSlider",
+                    min:10,
+                    max:200,
+                    value:100
+                },
+                select:{
+                    ui:"Button",
+                    text:"select"
+                },
+                OK:{
+                    ui:"Button",
+                    text:"OK"
+                }
+            });
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * image
+        */
+        image:function(url){
+            var that = this;
+
+            that.widgets.view.image(url);
+
+            return that;
+        },
+        /*
+         * fileName
+        */
+        fileName:function(){
+            return this._fileName;
+        },
+        /*
+         * fileSize
+        */
+        fileSize:function(){
+            return this._fileSize;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.initWidgets();
+        that.initEvents();
+        that.initSelect();
+        that.layout({
+            ui:"VBoxLayout",
+            items:[
+                that.widgets.view,
+                {
+                    ui:"HBoxLayout",
+                    items:[
+                        that.widgets.slider,
+                        that.widgets.select,
+                        that.widgets.OK
+                    ]
+                }
+            ]
+        })
+    }
+});

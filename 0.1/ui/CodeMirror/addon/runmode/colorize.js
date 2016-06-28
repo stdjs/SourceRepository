@@ -1,1 +1,40 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror"),require("./runmode")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","./runmode"],e):e(CodeMirror)}(function(e){"use strict";function o(e,n){if(3==e.nodeType)return n.push(e.nodeValue);for(var t=e.firstChild;t;t=t.nextSibling)o(t,n),r.test(e.nodeType)&&n.push("\n")}var r=/^(p|li|div|h\\d|pre|blockquote|td)$/;e.colorize=function(r,n){r||(r=document.body.getElementsByTagName("pre"));for(var t=0;t<r.length;++t){var i=r[t],d=i.getAttribute("data-lang")||n;if(d){var u=[];o(i,u),i.innerHTML="",e.runMode(u.join(""),d,i),i.className+=" cm-s-default"}}}});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("./runmode"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "./runmode"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var isBlock = /^(p|li|div|h\\d|pre|blockquote|td)$/;
+
+  function textContent(node, out) {
+    if (node.nodeType == 3) return out.push(node.nodeValue);
+    for (var ch = node.firstChild; ch; ch = ch.nextSibling) {
+      textContent(ch, out);
+      if (isBlock.test(node.nodeType)) out.push("\n");
+    }
+  }
+
+  CodeMirror.colorize = function(collection, defaultMode) {
+    if (!collection) collection = document.body.getElementsByTagName("pre");
+
+    for (var i = 0; i < collection.length; ++i) {
+      var node = collection[i];
+      var mode = node.getAttribute("data-lang") || defaultMode;
+      if (!mode) continue;
+
+      var text = [];
+      textContent(node, text);
+      node.innerHTML = "";
+      CodeMirror.runMode(text.join(""), mode, node);
+
+      node.className += " cm-s-default";
+    }
+  };
+});

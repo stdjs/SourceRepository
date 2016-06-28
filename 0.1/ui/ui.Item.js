@@ -1,1 +1,349 @@
-Std.ui.module("Item",{parent:"widget",action:{content:"text"},option:{level:2,defaultClass:"StdUI_Item",text:"",icon:null,value:null,tabIndex:null,iconClass:null,iconWidth:null,iconHeight:null,verticalAlign:"top"},"private":{textVisible:!0},extend:{beforeRender:function(){this.call_opts({text:"",value:null,icon:null,iconClass:null},!0)},width:function(){var t=this,e=t.opts,i=t.D,n=t.width();isNumber(e.iconWidth)&&i.icon&&n-t.boxSize.width<=e.iconWidth?t._textVisible&&i.text&&(i.text.hide(),t._textVisible=!1):!t._textVisible&&i.text&&(i.text.show(),t._textVisible=!0)},height:function(){var t=this,e=t.opts,i=e.verticalAlign;if("top"!==i&&"none"!==i){var n=t.D,o=t.height()-t.boxSize.height,l=0,c=0;"middle"===i?(isNumber(e.iconHeight)&&(l=(o-e.iconHeight)/2),c=o):"bottom"===i&&(isNumber(e.iconHeight)&&(l=o-e.iconHeight),c=2*o),n.icon&&isNumber(e.iconHeight)&&n.icon.marginTop(l),n.text&&n.text.lineHeight(c)}}},"protected":{initIcon:function(){var t=this,e=t.D,i=e.icon=newDiv("_icon");return e.text?i.insertBefore(e.text):i.appendTo(t[0]),t.call_opts({iconWidth:null,iconHeight:null},!0)}},"public":{verticalAlign:function(t){return this.opt("verticalAlign",t)},iconWidth:function(t){var e=this;return e.opt("iconWidth",t,function(){e.D.icon&&e.D.icon.width(t)})},iconHeight:function(t){var e=this;return e.opt("iconHeight",t,function(){e.D.icon&&e.D.icon.height(t)})},iconClass:function(t){var e=this,i=e.D;return e.opt("iconClass",t,function(){i.icon||e.initIcon(),i.icon.className("_icon "+t)})},text:function(t){var e=this;return e.opt("text",t,function(){e.D.text||(e.D.text=newDiv("_text").appendTo(e[0])),e.D.text.html(t)})},icon:function(t){var e=this,i=e.D;return e.opt("icon",t,function(){i.icon||e.initIcon(),i.iconImg||(i.iconImg=newDom("img").appendTo(i.icon)),i.iconImg.attr("src",t)})},edit:function(t){if(!this._editState){var e=this,i=e.D,n=i.text.html(),o=null,l=newDom("input","_edit"),c=newDom("span").css({top:-99,font:i.text.css("font"),fontSize:i.text.css("fontSize"),position:"absolute",visibility:"hidden",padding:l.css("padding")}).text(n).appendTo(e[0]);l.on({mousedown:function(t){t.stopPropagation()},keydown:function(t){13===t.keyCode?l.blur():(clearTimeout(o),o=setTimeout(function(){l.width(c.text(l.value()).width())},1))},blur:function(){var o=l.value();i.text.show(),isFunction(t)&&t.call(e.text(o),n,o),l.remove(),e._editState=!1}}).appendTo(e).focus().css({"float":i.text.css("float"),width:c.width(),height:i.text.height()}).value(n).select(),i.text.hide(),e._editState=!0}}},main:function(t,e,i){t.D={},isFunction(e.click)&&i.on("click",function(){t.enable()&&e.click.call(t)})}}),Std.ui.module("TemplateItem",{parent:"widget",events:"templateRender",action:{content:"text"},option:{level:2,defaultClass:"StdUI_TemplateItem",text:"",data:null,value:null,tabIndex:null,template:null,textField:"text",valueField:"value"},extend:{render:function(){var t=this;t.call_opts({data:null},!0)}},"public":{text:function(t){return this.opt("text",t)},template:function(t){var e=this,i=e.opts;return e.opt("template",t,function(){isString(t)?i.template=Std.template(t):t instanceof Std.template&&(i.template=t)})},data:function(t){var e=this,i=e.opts;if(void 0===t)return i.data;var n=e.template();return(isString(t)||isNumber(t))&&(t={value:t}),isObject(n)&&(n.renderTo(e,t),e.emit("templateRender")),e.text(t[i.textField]),e.value(t[i.valueField]),i.data=t,e}},main:function(t,e,i){t.D={},e.template&&t.template(e.template),isFunction(e.click)&&i.on("click",function(){t.enable()&&e.click.call(t)})}});
+/**
+ * item widget module
+*/
+Std.ui.module("Item",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:action]*/
+    action:{
+        content:"text"
+    },
+    /*[#module option:option]*/
+    option:{
+        level:2,
+        defaultClass:"StdUI_Item",
+        text:"",
+        icon:null,
+        value:null,
+        tabIndex:null,
+        iconClass:null,
+        iconWidth:null,
+        iconHeight:null,
+        verticalAlign:"top"  //none,top,middle,bottom
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * text visible
+        */
+        textVisible:true
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * before render
+        */
+        beforeRender:function(){
+            this.call_opts({
+                text:"",
+                value:null,
+                icon:null,
+                iconClass:null
+            },true);
+        },
+        /*
+         * width
+        */
+        width:function(){
+            var that  = this;
+            var opts  = that.opts;
+            var doms  = that.D;
+            var width = that.width();
+
+            if(isNumber(opts.iconWidth) && doms.icon && width - that.boxSize.width <= opts.iconWidth){
+                if(that._textVisible && doms.text){
+                    doms.text.hide();
+                    that._textVisible = false;
+                }
+            }else if(!that._textVisible && doms.text){
+                doms.text.show();
+                that._textVisible = true;
+            }
+        },
+        /*
+         * height
+        */
+        height:function(){
+            var that          = this;
+            var opts          = that.opts;
+            var verticalAlign = opts.verticalAlign;
+
+            if(verticalAlign === "top" || verticalAlign === "none"){
+                return;
+            }
+            var doms       = that.D;
+            var height     = that.height() - that.boxSize.height;
+            var top        = 0;
+            var lineHeight = 0;
+
+            if(verticalAlign === "middle"){
+                if(isNumber(opts.iconHeight)){
+                    top = (height - opts.iconHeight) / 2;
+                }
+                lineHeight = height;
+            }else if(verticalAlign === "bottom"){
+                if(isNumber(opts.iconHeight)){
+                    top = height - opts.iconHeight;
+                }
+                lineHeight = height * 2;
+            }
+            if(doms.icon && isNumber(opts.iconHeight)){
+                doms.icon.marginTop(top);
+            }
+            if(doms.text){
+                doms.text.lineHeight(lineHeight);
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * init icon
+        */
+        initIcon:function(){
+            var that = this;
+            var doms = that.D;
+            var icon = doms.icon = newDiv("_icon");
+
+            if(doms.text){
+                icon.insertBefore(doms.text);
+            }else{
+                icon.appendTo(that[0]);
+            }
+            return that.call_opts({
+                iconWidth:null,
+                iconHeight:null
+            },true);
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * verticalAlign
+        */
+        verticalAlign:function(align){
+            return this.opt("verticalAlign",align);
+        },
+        /*
+         * icon width
+        */
+        iconWidth:function(width){
+            var that = this;
+
+            return that.opt("iconWidth",width,function(){
+                that.D.icon && that.D.icon.width(width);
+            });
+        },
+        /*
+         * icon height
+        */
+        iconHeight:function(height){
+            var that = this;
+
+            return that.opt("iconHeight",height,function(){
+                that.D.icon && that.D.icon.height(height);
+            });
+        },
+        /*
+         * icon class name
+        */
+        iconClass:function(className){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("iconClass",className,function(){
+                if(!doms.icon){
+                    that.initIcon();
+                }
+                doms.icon.className("_icon " + className);
+            });
+        },
+        /*
+         * get or set text
+        */
+        text:function(text){
+            var that = this;
+
+            return that.opt("text",text,function(){
+                if(!that.D.text){
+                    that.D.text = newDiv("_text").appendTo(that[0]);
+                }
+                that.D.text.html(text);
+            });
+        },
+        /*
+         * get or set icon
+        */
+        icon:function(icon){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("icon",icon,function(){
+                if(!doms.icon){
+                    that.initIcon();
+                }
+                if(!doms.iconImg){
+                    doms.iconImg = newDom("img").appendTo(doms.icon);
+                }
+                doms.iconImg.attr("src",icon);
+            });
+        },
+        /*
+         * edit
+        */
+        edit:function(callback){
+            if(this._editState){
+                return;
+            }
+            var that  = this;
+            var doms  = that.D;
+            var text  = doms.text.html();
+            var timer = null;
+            var input = newDom("input","_edit");
+            var temp  = newDom("span").css({
+                top:-99,
+                font:doms.text.css("font"),
+                fontSize:doms.text.css("fontSize"),
+                position:"absolute",
+                visibility:"hidden",
+                padding:input.css("padding")
+            }).text(text).appendTo(that[0]);
+
+            input.on({
+                mousedown:function(e){
+                    e.stopPropagation();
+                },
+                keydown:function(e){
+                    if(e.keyCode === 13){
+                        input.blur()
+                    }else{
+                        clearTimeout(timer);
+                        timer = setTimeout(function(){
+                            input.width(temp.text(input.value()).width());
+                        },1);
+                    }
+                },
+                blur:function(){
+                    var value = input.value();
+                    doms.text.show();
+                    if(isFunction(callback)){
+                        callback.call(that.text(value),text,value);
+                    }
+                    input.remove();
+                    that._editState = false;
+                }
+            }).appendTo(that).focus().css({
+                float:doms.text.css("float"),
+                width:temp.width(),
+                height:doms.text.height()
+            }).value(text).select();
+
+            doms.text.hide();
+            that._editState = true;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.D = {};
+
+        isFunction(opts.click) && dom.on("click",function(){
+            that.enable() && opts.click.call(that);
+        });
+    }
+});
+
+/**
+ * template item widget module
+*/
+Std.ui.module("TemplateItem",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"templateRender",
+    /*[#module option:action]*/
+    action:{
+        content:"text"
+    },
+    /*[#module option:option]*/
+    option:{
+        level:2,
+        defaultClass:"StdUI_TemplateItem",
+        text:"",
+        data:null,
+        value:null,
+        tabIndex:null,
+        template:null,
+        textField:"text",
+        valueField:"value"
+    },
+    /*[#module option:extend]*/
+    extend:{
+        render:function(){
+            var that = this;
+
+            that.call_opts({
+                data:null
+            },true);
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * get or set text
+        */
+        text:function(text){
+            return this.opt("text",text);
+        },
+        /*
+         * template
+        */
+        template:function(template){
+            var that = this;
+            var opts = that.opts;
+
+            return that.opt("template",template,function(){
+                if(isString(template)){
+                    opts.template = Std.template(template);
+                }else if(template instanceof Std.template){
+                    opts.template = template;
+                }
+            });
+        },
+        /*
+         * data
+        */
+        data:function(data){
+            var that = this;
+            var opts = that.opts;
+
+            if(data === undefined){
+                return opts.data;
+            }
+            var template = that.template();
+
+            if(isString(data) || isNumber(data)){
+                data = {value:data};
+            }
+            if(isObject(template)){
+                template.renderTo(that,data);
+                that.emit("templateRender");
+            }
+            that.text(data[opts.textField]);
+            that.value(data[opts.valueField]);
+            opts.data = data;
+
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.D = {};
+
+        if(opts.template){
+            that.template(opts.template);
+        }
+        isFunction(opts.click) && dom.on("click",function(){
+            that.enable() && opts.click.call(that);
+        });
+    }
+});

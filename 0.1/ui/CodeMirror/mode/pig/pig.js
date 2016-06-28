@@ -1,1 +1,178 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("pig",function(e,O){function T(e,O,T){return O.tokenize=T,T(e,O)}function E(e,O){for(var T,E=!1;T=e.next();){if("/"==T&&E){O.tokenize=I;break}E="*"==T}return"comment"}function t(e){return function(O,T){for(var E,t=!1,r=!1;null!=(E=O.next());){if(E==e&&!t){r=!0;break}t=!t&&"\\"==E}return(r||!t&&!R)&&(T.tokenize=I),"error"}}function I(e,O){var I=e.next();return'"'==I||"'"==I?T(e,O,t(I)):/[\[\]{}\(\),;\.]/.test(I)?null:/\d/.test(I)?(e.eatWhile(/[\w\.]/),"number"):"/"==I?e.eat("*")?T(e,O,E):(e.eatWhile(S),"operator"):"-"==I?e.eat("-")?(e.skipToEnd(),"comment"):(e.eatWhile(S),"operator"):S.test(I)?(e.eatWhile(S),"operator"):(e.eatWhile(/[\w\$_]/),r&&r.propertyIsEnumerable(e.current().toUpperCase())&&!e.eat(")")&&!e.eat(".")?"keyword":N&&N.propertyIsEnumerable(e.current().toUpperCase())?"variable-2":A&&A.propertyIsEnumerable(e.current().toUpperCase())?"variable-3":"variable")}var r=O.keywords,N=O.builtins,A=O.types,R=O.multiLineStrings,S=/[*+\-%<>=&?:\/!|]/;return{startState:function(){return{tokenize:I,startOfLine:!0}},token:function(e,O){if(e.eatSpace())return null;var T=O.tokenize(e,O);return T}}}),function(){function O(e){for(var O={},T=e.split(" "),E=0;E<T.length;++E)O[T[E]]=!0;return O}var T="ABS ACOS ARITY ASIN ATAN AVG BAGSIZE BINSTORAGE BLOOM BUILDBLOOM CBRT CEIL CONCAT COR COS COSH COUNT COUNT_STAR COV CONSTANTSIZE CUBEDIMENSIONS DIFF DISTINCT DOUBLEABS DOUBLEAVG DOUBLEBASE DOUBLEMAX DOUBLEMIN DOUBLEROUND DOUBLESUM EXP FLOOR FLOATABS FLOATAVG FLOATMAX FLOATMIN FLOATROUND FLOATSUM GENERICINVOKER INDEXOF INTABS INTAVG INTMAX INTMIN INTSUM INVOKEFORDOUBLE INVOKEFORFLOAT INVOKEFORINT INVOKEFORLONG INVOKEFORSTRING INVOKER ISEMPTY JSONLOADER JSONMETADATA JSONSTORAGE LAST_INDEX_OF LCFIRST LOG LOG10 LOWER LONGABS LONGAVG LONGMAX LONGMIN LONGSUM MAX MIN MAPSIZE MONITOREDUDF NONDETERMINISTIC OUTPUTSCHEMA  PIGSTORAGE PIGSTREAMING RANDOM REGEX_EXTRACT REGEX_EXTRACT_ALL REPLACE ROUND SIN SINH SIZE SQRT STRSPLIT SUBSTRING SUM STRINGCONCAT STRINGMAX STRINGMIN STRINGSIZE TAN TANH TOBAG TOKENIZE TOMAP TOP TOTUPLE TRIM TEXTLOADER TUPLESIZE UCFIRST UPPER UTF8STORAGECONVERTER ",E="VOID IMPORT RETURNS DEFINE LOAD FILTER FOREACH ORDER CUBE DISTINCT COGROUP JOIN CROSS UNION SPLIT INTO IF OTHERWISE ALL AS BY USING INNER OUTER ONSCHEMA PARALLEL PARTITION GROUP AND OR NOT GENERATE FLATTEN ASC DESC IS STREAM THROUGH STORE MAPREDUCE SHIP CACHE INPUT OUTPUT STDERROR STDIN STDOUT LIMIT SAMPLE LEFT RIGHT FULL EQ GT LT GTE LTE NEQ MATCHES TRUE FALSE DUMP",t="BOOLEAN INT LONG FLOAT DOUBLE CHARARRAY BYTEARRAY BAG TUPLE MAP ";e.defineMIME("text/x-pig",{name:"pig",builtins:O(T),keywords:O(E),types:O(t)}),e.registerHelper("hintWords","pig",(T+t+E).split(" "))}()});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+/*
+ *      Pig Latin Mode for CodeMirror 2
+ *      @author Prasanth Jayachandran
+ *      @link   https://github.com/prasanthj/pig-codemirror-2
+ *  This implementation is adapted from PL/SQL mode in CodeMirror 2.
+ */
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode("pig", function(_config, parserConfig) {
+  var keywords = parserConfig.keywords,
+  builtins = parserConfig.builtins,
+  types = parserConfig.types,
+  multiLineStrings = parserConfig.multiLineStrings;
+
+  var isOperatorChar = /[*+\-%<>=&?:\/!|]/;
+
+  function chain(stream, state, f) {
+    state.tokenize = f;
+    return f(stream, state);
+  }
+
+  function tokenComment(stream, state) {
+    var isEnd = false;
+    var ch;
+    while(ch = stream.next()) {
+      if(ch == "/" && isEnd) {
+        state.tokenize = tokenBase;
+        break;
+      }
+      isEnd = (ch == "*");
+    }
+    return "comment";
+  }
+
+  function tokenString(quote) {
+    return function(stream, state) {
+      var escaped = false, next, end = false;
+      while((next = stream.next()) != null) {
+        if (next == quote && !escaped) {
+          end = true; break;
+        }
+        escaped = !escaped && next == "\\";
+      }
+      if (end || !(escaped || multiLineStrings))
+        state.tokenize = tokenBase;
+      return "error";
+    };
+  }
+
+
+  function tokenBase(stream, state) {
+    var ch = stream.next();
+
+    // is a start of string?
+    if (ch == '"' || ch == "'")
+      return chain(stream, state, tokenString(ch));
+    // is it one of the special chars
+    else if(/[\[\]{}\(\),;\.]/.test(ch))
+      return null;
+    // is it a number?
+    else if(/\d/.test(ch)) {
+      stream.eatWhile(/[\w\.]/);
+      return "number";
+    }
+    // multi line comment or operator
+    else if (ch == "/") {
+      if (stream.eat("*")) {
+        return chain(stream, state, tokenComment);
+      }
+      else {
+        stream.eatWhile(isOperatorChar);
+        return "operator";
+      }
+    }
+    // single line comment or operator
+    else if (ch=="-") {
+      if(stream.eat("-")){
+        stream.skipToEnd();
+        return "comment";
+      }
+      else {
+        stream.eatWhile(isOperatorChar);
+        return "operator";
+      }
+    }
+    // is it an operator
+    else if (isOperatorChar.test(ch)) {
+      stream.eatWhile(isOperatorChar);
+      return "operator";
+    }
+    else {
+      // get the while word
+      stream.eatWhile(/[\w\$_]/);
+      // is it one of the listed keywords?
+      if (keywords && keywords.propertyIsEnumerable(stream.current().toUpperCase())) {
+        //keywords can be used as variables like flatten(group), group.$0 etc..
+        if (!stream.eat(")") && !stream.eat("."))
+          return "keyword";
+      }
+      // is it one of the builtin functions?
+      if (builtins && builtins.propertyIsEnumerable(stream.current().toUpperCase()))
+        return "variable-2";
+      // is it one of the listed types?
+      if (types && types.propertyIsEnumerable(stream.current().toUpperCase()))
+        return "variable-3";
+      // default is a 'variable'
+      return "variable";
+    }
+  }
+
+  // Interface
+  return {
+    startState: function() {
+      return {
+        tokenize: tokenBase,
+        startOfLine: true
+      };
+    },
+
+    token: function(stream, state) {
+      if(stream.eatSpace()) return null;
+      var style = state.tokenize(stream, state);
+      return style;
+    }
+  };
+});
+
+(function() {
+  function keywords(str) {
+    var obj = {}, words = str.split(" ");
+    for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+    return obj;
+  }
+
+  // builtin funcs taken from trunk revision 1303237
+  var pBuiltins = "ABS ACOS ARITY ASIN ATAN AVG BAGSIZE BINSTORAGE BLOOM BUILDBLOOM CBRT CEIL "
+    + "CONCAT COR COS COSH COUNT COUNT_STAR COV CONSTANTSIZE CUBEDIMENSIONS DIFF DISTINCT DOUBLEABS "
+    + "DOUBLEAVG DOUBLEBASE DOUBLEMAX DOUBLEMIN DOUBLEROUND DOUBLESUM EXP FLOOR FLOATABS FLOATAVG "
+    + "FLOATMAX FLOATMIN FLOATROUND FLOATSUM GENERICINVOKER INDEXOF INTABS INTAVG INTMAX INTMIN "
+    + "INTSUM INVOKEFORDOUBLE INVOKEFORFLOAT INVOKEFORINT INVOKEFORLONG INVOKEFORSTRING INVOKER "
+    + "ISEMPTY JSONLOADER JSONMETADATA JSONSTORAGE LAST_INDEX_OF LCFIRST LOG LOG10 LOWER LONGABS "
+    + "LONGAVG LONGMAX LONGMIN LONGSUM MAX MIN MAPSIZE MONITOREDUDF NONDETERMINISTIC OUTPUTSCHEMA  "
+    + "PIGSTORAGE PIGSTREAMING RANDOM REGEX_EXTRACT REGEX_EXTRACT_ALL REPLACE ROUND SIN SINH SIZE "
+    + "SQRT STRSPLIT SUBSTRING SUM STRINGCONCAT STRINGMAX STRINGMIN STRINGSIZE TAN TANH TOBAG "
+    + "TOKENIZE TOMAP TOP TOTUPLE TRIM TEXTLOADER TUPLESIZE UCFIRST UPPER UTF8STORAGECONVERTER ";
+
+  // taken from QueryLexer.g
+  var pKeywords = "VOID IMPORT RETURNS DEFINE LOAD FILTER FOREACH ORDER CUBE DISTINCT COGROUP "
+    + "JOIN CROSS UNION SPLIT INTO IF OTHERWISE ALL AS BY USING INNER OUTER ONSCHEMA PARALLEL "
+    + "PARTITION GROUP AND OR NOT GENERATE FLATTEN ASC DESC IS STREAM THROUGH STORE MAPREDUCE "
+    + "SHIP CACHE INPUT OUTPUT STDERROR STDIN STDOUT LIMIT SAMPLE LEFT RIGHT FULL EQ GT LT GTE LTE "
+    + "NEQ MATCHES TRUE FALSE DUMP";
+
+  // data types
+  var pTypes = "BOOLEAN INT LONG FLOAT DOUBLE CHARARRAY BYTEARRAY BAG TUPLE MAP ";
+
+  CodeMirror.defineMIME("text/x-pig", {
+    name: "pig",
+    builtins: keywords(pBuiltins),
+    keywords: keywords(pKeywords),
+    types: keywords(pTypes)
+  });
+
+  CodeMirror.registerHelper("hintWords", "pig", (pBuiltins + pTypes + pKeywords).split(" "));
+}());
+
+});

@@ -1,1 +1,397 @@
-Std.ui.module("canvas",{nodeName:"canvas",parent:"widget",option:{context:"2d",notSupportText:"Your browser doesn't support the canvas element"},"public":{moveTo:function(t,e){return this.context.moveTo(t,e)},createImageData:function(t,e){return this.context.createImageData(t,e)},measureText:function(t){return this.context.measureText(t)},createPattern:function(t,e){return this.context.createPattern(t,e||"no-repeat")},drawImage:function(t,e,n,r,i,a,c,s,o){return this.context.drawImage(t,e,n,r,i,a,c,s,o),this},getImageData:function(t,e,n,r){return this.context.getImageData(t,e,n,r)},putImageData:function(t,e,n,r,i,a,c){return this.context.drawImage(t,e,n,r,i,a,c),this},rotate:function(t){return this.context.rotate(t),this},translate:function(t,e){return this.context.rotate(t,e),this},isPointInPath:function(t,e){return void 0==t||void 0==e?!1:this.context.isPointInPath(t,e)},scale:function(t,e){var n=this,r=n.context;return void 0===e?r.scale(t,t):r.scale(t,e),n},lineTo:function(t,e){var n=this,r=n.context;if(void 0==e)if(isArray(t))Std.each(t,function(t,e){n.lineTo(e)});else if(isString(t)){var i=t.split(",");2==i.length&&r.lineTo(i[0],i[1])}else isPlainObject(t)&&r.lineTo(t.x||0,t.y||0);else r.lineTo(t,e);return n},quadraticCurveTo:function(t){var e=this,n=e.context;if(1===arguments.length)if(isArray(t))Std.each(t,function(t,n){e.quadraticCurveTo(n)});else if(isString(t)){var r=t.split(",");4==r.length&&n.quadraticCurveTo(r[0],r[1],r[2],r[3])}else isPlainObject(t)&&n.quadraticCurveTo(t.cpx||0,t.cpy||0,t.x||0,t.y||0);else n.quadraticCurveTo.apply(n,arguments);return e},bezierCurveTo:function(t){var e=this,n=e.context;if(1===arguments.length)if(isArray(t))Std.each(t,function(t,n){e.bezierCurveTo(n)});else if(isString(t)){var r=t.split(",");6==r.length&&n.bezierCurveTo(r[0],r[1],r[2],r[3],r[4],r[5])}else isPlainObject(t)&&n.bezierCurveTo(t.cp1x||0,t.cp1y||0,t.cp2x||0,t.cp2y||0,t.x||0,t.y||0);else n.bezierCurveTo.apply(n,arguments);return e},createLinearGradient:function(t,e,n,r){var i=this,a=i.context;switch(arguments.length){case 1:if(isString(t)){var c=t.split(",");if(4==c.length)return a.createLinearGradient(t,e,n,r)}else if(isPlainObject(t))return a.createLinearGradient(t.x0||0,t.y0||0,t.x1||0,t.y1||0);break;case 4:return a.createLinearGradient(t,e,n,r)}return!1},createRadialGradient:function(t,e,n,r,i,a){var c=this,s=c.context;switch(arguments.length){case 1:if(isString(t)){var o=t.split(",");if(6==o.length)return s.createRadialGradient(o[0],o[1],o[2],o[3],o[4],o[5])}else if(isPlainObject(t))return s.createRadialGradient(t.y0||0,t.y1||0,t.r0||0,t.x1||0,t.y1||0,t.r1||0);break;case 6:return s.createRadialGradient(t,e,n,r,i,a)}return!1},arc:function(t,e,n,r,i,a){var c=this,s=arguments,o=c.context;if(1==s.length)if(isArray(t))Std.each(t,function(t,e){c.arc(e)});else if(isString(t)){var l=t.split(",");l.length>=5&&o.arc(l[0],l[1],l[2],l[3],l[4],l[5]||!1)}else isPlainObject(t)&&o.arc(t.x||0,t.y||0,t.r||0,t.sAngle||0,t.eAngle||0,t.counterclockwise||!1);else s.length>=5&&o.arc(t,e,n,r,i,a||!1);return c},arcTo:function(t){var e=this,n=e.context,r=arguments;if(1==r.length)if(isArray(t))Std.each(t,function(t,n){e.arcTo(n)});else if(isString(t)){var i=t.split(",");5==i.length&&n.arcTo(i[0],i[1],i[2],i[3],i[4])}else isPlainObject(t)&&n.arcTo(t.x1||0,t.y1||0,t.x2||0,t.y2||0,t.r||50);else n.arcTo.apply(n,r);return e}},main:function(t,e,n){t.context=n[0].getContext(e.context),n.html(e.notSupportText)},entrance:function(t){Std.each("stroke fill beginPath closePath clip save restore toDataURL",function(e,n){t[n]=function(){var t=this;return t.context[n].apply(t,arguments),t}}),Std.each("shadowColor shadowBlur fillStyle strokeStyle shadowOffsetX shadowOffsetY lineCap lineJoin lineWidth miterLimit font textAlign textBaseline globalAlpha globalCompositeOperation",function(e,n){t[n]=function(t){var e=this,r=e.context;return void 0==t?r[n]:(r[n]=t,e)}}),Std.each("transform setTransform",function(e,n){t[n]=function(t){var e=this,r=arguments,i=e.context;if(1==r.length){if(isArray(t))return Std.each(t,function(t,r){e[n](r)}),e;if(isString(t)){var a=t.split(",");6==a.length&&i[n](a[0],a[1],a[2],a[3],a[4],a[5])}else isPlainObject(t)&&i[n](t.a||0,t.b||0,t.c||0,t.d||0,t.e||0,t.f||0)}else 6==r.length&&i[n].apply(i,r);return e}}),Std.each("fillText strokeText",function(e,n){t[n]=function(t,e){var r=this,i=r.context;switch(arguments.length){case 1:if(isString(t))i[n](t,0,0);else{if(isArray(t))return Std.each(t,function(t,e){r[n](e)}),r;isPlainObject(t)&&i[n](t.text||0,t.x||0,t.y||0,t.maxWidth)}break;case 2:i[n](t,e,0);break;default:i[n].apply(i,arguments)}return r}}),Std.each("rect fillRect strokeRect clearRect",function(e,n){t[n]=function(t,e){var r=this,i=r.context;switch(arguments.length){case 1:if(isArray(t))Std.each(t,function(t,e){r[n](e)});else if(isString(t)){var a=t.split(",");4==a.length&&i[n](a[0],a[1],a[2],a[3])}else isPlainObject(t)&&i[n](t.x||0,t.y||0,t.width||0,t.height||0);break;case 2:i[n](0,0,t,e);break;default:i[n].apply(i,arguments)}return r}})}});
+/**
+ * canvas widget module
+*/
+Std.ui.module("canvas",{
+    /*[#module option:nodeName]*/
+    nodeName:"canvas",
+    /*[#module option:widget]*/
+    parent:"widget",
+    /*[#module option:option]*/
+    option:{
+        context:"2d",
+        notSupportText:"Your browser doesn't support the canvas element"
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * move to
+        */
+        moveTo:function(x,y){
+            return this.context.moveTo(x,y);
+        },
+        /*
+         * createImageData
+        */
+        createImageData:function(w,h){
+            return this.context.createImageData(w,h);
+        },
+        /*
+         *  measureText
+        */
+        measureText:function(text){
+            return this.context.measureText(text);
+        },
+        /*
+         * createPattern
+        */
+        createPattern:function(image,type){
+            return this.context.createPattern(image,type || "no-repeat");
+        },
+        /*
+         *  drawImage
+         */
+        drawImage:function(img,sx,sy,swidth,sheight,x,y,width,height){
+            this.context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+
+            return this;
+        },
+        /*
+         *  getImageData
+         */
+        getImageData:function(x,y,width,height){
+            return this.context.getImageData(x,y,width,height);
+        },
+        /*
+         *  putImageData
+         */
+        putImageData:function(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight){
+            this.context.drawImage(imgData,x,y,dirtyX,dirtyY,dirtyWidth,dirtyHeight);
+            return this;
+        },
+        /*
+         *  rotate
+        */
+        rotate:function(angle){
+            this.context.rotate(angle);
+
+            return this;
+        },
+        /*
+         *  translate
+        */
+        translate:function(x,y){
+            this.context.rotate(x,y);
+
+            return this;
+        },
+        /*
+         * isPointInPath
+        */
+        isPointInPath:function(x,y){
+            if(x == undefined || y == undefined){
+                return false;
+            }
+            return this.context.isPointInPath(x,y);
+        },
+        /*
+         *  scale
+         */
+        scale:function(arg1,arg2){
+            var that    = this;
+            var context = that.context;
+
+            if(arg2 === undefined){
+                context.scale(arg1,arg1);
+            }else{
+                context.scale(arg1,arg2);
+            }
+            return that;
+        },
+        /*
+         * lineTo
+        */
+        lineTo:function(arg1,arg2){
+            var that    = this;
+            var context = that.context;
+
+            if(arg2 == undefined){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.lineTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var value = arg1.split(",");
+                    if(value.length == 2){
+                        context.lineTo(value[0],value[1]);
+                    }
+                }else if(isPlainObject(arg1)){
+                    context.lineTo(arg1.x || 0,arg1.y || 0);
+                }
+            }else{
+                context.lineTo(arg1,arg2);
+            }
+            return that;
+        },
+        /*
+         * quadraticCurveTo
+        */
+        quadraticCurveTo:function(arg1,arg2,arg3,arg4){
+            var that    = this;
+            var context = that.context;
+
+            if(arguments.length === 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.quadraticCurveTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length == 4){
+                        context.quadraticCurveTo(values[0],values[1],values[2],values[3]);
+                    }
+                }else if(isPlainObject(arg1)){
+                    context.quadraticCurveTo(arg1.cpx || 0,arg1.cpy || 0,arg1.x || 0,arg1.y || 0);
+                }
+            }else{
+                context.quadraticCurveTo.apply(context,arguments);
+            }
+
+            return that;
+        },
+        /*
+         * bezierCurveTo
+        */
+        bezierCurveTo:function(arg1,arg2,arg3,arg4,arg5,arg6){
+            var that    = this;
+            var context = that.context;
+
+            if(arguments.length === 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.bezierCurveTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length == 6){
+                        context.bezierCurveTo(values[0],values[1],values[2],values[3],values[4],values[5]);
+                    }
+                }else if(isPlainObject(arg1)){
+                    context.bezierCurveTo(arg1.cp1x || 0,arg1.cp1y || 0,arg1.cp2x || 0,arg1.cp2y || 0,arg1.x || 0,arg1.y || 0);
+                }
+            }else{
+                context.bezierCurveTo.apply(context,arguments);
+            }
+            return that;
+        },
+        /*
+         * createLinearGradient
+        */
+        createLinearGradient:function(arg1,arg2,arg3,arg4){
+            var that    = this;
+            var context = that.context;
+
+            switch(arguments.length){
+                case 1:
+                    if(isString(arg1)){
+                        var values = arg1.split(",");
+                        if(values.length == 4){
+                            return context.createLinearGradient(arg1,arg2,arg3,arg4);
+                        }
+                    }else if(isPlainObject(arg1)){
+                        return context.createLinearGradient(arg1.x0 || 0,arg1.y0 || 0,arg1.x1 || 0,arg1.y1 || 0);
+                    }
+                    break;
+                case 4:
+                    return context.createLinearGradient(arg1,arg2,arg3,arg4);
+                    break;
+            }
+            return false;
+        },
+        /*
+         * createRadialGradient
+        */
+        createRadialGradient:function(arg1,arg2,arg3,arg4,arg5,arg6){
+            var that    = this;
+            var context = that.context;
+
+            switch(arguments.length){
+                case 1:
+                    if(isString(arg1)){
+                        var values = arg1.split(",");
+                        if(values.length == 6){
+                            return context.createRadialGradient(values[0],values[1],values[2],values[3],values[4],values[5]);
+                        }
+                    }else if(isPlainObject(arg1)){
+                        return context.createRadialGradient(arg1.y0 || 0,arg1.y1 || 0,arg1.r0 || 0,arg1.x1 || 0,arg1.y1 || 0,arg1.r1 || 0);
+                    }
+                    break;
+                case 6:
+                    return context.createRadialGradient(arg1,arg2,arg3,arg4,arg5,arg6);
+                    break;
+            }
+            return false;
+        },
+        /*
+         * arc
+        */
+        arc:function(arg1,arg2,arg3,arg4,arg5,arg6){
+            var that    = this;
+            var args    = arguments;
+            var context = that.context;
+
+            if(args.length == 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.arc(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length >= 5){
+                        context.arc(values[0],values[1],values[2],values[3],values[4],values[5] || false);
+                    }
+                }else if(isPlainObject(arg1)){
+                    context.arc(arg1.x || 0,arg1.y || 0,arg1.r || 0,arg1.sAngle || 0,arg1.eAngle || 0,arg1.counterclockwise || false);
+                }
+            }else if(args.length >= 5){
+                context.arc(arg1,arg2,arg3,arg4,arg5,arg6 || false)
+            }
+            return that;
+        },
+        /*
+         * arcTo
+        */
+        arcTo:function(arg1,arg2,arg3,arg4,arg5){
+            var that    = this;
+            var context = that.context;
+            var args    = arguments;
+
+            if(args.length == 1){
+                if(isArray(arg1)){
+                    Std.each(arg1,function(i,value){
+                        that.arcTo(value);
+                    });
+                }else if(isString(arg1)){
+                    var values = arg1.split(",");
+                    if(values.length == 5){
+                        context.arcTo(values[0],values[1],values[2],values[3],values[4]);
+                    }
+                }else if(isPlainObject(arg1)){
+                    context.arcTo(arg1.x1 || 0,arg1.y1 || 0,arg1.x2 || 0,arg1.y2 || 0,arg1.r || 50);
+                }
+            }else{
+                context.arcTo.apply(context,args);
+            }
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.context = dom[0].getContext(opts.context);
+
+        dom.html(opts.notSupportText);
+    },
+    /*[#module option:entrance]*/
+    entrance:function(widget){
+        Std.each("stroke fill beginPath closePath clip save restore toDataURL",function(i,name){
+            widget[name] = function(){
+                var that = this;
+                that.context[name].apply(that,arguments);
+                return that;
+            }
+        });
+
+        Std.each("shadowColor shadowBlur fillStyle strokeStyle shadowOffsetX shadowOffsetY " +
+            "lineCap lineJoin lineWidth miterLimit font textAlign textBaseline " +
+            "globalAlpha globalCompositeOperation",
+
+            function(i,name){
+                widget[name] = function(value){
+                    var that    = this;
+                    var context = that.context;
+
+                    if(value == undefined){
+                        return context[name];
+                    }
+                    context[name] = value;
+                    return that;
+                }
+            }
+        );
+
+        Std.each("transform setTransform",function(i,name){
+            widget[name] = function(value){
+                var that    = this;
+                var args    = arguments;
+                var context = that.context;
+
+                if(args.length == 1){
+                    if(isArray(value)){
+                        Std.each(value,function(i,value){
+                            that[name](value);
+                        });
+                        return that;
+                    }else if(isString(value)){
+                        var values = value.split(",");
+                        if(values.length == 6){
+                            context[name](values[0],values[1],values[2],values[3],values[4],values[5]);
+                        }
+                    }else if(isPlainObject(value)){
+                        context[name](value.a || 0,value.b || 0,value.c || 0,value.d || 0,value.e || 0,value.f || 0);
+                    }
+                }else if(args.length == 6){
+                    context[name].apply(context,args);
+                }
+                return that;
+            }
+        });
+
+        Std.each("fillText strokeText",function(i,name){
+            widget[name] = function(arg1,arg2,arg3,maxWidth){
+                var that    = this;
+                var context = that.context;
+
+                switch(arguments.length){
+                    case 1:
+                        if(isString(arg1)){
+                            context[name](arg1,0,0);
+                        }else if(isArray(arg1)){
+                            Std.each(arg1,function(i,value){
+                                that[name](value);
+                            });
+                            return that;
+                        }else if(isPlainObject(arg1)){
+                            context[name](arg1.text || 0,arg1.x || 0,arg1.y || 0,arg1.maxWidth);
+                        }
+                        break;
+                    case 2:
+                        context[name](arg1,arg2,0);
+                        break;
+                    default:
+                        context[name].apply(context,arguments);
+                }
+                return that;
+            }
+        });
+
+
+        Std.each("rect fillRect strokeRect clearRect",function(i,name){
+            widget[name] = function(arg1,arg2,arg3,arg4){
+                var that    = this;
+                var context = that.context;
+
+                switch(arguments.length){
+                    case 1:
+                        if(isArray(arg1)){
+                            Std.each(arg1,function(i,value){
+                                that[name](value);
+                            });
+                        }else if(isString(arg1)){
+                            var values = arg1.split(",");
+                            if(values.length == 4){
+                                context[name](values[0],values[1],values[2],values[3]);
+                            }
+                        }else if(isPlainObject(arg1)){
+                            context[name](arg1.x || 0,arg1.y || 0,arg1.width || 0,arg1.height || 0);
+                        }
+                        break;
+                    case 2:
+                        context[name](0,0,arg1,arg2);
+                        break;
+                    default:
+                        context[name].apply(context,arguments);
+                }
+                return that;
+            }
+        });
+    }
+});

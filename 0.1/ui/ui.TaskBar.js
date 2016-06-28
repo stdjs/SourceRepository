@@ -1,1 +1,408 @@
-Std.ui.module("TaskBarItem",{parent:"Item",events:"active select",option:{activated:!1,selected:!1,defaultClass:"StdUI_Item StdUI_TaskBarItem"},"public":{selected:function(e){var t=this;return t.opt("selected",e,function(){t[0].toggleClass("selected",e),t.emit("select",e),t.parent().emit("itemSelect",[e,t],!0)})},activated:function(e){var t=this;return t.opt("activated",e,function(){var i=t.parent();t[0].toggleClass("activated",e),t.emit("active",e),i.emit("itemActive",[e,t],!0),e===!1&&(t.selected()&&i.reselect(t),t[0].removeClass("hover"),t.selected(!1))})},updateStyle:function(e,t,i){var n=this;!n.iconHeight()!==t/2&&n.iconHeight(t/2).iconWidth(t/2),e!==n._spacing&&n[0].marginRight(n._spacing=e),n.height(t).width(i)}},main:function(e){e.call_opts({activated:!1,selected:!1},!0)}}),Std.ui.module("TaskBar",{parent:"widget",events:"itemClick itemActive itemSelect itemContextMenu",option:{level:3,defaultClass:"StdUI_TaskBar",items:null,height:35,spacing:8,minItemHeight:26,tabIndex:null,multiRow:!0,taskMenu:null},"private":{selectedItem:null},extend:{render:function(){var e=this;isEmpty(e._items)||(Std.each(e._items,function(e,t){t.render()}),e.update()),e.initEvents(),e.initDocEvents()},remove:function(e){var t=this,i=t._items;if(void 0===e)isWidget(t._taskMenu)&&t._taskMenu.remove(),t._docEvents&&Std.dom(document).off("mousedown",t._docEvents);else if(isNumber(e))t.reselect(i[e]),i[e].remove(),i.remove(e);else if(isWidget(e)){var n=i.indexOf(e);-1!==n&&(t.reselect(e),i[n].remove(),i.remove(n))}}},"protected":{reselect:function(e){for(var t=this,i=t._items,n=i.indexOf(e),s=i.length,a=-1,u=n+1;s>u;u++)if(i[u].activated()){a=u;break}if(-1==a)for(var u=n-1;u>=0;u--)if(i[u].activated()){a=u;break}return-1!==a&&(t._selectedItem=i[a].selected(!0)),t},itemClick:function(e,t){var i=this,n=t.index(),s=i._items[n];i.select(s,!s.selected()),i.emit("itemClick",[e,n,s],!0)},initDocEvents:function(){var e=this;Std.dom(document).on("mousedown",e._docEvents=function(t){e._taskMenu&&!e._taskMenu[0].contains(t.target)&&e._taskMenu.hide()})},initTaskMenu:function(){var e=this,t=e.opts;return e._taskMenu=isWidget(t.taskMenu)?t.taskMenu:Std.ui("Menu",t.taskMenu),isWidget(e._taskMenu)&&(e._taskMenu[0].css("position","absolute"),e._taskMenu.on({itemPress:function(){e._taskMenu.hide()}}).renderTo("body")),e},initEvents:function(){var e=this,t=e.opts;return e[0].on("contextmenu",function(e){e.preventDefault()}),e[0].on("mouseenter",">.StdUI_Item",function(){this.mouse({auto:!1,unselect:!0,click:function(t){return e.itemClick(t,this)}})}).on("contextmenu",">.StdUI_Item",function(i){if(!e._taskMenu&&isObject(t.taskMenu)&&e.initTaskMenu(),isWidget(e._taskMenu)){var n=e._taskMenu.show(),s=i.pageX,a=i.pageY,u=n.width(),o=n.height();s+u>Std.dom(window).width()&&(s=Std.dom(window).width()-u),n.toForeground()[0].css({top:a-o,left:s})}e.emit("itemContextMenu",[i,this.ui()],!0),i.preventDefault()}),e},createItem:function(e){var t=this,i=null;return isWidget(e)?i=e:isObject(e)?i=Std.ui(e.ui||"TaskBarItem",e||{}):(isString(e)||isNumber(e))&&(i=Std.ui("TaskBarItem",{text:e})),isWidget(i)&&(i.parent(t),i.verticalAlign("middle"),i.appendTo(t[0]),t.renderState&&i.render()),i},update:function(){var e=this,t=e.opts,i=e._items.length,n=e.width()-e.boxSize.width,s=e.height()-e.boxSize.height,a=t.spacing,u=5,o=200>n/u?n/(u=Math.floor(n/200)):n/u;return o*i>n&&(s/t.minItemHeight>=2&&t.multiRow?o*(s/=2)>=n&&i>=2*u&&(o=Math.floor(i%2==0?2*n/i:2*n/(i+1))):o=Math.floor((n-a)/i)),Std.each(e._items,function(e,t){t.updateStyle(a,s,o-a<s/2+t.boxSize.width?s/2+t.boxSize.width:o-a)}),e}},"public":{add:function(e){var t=this,i=t.createItem(e);return null!==i&&t._items.push(i),i},taskMenu:function(e){var t=this;return t.opt("taskMenu",e,function(){t._taskMenu&&(t._taskMenu.remove(),t._taskMenu=null)})},select:function(e,t){var i=this;if(isNumber(e)&&(e=i._items[e]),t===!0){if(i._selectedItem===e&&e.selected())return i;e.activated()||e.activated(!0),i._selectedItem&&i._selectedItem.selected(!1),i._selectedItem=e.selected(!0)}else e.activated()&&e.activated(!1),e.selected(!1),i.reselect(e);return i},append:function(e){var t=this;return isArray(e)?Std.each(e,function(e,i){t.add(i)}):t.add(e),t.renderState&&t.update(),t}},main:function(e,t){e._items=[],t.items&&e.append(t.items)}});
+/**
+ * task bar item widget
+*/
+Std.ui.module("TaskBarItem",{
+    /*[#module option:parent]*/
+    parent:"Item",
+    /*[#module option:events]*/
+    events:"active select",
+    /*[#module option:option]*/
+    option:{
+        activated:false,
+        selected:false,
+        defaultClass:"StdUI_Item StdUI_TaskBarItem"
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * selected
+        */
+        selected:function(selected){
+            var that = this;
+
+            return that.opt("selected",selected,function(){
+                that[0].toggleClass("selected",selected);
+                that.emit("select",selected);
+                that.parent().emit("itemSelect",[selected,that],true);
+            });
+        },
+        /*
+         * activated
+        */
+        activated:function(activated){
+            var that = this;
+
+            return that.opt("activated",activated,function(){
+                var parent = that.parent();
+
+                that[0].toggleClass("activated",activated);
+                that.emit("active",activated);
+                parent.emit("itemActive",[activated,that],true);
+
+                if(activated === false){
+                    if(that.selected()){
+                        parent.reselect(that);
+                    }
+                    that[0].removeClass("hover");
+                    that.selected(false);
+                }
+            });
+        },
+        /*
+         * update style
+        */
+        updateStyle:function(spacing,height,width){
+            var that = this;
+
+            if(!that.iconHeight() !== height / 2){
+                that.iconHeight(height / 2).iconWidth(height / 2);
+            }
+            if(spacing !== that._spacing){
+                that[0].marginRight(that._spacing = spacing);
+            }
+            that.height(height).width(width);
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that){
+        that.call_opts({
+            activated:false,
+            selected:false
+        },true);
+    }
+});
+
+/**
+ * task bar widget
+*/
+Std.ui.module("TaskBar",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"itemClick itemActive itemSelect itemContextMenu",
+    /*[#module option:option]*/
+    option:{
+        level:3,
+        defaultClass:"StdUI_TaskBar",
+        items:null,
+        height:35,
+        spacing:8,
+        minItemHeight:26,
+        tabIndex:null,
+        multiRow:true,
+        taskMenu:null
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * selectedItem
+        */
+        selectedItem:null
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            if(!isEmpty(that._items)){
+                Std.each(that._items,function(i,item){
+                    item.render();
+                });
+                that.update();
+            }
+            that.initEvents();
+            that.initDocEvents();
+        },
+        /*
+         * remove
+        */
+        remove:function(item){
+            var that  = this;
+            var items = that._items;
+
+            if(item === undefined){
+                if(isWidget(that._taskMenu)){
+                    that._taskMenu.remove();
+                }
+                if(that._docEvents){
+                    Std.dom(document).off("mousedown",that._docEvents);
+                }
+            }else if(isNumber(item)){
+                that.reselect(items[item]);
+                items[item].remove();
+                items.remove(item);
+            }else if(isWidget(item)){
+                var index = items.indexOf(item);
+                if(index !== -1){
+                    that.reselect(item);
+                    items[index].remove();
+                    items.remove(index);
+                }
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * reselect
+        */
+        reselect:function(currentItem){
+            var that     = this;
+            var items    = that._items;
+            var index    = items.indexOf(currentItem);
+            var length   = items.length;
+            var newIndex = -1;
+
+            for(var i=index+1;i<length;i++){
+                if(items[i].activated()){
+                    newIndex = i;
+                    break;
+                }
+            }
+            if(newIndex == -1){
+                for(var i=index-1;i>=0;i--){
+                    if(items[i].activated()){
+                        newIndex = i;
+                        break;
+                    }
+                }
+            }
+            if(newIndex !== -1){
+                that._selectedItem = items[newIndex].selected(true);
+            }
+            return that;
+        },
+        /*
+         * itemClick
+        */
+        itemClick:function(e,itemElem){
+            var that  = this;
+            var index = itemElem.index();
+            var item  = that._items[index];
+
+            that.select(item,!item.selected());
+            that.emit("itemClick",[e,index,item],true);
+        },
+        /*
+         * init document events
+        */
+        initDocEvents:function(){
+            var that = this;
+
+            Std.dom(document).on("mousedown",that._docEvents = function(e){
+                if(that._taskMenu && !that._taskMenu[0].contains(e.target)){
+                    that._taskMenu.hide();
+                }
+            });
+        },
+        /*
+         * init task menu
+        */
+        initTaskMenu:function(){
+            var that = this;
+            var opts = that.opts;
+
+            if(isWidget(opts.taskMenu)){
+                that._taskMenu = opts.taskMenu;
+            }else{
+                that._taskMenu = Std.ui("Menu",opts.taskMenu);
+            }
+
+            if(isWidget(that._taskMenu)){
+                that._taskMenu[0].css("position","absolute");
+                that._taskMenu.on({
+                    itemPress:function(){
+                        that._taskMenu.hide();
+                    }
+                }).renderTo("body");
+            }
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that[0].on("contextmenu",function(e){
+                e.preventDefault();
+            });
+            that[0].on("mouseenter",">.StdUI_Item",function(e){
+                this.mouse({
+                    auto:false,
+                    unselect:true,
+                    click:function(e){
+                        return that.itemClick(e,this);
+                    }
+                });
+            }).on("contextmenu",">.StdUI_Item",function(e){
+                if(!that._taskMenu && isObject(opts.taskMenu)){
+                    that.initTaskMenu();
+                }
+                if(isWidget(that._taskMenu)){
+                    var taskMenu = that._taskMenu.show();
+                    var x        = e.pageX;
+                    var y        = e.pageY;
+                    var width    = taskMenu.width();
+                    var height   = taskMenu.height();
+
+                    if(x + width > Std.dom(window).width()){
+                        x = Std.dom(window).width() - width;
+                    }
+                    taskMenu.toForeground()[0].css({
+                        top:y - height,
+                        left:x
+                    });
+                }
+                that.emit("itemContextMenu",[e,this.ui()],true);
+                e.preventDefault();
+            });
+
+            return that;
+        },
+        /*
+         * create item
+        */
+        createItem:function(data){
+            var that = this;
+            var item = null;
+
+            if(isWidget(data)){
+                item = data;
+            }else if(isObject(data)){
+                item = Std.ui(data.ui || "TaskBarItem",data || {});
+            }else if(isString(data) || isNumber(data)){
+                item = Std.ui("TaskBarItem",{
+                    text:data
+                });
+            }
+            if(isWidget(item)){
+                item.parent(that);
+                item.verticalAlign("middle");
+                item.appendTo(that[0]);
+                that.renderState && item.render();
+            }
+            return item;
+        },
+        /*
+         * update
+        */
+        update:function(){
+            var that      = this;
+            var opts      = that.opts;
+            var length    = that._items.length;
+            var width     = that.width()  - that.boxSize.width;
+            var height    = that.height() - that.boxSize.height;
+            var spacing   = opts.spacing;
+            var rowNumber = 5;
+            var itemWidth = width / rowNumber < 200 ? width / (rowNumber = Math.floor(width / 200)) : width / rowNumber;
+
+            if(itemWidth * length > width){
+                if(!(height / opts.minItemHeight >= 2) || !opts.multiRow){
+                    itemWidth = Math.floor((width - spacing) / length);
+                }else if(itemWidth * (height /= 2) >= width && length >= rowNumber * 2){
+                    if(length % 2 == 0){
+                        itemWidth = Math.floor(width * 2 / length);
+                    }else{
+                        itemWidth = Math.floor(width * 2 / (length + 1))
+                    }
+                }
+            }
+            Std.each(that._items,function(i,itemWidget){
+                itemWidget.updateStyle(
+                    spacing,height,
+                    itemWidth - spacing < height / 2 + itemWidget.boxSize.width ? height / 2 + itemWidget.boxSize.width : itemWidth - spacing
+                );
+            });
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * add
+        */
+        add:function(data){
+            var that = this;
+            var item = that.createItem(data);
+
+            if(item !== null){
+                that._items.push(item);
+            }
+            return item;
+        },
+        /*
+         * task menu
+        */
+        taskMenu:function(taskMenu){
+            var that = this;
+
+            return that.opt("taskMenu",taskMenu,function(){
+                if(that._taskMenu){
+                    that._taskMenu.remove();
+                    that._taskMenu = null;
+                }
+            });
+        },
+        /*
+         * select
+        */
+        select:function(data,selected){
+            var that = this;
+
+            if(isNumber(data)){
+                data = that._items[data];
+            }
+            if(selected === true){
+                if(that._selectedItem === data && data.selected()){
+                    return that;
+                }
+                if(!data.activated()){
+                    data.activated(true);
+                }
+                if(that._selectedItem){
+                    that._selectedItem.selected(false);
+                }
+                that._selectedItem = data.selected(true);
+            }else{
+                if(data.activated()){
+                    data.activated(false);
+                }
+                data.selected(false);
+                that.reselect(data);
+            }
+            return that;
+        },
+        /*
+         * append
+        */
+        append:function(data){
+            var that = this;
+
+            if(isArray(data)){
+                Std.each(data,function(i,itemData){
+                    that.add(itemData);
+                });
+            }else{
+                that.add(data);
+            }
+
+            if(that.renderState){
+                that.update();
+            }
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts){
+        that._items = [];
+
+        if(opts.items){
+            that.append(opts.items);
+        }
+    }
+});

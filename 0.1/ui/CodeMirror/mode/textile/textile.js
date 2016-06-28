@@ -1,1 +1,469 @@
-!function(t){"object"==typeof exports&&"object"==typeof module?t(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],t):t(CodeMirror)}(function(t){"use strict";function e(t,e){e.mode=f.newLayout,e.tableHeading=!1,"definitionList"===e.layoutType&&e.spanningLayout&&t.match(s("definitionListEnd"),!1)&&(e.spanningLayout=!1)}function n(t,e,n){if("_"===n)return t.eat("_")?i(t,e,"italic",/__/,2):i(t,e,"em",/_/,1);if("*"===n)return t.eat("*")?i(t,e,"bold",/\*\*/,2):i(t,e,"strong",/\*/,1);if("["===n)return t.match(/\d+\]/)&&(e.footCite=!0),a(e);if("("===n){var r=t.match(/^(r|tm|c)\)/);if(r)return l(e,c.specialChar)}if("<"===n&&t.match(/(\w+)[^>]+>[^<]+<\/\1>/))return l(e,c.html);if("?"===n&&t.eat("?"))return i(t,e,"cite",/\?\?/,2);if("="===n&&t.eat("="))return i(t,e,"notextile",/==/,2);if("-"===n&&!t.eat("-"))return i(t,e,"deletion",/-/,1);if("+"===n)return i(t,e,"addition",/\+/,1);if("~"===n)return i(t,e,"sub",/~/,1);if("^"===n)return i(t,e,"sup",/\^/,1);if("%"===n)return i(t,e,"span",/%/,1);if("@"===n)return i(t,e,"code",/@/,1);if("!"===n){var o=i(t,e,"image",/(?:\([^\)]+\))?!/,1);return t.match(/^:\S+/),o}return a(e)}function i(t,e,n,i,r){var l=t.pos>r?t.string.charAt(t.pos-r-1):null,o=t.peek();if(e[n]){if((!o||/\W/.test(o))&&l&&/\S/.test(l)){var u=a(e);return e[n]=!1,u}}else(!l||/\W/.test(l))&&o&&/\S/.test(o)&&t.match(new RegExp("^.*\\S"+i.source+"(?:\\W|$)"),!1)&&(e[n]=!0,e.mode=f.attributes);return a(e)}function a(t){var e=r(t);if(e)return e;var n=[];return t.layoutType&&n.push(c[t.layoutType]),n=n.concat(o(t,"addition","bold","cite","code","deletion","em","footCite","image","italic","link","span","strong","sub","sup","table","tableHeading")),"header"===t.layoutType&&n.push(c.header+"-"+t.header),n.length?n.join(" "):null}function r(t){var e=t.layoutType;switch(e){case"notextile":case"code":case"pre":return c[e];default:return t.notextile?c.notextile+(e?" "+c[e]:""):null}}function l(t,e){var n=r(t);if(n)return n;var i=a(t);return e?i?i+" "+e:e:i}function o(t){for(var e=[],n=1;n<arguments.length;++n)t[arguments[n]]&&e.push(c[arguments[n]]);return e}function u(t){var e=t.spanningLayout,n=t.layoutType;for(var i in t)t.hasOwnProperty(i)&&delete t[i];t.mode=f.newLayout,e&&(t.layoutType=n,t.spanningLayout=!0)}function s(t){return d.cache[t]||(d.cache[t]=d.createRe(t))}var c={addition:"positive",attributes:"attribute",bold:"strong",cite:"keyword",code:"atom",definitionList:"number",deletion:"negative",div:"punctuation",em:"em",footnote:"variable",footCite:"qualifier",header:"header",html:"comment",image:"string",italic:"em",link:"link",linkDefinition:"link",list1:"variable-2",list2:"variable-3",list3:"keyword",notextile:"string-2",pre:"operator",p:"property",quote:"bracket",span:"quote",specialChar:"tag",strong:"strong",sub:"builtin",sup:"builtin",table:"variable-3",tableHeading:"operator"},d={cache:{},single:{bc:"bc",bq:"bq",definitionList:/- [^(?::=)]+:=+/,definitionListEnd:/.*=:\s*$/,div:"div",drawTable:/\|.*\|/,foot:/fn\d+/,header:/h[1-6]/,html:/\s*<(?:\/)?(\w+)(?:[^>]+)?>(?:[^<]+<\/\1>)?/,link:/[^"]+":\S/,linkDefinition:/\[[^\s\]]+\]\S+/,list:/(?:#+|\*+)/,notextile:"notextile",para:"p",pre:"pre",table:"table",tableCellAttributes:/[\/\\]\d+/,tableHeading:/\|_\./,tableText:/[^"_\*\[\(\?\+~\^%@|-]+/,text:/[^!"_=\*\[\(<\?\+~\^%@-]+/},attributes:{align:/(?:<>|<|>|=)/,selector:/\([^\(][^\)]+\)/,lang:/\[[^\[\]]+\]/,pad:/(?:\(+|\)+){1,2}/,css:/\{[^\}]+\}/},createRe:function(t){switch(t){case"drawTable":return d.makeRe("^",d.single.drawTable,"$");case"html":return d.makeRe("^",d.single.html,"(?:",d.single.html,")*","$");case"linkDefinition":return d.makeRe("^",d.single.linkDefinition,"$");case"listLayout":return d.makeRe("^",d.single.list,s("allAttributes"),"*\\s+");case"tableCellAttributes":return d.makeRe("^",d.choiceRe(d.single.tableCellAttributes,s("allAttributes")),"+\\.");case"type":return d.makeRe("^",s("allTypes"));case"typeLayout":return d.makeRe("^",s("allTypes"),s("allAttributes"),"*\\.\\.?","(\\s+|$)");case"attributes":return d.makeRe("^",s("allAttributes"),"+");case"allTypes":return d.choiceRe(d.single.div,d.single.foot,d.single.header,d.single.bc,d.single.bq,d.single.notextile,d.single.pre,d.single.table,d.single.para);case"allAttributes":return d.choiceRe(d.attributes.selector,d.attributes.css,d.attributes.lang,d.attributes.align,d.attributes.pad);default:return d.makeRe("^",d.single[t])}},makeRe:function(){for(var t="",e=0;e<arguments.length;++e){var n=arguments[e];t+="string"==typeof n?n:n.source}return new RegExp(t)},choiceRe:function(){for(var t=[arguments[0]],e=1;e<arguments.length;++e)t[2*e-1]="|",t[2*e]=arguments[e];return t.unshift("(?:"),t.push(")"),d.makeRe.apply(null,t)}},f={newLayout:function(t,e){if(t.match(s("typeLayout"),!1))return e.spanningLayout=!1,(e.mode=f.blockType)(t,e);var n;return r(e)||(t.match(s("listLayout"),!1)?n=f.list:t.match(s("drawTable"),!1)?n=f.table:t.match(s("linkDefinition"),!1)?n=f.linkDefinition:t.match(s("definitionList"))?n=f.definitionList:t.match(s("html"),!1)&&(n=f.html)),(e.mode=n||f.text)(t,e)},blockType:function(t,e){var n,i;return e.layoutType=null,(n=t.match(s("type")))?(i=n[0],(n=i.match(s("header")))?(e.layoutType="header",e.header=parseInt(n[0][1])):i.match(s("bq"))?e.layoutType="quote":i.match(s("bc"))?e.layoutType="code":i.match(s("foot"))?e.layoutType="footnote":i.match(s("notextile"))?e.layoutType="notextile":i.match(s("pre"))?e.layoutType="pre":i.match(s("div"))?e.layoutType="div":i.match(s("table"))&&(e.layoutType="table"),e.mode=f.attributes,a(e)):(e.mode=f.text)(t,e)},text:function(t,e){if(t.match(s("text")))return a(e);var i=t.next();return'"'===i?(e.mode=f.link)(t,e):n(t,e,i)},attributes:function(t,e){return e.mode=f.layoutLength,t.match(s("attributes"))?l(e,c.attributes):a(e)},layoutLength:function(t,e){return t.eat(".")&&t.eat(".")&&(e.spanningLayout=!0),e.mode=f.text,a(e)},list:function(t,e){var n=t.match(s("list"));e.listDepth=n[0].length;var i=(e.listDepth-1)%3;return e.layoutType=i?1===i?"list2":"list3":"list1",e.mode=f.attributes,a(e)},link:function(t,e){return e.mode=f.text,t.match(s("link"))?(t.match(/\S+/),l(e,c.link)):a(e)},linkDefinition:function(t,e){return t.skipToEnd(),l(e,c.linkDefinition)},definitionList:function(t,e){return t.match(s("definitionList")),e.layoutType="definitionList",t.match(/\s*$/)?e.spanningLayout=!0:e.mode=f.attributes,a(e)},html:function(t,e){return t.skipToEnd(),l(e,c.html)},table:function(t,e){return e.layoutType="table",(e.mode=f.tableCell)(t,e)},tableCell:function(t,e){return t.match(s("tableHeading"))?e.tableHeading=!0:t.eat("|"),e.mode=f.tableCellAttributes,a(e)},tableCellAttributes:function(t,e){return e.mode=f.tableText,t.match(s("tableCellAttributes"))?l(e,c.attributes):a(e)},tableText:function(t,e){return t.match(s("tableText"))?a(e):"|"===t.peek()?(e.mode=f.tableCell,a(e)):n(t,e,t.next())}};t.defineMode("textile",function(){return{startState:function(){return{mode:f.newLayout}},token:function(t,n){return t.sol()&&e(t,n),n.mode(t,n)},blankLine:u}}),t.defineMIME("text/x-textile","textile")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") { // CommonJS
+    mod(require("../../lib/codemirror"));
+  } else if (typeof define == "function" && define.amd) { // AMD
+    define(["../../lib/codemirror"], mod);
+  } else { // Plain browser env
+    mod(CodeMirror);
+  }
+})(function(CodeMirror) {
+  "use strict";
+
+  var TOKEN_STYLES = {
+    addition: "positive",
+    attributes: "attribute",
+    bold: "strong",
+    cite: "keyword",
+    code: "atom",
+    definitionList: "number",
+    deletion: "negative",
+    div: "punctuation",
+    em: "em",
+    footnote: "variable",
+    footCite: "qualifier",
+    header: "header",
+    html: "comment",
+    image: "string",
+    italic: "em",
+    link: "link",
+    linkDefinition: "link",
+    list1: "variable-2",
+    list2: "variable-3",
+    list3: "keyword",
+    notextile: "string-2",
+    pre: "operator",
+    p: "property",
+    quote: "bracket",
+    span: "quote",
+    specialChar: "tag",
+    strong: "strong",
+    sub: "builtin",
+    sup: "builtin",
+    table: "variable-3",
+    tableHeading: "operator"
+  };
+
+  function startNewLine(stream, state) {
+    state.mode = Modes.newLayout;
+    state.tableHeading = false;
+
+    if (state.layoutType === "definitionList" && state.spanningLayout &&
+        stream.match(RE("definitionListEnd"), false))
+      state.spanningLayout = false;
+  }
+
+  function handlePhraseModifier(stream, state, ch) {
+    if (ch === "_") {
+      if (stream.eat("_"))
+        return togglePhraseModifier(stream, state, "italic", /__/, 2);
+      else
+        return togglePhraseModifier(stream, state, "em", /_/, 1);
+    }
+
+    if (ch === "*") {
+      if (stream.eat("*")) {
+        return togglePhraseModifier(stream, state, "bold", /\*\*/, 2);
+      }
+      return togglePhraseModifier(stream, state, "strong", /\*/, 1);
+    }
+
+    if (ch === "[") {
+      if (stream.match(/\d+\]/)) state.footCite = true;
+      return tokenStyles(state);
+    }
+
+    if (ch === "(") {
+      var spec = stream.match(/^(r|tm|c)\)/);
+      if (spec)
+        return tokenStylesWith(state, TOKEN_STYLES.specialChar);
+    }
+
+    if (ch === "<" && stream.match(/(\w+)[^>]+>[^<]+<\/\1>/))
+      return tokenStylesWith(state, TOKEN_STYLES.html);
+
+    if (ch === "?" && stream.eat("?"))
+      return togglePhraseModifier(stream, state, "cite", /\?\?/, 2);
+
+    if (ch === "=" && stream.eat("="))
+      return togglePhraseModifier(stream, state, "notextile", /==/, 2);
+
+    if (ch === "-" && !stream.eat("-"))
+      return togglePhraseModifier(stream, state, "deletion", /-/, 1);
+
+    if (ch === "+")
+      return togglePhraseModifier(stream, state, "addition", /\+/, 1);
+
+    if (ch === "~")
+      return togglePhraseModifier(stream, state, "sub", /~/, 1);
+
+    if (ch === "^")
+      return togglePhraseModifier(stream, state, "sup", /\^/, 1);
+
+    if (ch === "%")
+      return togglePhraseModifier(stream, state, "span", /%/, 1);
+
+    if (ch === "@")
+      return togglePhraseModifier(stream, state, "code", /@/, 1);
+
+    if (ch === "!") {
+      var type = togglePhraseModifier(stream, state, "image", /(?:\([^\)]+\))?!/, 1);
+      stream.match(/^:\S+/); // optional Url portion
+      return type;
+    }
+    return tokenStyles(state);
+  }
+
+  function togglePhraseModifier(stream, state, phraseModifier, closeRE, openSize) {
+    var charBefore = stream.pos > openSize ? stream.string.charAt(stream.pos - openSize - 1) : null;
+    var charAfter = stream.peek();
+    if (state[phraseModifier]) {
+      if ((!charAfter || /\W/.test(charAfter)) && charBefore && /\S/.test(charBefore)) {
+        var type = tokenStyles(state);
+        state[phraseModifier] = false;
+        return type;
+      }
+    } else if ((!charBefore || /\W/.test(charBefore)) && charAfter && /\S/.test(charAfter) &&
+               stream.match(new RegExp("^.*\\S" + closeRE.source + "(?:\\W|$)"), false)) {
+      state[phraseModifier] = true;
+      state.mode = Modes.attributes;
+    }
+    return tokenStyles(state);
+  };
+
+  function tokenStyles(state) {
+    var disabled = textileDisabled(state);
+    if (disabled) return disabled;
+
+    var styles = [];
+    if (state.layoutType) styles.push(TOKEN_STYLES[state.layoutType]);
+
+    styles = styles.concat(activeStyles(
+      state, "addition", "bold", "cite", "code", "deletion", "em", "footCite",
+      "image", "italic", "link", "span", "strong", "sub", "sup", "table", "tableHeading"));
+
+    if (state.layoutType === "header")
+      styles.push(TOKEN_STYLES.header + "-" + state.header);
+
+    return styles.length ? styles.join(" ") : null;
+  }
+
+  function textileDisabled(state) {
+    var type = state.layoutType;
+
+    switch(type) {
+    case "notextile":
+    case "code":
+    case "pre":
+      return TOKEN_STYLES[type];
+    default:
+      if (state.notextile)
+        return TOKEN_STYLES.notextile + (type ? (" " + TOKEN_STYLES[type]) : "");
+      return null;
+    }
+  }
+
+  function tokenStylesWith(state, extraStyles) {
+    var disabled = textileDisabled(state);
+    if (disabled) return disabled;
+
+    var type = tokenStyles(state);
+    if (extraStyles)
+      return type ? (type + " " + extraStyles) : extraStyles;
+    else
+      return type;
+  }
+
+  function activeStyles(state) {
+    var styles = [];
+    for (var i = 1; i < arguments.length; ++i) {
+      if (state[arguments[i]])
+        styles.push(TOKEN_STYLES[arguments[i]]);
+    }
+    return styles;
+  }
+
+  function blankLine(state) {
+    var spanningLayout = state.spanningLayout, type = state.layoutType;
+
+    for (var key in state) if (state.hasOwnProperty(key))
+      delete state[key];
+
+    state.mode = Modes.newLayout;
+    if (spanningLayout) {
+      state.layoutType = type;
+      state.spanningLayout = true;
+    }
+  }
+
+  var REs = {
+    cache: {},
+    single: {
+      bc: "bc",
+      bq: "bq",
+      definitionList: /- [^(?::=)]+:=+/,
+      definitionListEnd: /.*=:\s*$/,
+      div: "div",
+      drawTable: /\|.*\|/,
+      foot: /fn\d+/,
+      header: /h[1-6]/,
+      html: /\s*<(?:\/)?(\w+)(?:[^>]+)?>(?:[^<]+<\/\1>)?/,
+      link: /[^"]+":\S/,
+      linkDefinition: /\[[^\s\]]+\]\S+/,
+      list: /(?:#+|\*+)/,
+      notextile: "notextile",
+      para: "p",
+      pre: "pre",
+      table: "table",
+      tableCellAttributes: /[\/\\]\d+/,
+      tableHeading: /\|_\./,
+      tableText: /[^"_\*\[\(\?\+~\^%@|-]+/,
+      text: /[^!"_=\*\[\(<\?\+~\^%@-]+/
+    },
+    attributes: {
+      align: /(?:<>|<|>|=)/,
+      selector: /\([^\(][^\)]+\)/,
+      lang: /\[[^\[\]]+\]/,
+      pad: /(?:\(+|\)+){1,2}/,
+      css: /\{[^\}]+\}/
+    },
+    createRe: function(name) {
+      switch (name) {
+      case "drawTable":
+        return REs.makeRe("^", REs.single.drawTable, "$");
+      case "html":
+        return REs.makeRe("^", REs.single.html, "(?:", REs.single.html, ")*", "$");
+      case "linkDefinition":
+        return REs.makeRe("^", REs.single.linkDefinition, "$");
+      case "listLayout":
+        return REs.makeRe("^", REs.single.list, RE("allAttributes"), "*\\s+");
+      case "tableCellAttributes":
+        return REs.makeRe("^", REs.choiceRe(REs.single.tableCellAttributes,
+                                            RE("allAttributes")), "+\\.");
+      case "type":
+        return REs.makeRe("^", RE("allTypes"));
+      case "typeLayout":
+        return REs.makeRe("^", RE("allTypes"), RE("allAttributes"),
+                          "*\\.\\.?", "(\\s+|$)");
+      case "attributes":
+        return REs.makeRe("^", RE("allAttributes"), "+");
+
+      case "allTypes":
+        return REs.choiceRe(REs.single.div, REs.single.foot,
+                            REs.single.header, REs.single.bc, REs.single.bq,
+                            REs.single.notextile, REs.single.pre, REs.single.table,
+                            REs.single.para);
+
+      case "allAttributes":
+        return REs.choiceRe(REs.attributes.selector, REs.attributes.css,
+                            REs.attributes.lang, REs.attributes.align, REs.attributes.pad);
+
+      default:
+        return REs.makeRe("^", REs.single[name]);
+      }
+    },
+    makeRe: function() {
+      var pattern = "";
+      for (var i = 0; i < arguments.length; ++i) {
+        var arg = arguments[i];
+        pattern += (typeof arg === "string") ? arg : arg.source;
+      }
+      return new RegExp(pattern);
+    },
+    choiceRe: function() {
+      var parts = [arguments[0]];
+      for (var i = 1; i < arguments.length; ++i) {
+        parts[i * 2 - 1] = "|";
+        parts[i * 2] = arguments[i];
+      }
+
+      parts.unshift("(?:");
+      parts.push(")");
+      return REs.makeRe.apply(null, parts);
+    }
+  };
+
+  function RE(name) {
+    return (REs.cache[name] || (REs.cache[name] = REs.createRe(name)));
+  }
+
+  var Modes = {
+    newLayout: function(stream, state) {
+      if (stream.match(RE("typeLayout"), false)) {
+        state.spanningLayout = false;
+        return (state.mode = Modes.blockType)(stream, state);
+      }
+      var newMode;
+      if (!textileDisabled(state)) {
+        if (stream.match(RE("listLayout"), false))
+          newMode = Modes.list;
+        else if (stream.match(RE("drawTable"), false))
+          newMode = Modes.table;
+        else if (stream.match(RE("linkDefinition"), false))
+          newMode = Modes.linkDefinition;
+        else if (stream.match(RE("definitionList")))
+          newMode = Modes.definitionList;
+        else if (stream.match(RE("html"), false))
+          newMode = Modes.html;
+      }
+      return (state.mode = (newMode || Modes.text))(stream, state);
+    },
+
+    blockType: function(stream, state) {
+      var match, type;
+      state.layoutType = null;
+
+      if (match = stream.match(RE("type")))
+        type = match[0];
+      else
+        return (state.mode = Modes.text)(stream, state);
+
+      if (match = type.match(RE("header"))) {
+        state.layoutType = "header";
+        state.header = parseInt(match[0][1]);
+      } else if (type.match(RE("bq"))) {
+        state.layoutType = "quote";
+      } else if (type.match(RE("bc"))) {
+        state.layoutType = "code";
+      } else if (type.match(RE("foot"))) {
+        state.layoutType = "footnote";
+      } else if (type.match(RE("notextile"))) {
+        state.layoutType = "notextile";
+      } else if (type.match(RE("pre"))) {
+        state.layoutType = "pre";
+      } else if (type.match(RE("div"))) {
+        state.layoutType = "div";
+      } else if (type.match(RE("table"))) {
+        state.layoutType = "table";
+      }
+
+      state.mode = Modes.attributes;
+      return tokenStyles(state);
+    },
+
+    text: function(stream, state) {
+      if (stream.match(RE("text"))) return tokenStyles(state);
+
+      var ch = stream.next();
+      if (ch === '"')
+        return (state.mode = Modes.link)(stream, state);
+      return handlePhraseModifier(stream, state, ch);
+    },
+
+    attributes: function(stream, state) {
+      state.mode = Modes.layoutLength;
+
+      if (stream.match(RE("attributes")))
+        return tokenStylesWith(state, TOKEN_STYLES.attributes);
+      else
+        return tokenStyles(state);
+    },
+
+    layoutLength: function(stream, state) {
+      if (stream.eat(".") && stream.eat("."))
+        state.spanningLayout = true;
+
+      state.mode = Modes.text;
+      return tokenStyles(state);
+    },
+
+    list: function(stream, state) {
+      var match = stream.match(RE("list"));
+      state.listDepth = match[0].length;
+      var listMod = (state.listDepth - 1) % 3;
+      if (!listMod)
+        state.layoutType = "list1";
+      else if (listMod === 1)
+        state.layoutType = "list2";
+      else
+        state.layoutType = "list3";
+
+      state.mode = Modes.attributes;
+      return tokenStyles(state);
+    },
+
+    link: function(stream, state) {
+      state.mode = Modes.text;
+      if (stream.match(RE("link"))) {
+        stream.match(/\S+/);
+        return tokenStylesWith(state, TOKEN_STYLES.link);
+      }
+      return tokenStyles(state);
+    },
+
+    linkDefinition: function(stream, state) {
+      stream.skipToEnd();
+      return tokenStylesWith(state, TOKEN_STYLES.linkDefinition);
+    },
+
+    definitionList: function(stream, state) {
+      stream.match(RE("definitionList"));
+
+      state.layoutType = "definitionList";
+
+      if (stream.match(/\s*$/))
+        state.spanningLayout = true;
+      else
+        state.mode = Modes.attributes;
+
+      return tokenStyles(state);
+    },
+
+    html: function(stream, state) {
+      stream.skipToEnd();
+      return tokenStylesWith(state, TOKEN_STYLES.html);
+    },
+
+    table: function(stream, state) {
+      state.layoutType = "table";
+      return (state.mode = Modes.tableCell)(stream, state);
+    },
+
+    tableCell: function(stream, state) {
+      if (stream.match(RE("tableHeading")))
+        state.tableHeading = true;
+      else
+        stream.eat("|");
+
+      state.mode = Modes.tableCellAttributes;
+      return tokenStyles(state);
+    },
+
+    tableCellAttributes: function(stream, state) {
+      state.mode = Modes.tableText;
+
+      if (stream.match(RE("tableCellAttributes")))
+        return tokenStylesWith(state, TOKEN_STYLES.attributes);
+      else
+        return tokenStyles(state);
+    },
+
+    tableText: function(stream, state) {
+      if (stream.match(RE("tableText")))
+        return tokenStyles(state);
+
+      if (stream.peek() === "|") { // end of cell
+        state.mode = Modes.tableCell;
+        return tokenStyles(state);
+      }
+      return handlePhraseModifier(stream, state, stream.next());
+    }
+  };
+
+  CodeMirror.defineMode("textile", function() {
+    return {
+      startState: function() {
+        return { mode: Modes.newLayout };
+      },
+      token: function(stream, state) {
+        if (stream.sol()) startNewLine(stream, state);
+        return state.mode(stream, state);
+      },
+      blankLine: blankLine
+    };
+  });
+
+  CodeMirror.defineMIME("text/x-textile", "textile");
+});

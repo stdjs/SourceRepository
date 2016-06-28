@@ -1,1 +1,480 @@
-Std.ui.module("MenuItem",{parent:"Item",action:{content:"text",children:"append"},option:{defaultClass:"StdUI_MenuItem",text:"menu item",items:null,root:null},"private":{childVisible:!1},extend:{render:function(){var e=this,t=e.opts;null!==t.items&&(e.D.open=newDiv("_open").appendTo(e[0]))},remove:function(e){var t=this;t.menu&&t.menu.remove(e),t.items&&t.items.clear()}},"public":{root:function(e){var t=this,i=t.opts;return void 0===e?i.root||t:(i.root=e,t)},insert:function(e,t){var i=this,n=i.D;return i.menu?i.menu.insert(e,t):(i.items||(i.items=[]),i.items.insert(e,t)),n.open||(n.open=newDiv("_open").appendTo(i[0])),i},append:Std.func(function(e){return this.insert(e)},{each:[isArray]}),showChild:function(){var e=this,t=e[0].offset();return e._childVisible?e:(e.menu||(e.menu=Std.ui("Menu",{parent:e,items:e.items,root:e.root(),renderTo:"body"})),e.menu.visible(e._childVisible=!0).toForeground(),e.menu[0].css({position:"absolute",left:t.x+e.width(),top:t.y,margin:0}),e)},hideChild:function(e){var t=this;return t.menu?(e===!1?t.menu.visible(t._childVisible=!1):t.menu[0].animate("end").animate({to:{opacity:0}},100,function(){t.menu.visible(t._childVisible=!1)}),t):t},childVisible:function(e){var t=this;return void 0===e?t._childVisible:e===t._childVisible?t:(t._childVisible===!0?t.showChild():t.hideChild(),t)}},main:function(e,t,i){var n=e.D;t.items&&(e.items=t.items),n.icon||e.initIcon(),n.text||i.append(n.text=newDiv("_text"))}}),Std.ui.module("Menu",{parent:"widget",events:"itemPress",option:{defaultClass:"StdUI_Menu",level:1,width:"auto",height:"auto",items:null,root:null},"private":{currentItem:null},extend:{render:function(){var e=this;e.items.each(function(e,t){t.render()})},visible:function(e){var t=this;e===!0?t[0].css("zIndex",++Std.ui.status.zIndex):(t.select(!1),t.items.each(function(e,t){t._childVisible&&t.hideChild()}))},remove:function(e){var t=this,i=t.items;if(void 0===e)i.each(function(e,t){t.remove()});else if(isNumber(e))i[e]&&i[e].remove()&&i.remove(e);else if(isWidget(e)){var n=i.indexOf(e);-1!==n&&i[n]&&i[n].remove()&&i.remove(n)}}},"protected":{keyEvent:function(e,t,i){var n=this,r=0,s=n.items,o=n.parent(),u=function(e){return!e.enable()||"MenuItem"!==e.ui};if(13===e)n.root().emit("itemPress",t.emit("press"));else if(27===e)isWidget(o)&&(n.hide(),"MenuItem"===o.ui?o.parent().focus():o.focus());else{if(37===e)return t.hideChild(),o&&"MenuItem"===o.ui&&(o.focus().hideChild(),o.parent().focus()),!1;if(38===e)return function(e){++r>s.length||(e=--e<0?s.length-1:e,u(s[e])?arguments.callee(e):n.select(e))}(i),!1;if(39===e)return t.menu&&(t.showChild(),t.menu.focus().select(0)),!1;if(40===e)return function(e){++r>s.length||(e=++e>=s.length?0:e,u(s[e])?arguments.callee(e):n.select(e))}(i),!1}},initKeyboard:function(){var e=this;return e[0].on({contextmenu:Std.func(!1),keydown:function(t){var i=e._currentItem,n=e.items.indexOf(i);return-1!=n?e.keyEvent(t.keyCode,i,n):void 0}}),e},initEvents:function(){var e=this,t=!1;return e[0].delegate("mouseenter mouseleave mousedown click",".StdUI_MenuItem",function(i){var n=e.items[this.index()],r=i.name;t===!1&&e[0].unselect(t=!0),n.enable()&&"sep"!==n.ui&&("click"===r?e.root().emit("itemPress",n.emit("press")):"mousedown"===r?i.stopPropagation():"mouseenter"==r?e.select(n):"mouseleave"!=r||n.childVisible()||e.select(!1))}),e},createItem:function(e){var t=null,i=this.root();return isString(e)?t=Std.ui("MenuItem",{text:e,root:i}):isWidget(e)?t=e:isObject(e)&&(e.root=i,t=Std.ui(e.ui||"MenuItem",e)),t}},"public":{each:function(e){return Std.each(this.items,e)},root:function(e){var t=this,i=t.opts;return void 0===e?i.root||t:(i.root=e,t)},select:function(e){var t=this;return e===t._currentItem?t:(t._currentItem&&(t._currentItem.removeClass("selected").hideChild(!1),t._currentItem=null),e===!1?t:(isNumber(e)&&(e=t.items[e]),isWidget(e)&&"MenuItem"===e.ui&&e.enable()?((t._currentItem=e.addClass("selected")).D.open&&e.showChild(),t):t))},insert:function(e,t){var i=this,n=i.createItem(e);return isWidget(n)&&(i[0].insert(n[0],t),i.renderState&&n.render(),i.items.insert(n.parent(i),t)),i},append:Std.func(function(e){this.insert(e)},{each:[isArray]})},main:function(e,t){e.items=[],null!=t.items&&e.append(t.items),e.initEvents(),e.initKeyboard()}});
+/**
+ *  MenuItem widget module
+*/
+Std.ui.module("MenuItem",{
+    /*[#module option:parent]*/
+    parent:"Item",
+    /*[#module option:action]*/
+    action:{
+        content:"text",
+        children:"append"
+    },
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_MenuItem",
+        text:"menu item",
+        items:null,
+        root:null
+    },
+    /*[#module option:private]*/
+    private:{
+        /*
+         * child visible state
+        */
+        childVisible:false
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * extend render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            if(opts.items !== null){
+                that.D.open = newDiv("_open").appendTo(that[0]);
+            }
+        },
+        /*
+         * extend remove
+        */
+        remove:function(data){
+            var that = this;
+
+            that.menu  && that.menu.remove(data);
+            that.items && that.items.clear();
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * root
+         */
+        root:function(root){
+            var that = this;
+            var opts = that.opts;
+
+            if(root === undefined){
+                return opts.root || that;
+            }
+            opts.root = root;
+            return that;
+        },
+        /*
+         * insert
+        */
+        insert:function(data,index){
+            var that = this;
+            var doms = that.D;
+
+            if(that.menu){
+                that.menu.insert(data,index);
+            }else{
+                if(!that.items){
+                    that.items = [];
+                }
+                that.items.insert(data,index);
+            }
+            if(!doms.open){
+                doms.open = newDiv("_open").appendTo(that[0]);
+            }
+            return that;
+        },
+        /*
+         * append
+        */
+        append:Std.func(function(data){
+            return this.insert(data);
+        },{
+            each:[isArray]
+        }),
+        /*
+         * show child menu
+        */
+        showChild:function(){
+            var that   = this;
+            var offset = that[0].offset();
+
+            if(that._childVisible){
+                return that;
+            }
+            if(!that.menu){
+                that.menu = Std.ui("Menu",{
+                    parent:that,
+                    items:that.items,
+                    root:that.root(),
+                    renderTo:"body"
+                });
+            }
+
+            //------show menu and set style
+            that.menu.visible(that._childVisible = true).toForeground();
+            that.menu[0].css({
+                position:"absolute",
+                left:offset.x + that.width(),
+                top:offset.y,
+                margin:0
+            });
+
+            return that;
+        },
+        /*
+         * hide child menu
+        */
+        hideChild:function(useAnimate){
+            var that = this;
+
+            if(!that.menu){
+                return that;
+            }
+            if(useAnimate === false){
+                that.menu.visible(that._childVisible = false);
+            }else{
+                that.menu[0].animate("end").animate({
+                    to:{
+                        opacity:0
+                    }
+                },100,function(){
+                    that.menu.visible(that._childVisible = false);
+                });
+            }
+            return that;
+        },
+        /*
+         * children visible
+        */
+        childVisible:function(state){
+            var that = this;
+
+            //------
+            if(state === undefined){
+                return that._childVisible;
+            }
+            if(state === that._childVisible){
+                return that;
+            }
+            if(that._childVisible === true){
+                that.showChild();
+            }else{
+                that.hideChild();
+            }
+            return that;
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        var doms = that.D;
+
+        //------
+        if(opts.items){
+            that.items = opts.items;
+        }
+        if(!doms.icon){
+            that.initIcon();
+        }
+        if(!doms.text){
+            dom.append(doms.text = newDiv("_text"));
+        }
+    }
+});
+
+/**
+ * menu widget module
+*/
+Std.ui.module("Menu",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"itemPress",
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_Menu",
+        level:1,
+        width:"auto",
+        height:"auto",
+        items:null,
+        root:null
+    },
+    /*[#module option:private]*/
+    private:{
+        currentItem:null
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+
+            that.items.each(function(i,item){
+                item.render();
+            });
+        },
+        /*
+         * extend visible
+        */
+        visible:function(status){
+            var that = this;
+
+            if(status === true){
+                that[0].css("zIndex",++Std.ui.status.zIndex);
+            }else{
+                that.select(false);
+                that.items.each(function(i,item){
+                    if(item._childVisible){
+                        item.hideChild();
+                    }
+                });
+            }
+        },
+        /*
+         * extend remove
+        */
+        remove:function(data){
+            var that  = this;
+            var items = that.items;
+
+            //------data is undefined
+            if(data === undefined){
+                items.each(function(i,item){
+                    item.remove();
+                });
+            }else if(isNumber(data)){
+                items[data] && items[data].remove() && items.remove(data);
+            }else if(isWidget(data)){
+                var index = items.indexOf(data);
+                if(index !== -1){
+                    items[index] && items[index].remove() && items.remove(index);
+                }
+            }
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * key event
+        */
+        keyEvent:function(keyCode,currentItem,index){
+            var that   = this;
+            var jump   = 0;
+            var items  = that.items;
+            var parent = that.parent();
+            var check  = function(item){
+                return !item.enable() || item.ui !== "MenuItem";
+            };
+
+            //-----enter key
+            if(keyCode === 13){
+                that.root().emit("itemPress",currentItem.emit("press"));
+            }
+            //-----esc key
+            else if(keyCode === 27){
+                if(isWidget(parent)){
+                    that.hide();
+                    if(parent.ui === "MenuItem"){
+                        parent.parent().focus();
+                    }else{
+                        parent.focus();
+                    }
+                }
+            }
+            //-----left key
+            else if(keyCode === 37){
+                currentItem.hideChild();
+                if(parent && parent.ui === "MenuItem"){
+                    parent.focus().hideChild();
+                    parent.parent().focus();
+                }
+                return false;
+            }
+            //-----up key
+            else if(keyCode === 38){
+                (function(i){
+                    if(++jump > items.length){
+                        return;
+                    }
+                    i = --i < 0 ? items.length - 1 : i;
+                    check(items[i]) ? arguments.callee(i) : that.select(i);
+                })(index);
+                return false;
+            }
+            //-----right key
+            else if(keyCode === 39){
+                if(currentItem.menu){
+                    currentItem.showChild();
+                    currentItem.menu.focus().select(0);
+                }
+                return false;
+            }
+            //-----right key
+            else if(keyCode === 40){
+                (function(i){
+                    if(++jump > items.length){
+                        return;
+                    }
+                    i = ++i >= items.length ? 0 : i;
+                    check(items[i]) ? arguments.callee(i) : that.select(i);
+                })(index);
+                return false;
+            }
+        },
+        /*
+         * init keyboard
+        */
+        initKeyboard:function(){
+            var that = this;
+
+            that[0].on({
+                contextmenu:Std.func(false),
+                keydown:function(e){
+                    var currentItem = that._currentItem;
+                    var index       = that.items.indexOf(currentItem);
+
+                    if(index == -1){
+                        return;
+                    }
+                    return that.keyEvent(e.keyCode,currentItem,index);
+                }
+            });
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that  = this;
+            var state = false;
+
+            that[0].delegate("mouseenter mouseleave mousedown click",".StdUI_MenuItem",function(e){
+                var item      = that.items[this.index()];
+                var eventName = e.name;
+
+                if(state === false){
+                    that[0].unselect(state = true);
+                }
+                if(!item.enable() || item.ui === "sep"){
+                    return;
+                }
+
+                //-------events
+                if(eventName === "click"){
+                    that.root().emit("itemPress",item.emit("press"));
+                }else if(eventName === "mousedown"){
+                    e.stopPropagation();
+                }else if(eventName == "mouseenter"){
+                    that.select(item);
+                }else if(eventName == "mouseleave" && !item.childVisible()){
+                    that.select(false);
+                }
+            });
+            return that;
+        },
+        /*
+         * create item
+        */
+        createItem:function(data){
+            var item = null;
+            var root = this.root();
+
+            if(isString(data)){
+                item = Std.ui("MenuItem",{
+                    text:data,
+                    root:root
+                });
+            }else if(isWidget(data)){
+                item = data;
+            }else if(isObject(data)){
+                data.root = root;
+                item = Std.ui(data.ui || "MenuItem",data);
+            }
+            return item;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * each
+        */
+        each:function(callback){
+            return Std.each(this.items,callback)
+        },
+        /*
+         * root
+        */
+        root:function(root){
+            var that = this;
+            var opts = that.opts;
+
+            if(root === undefined){
+                return opts.root || that;
+            }
+            opts.root = root;
+            return that;
+        },
+        /*
+         * select
+        */
+        select:function(item){
+            var that = this;
+
+            if(item === that._currentItem){
+                return that;
+            }
+            if(that._currentItem){
+                that._currentItem.removeClass("selected").hideChild(false);
+                that._currentItem = null;
+            }
+            if(item === false){
+                return that;
+            }
+            if(isNumber(item)){
+                item = that.items[item];
+            }
+            if(!isWidget(item) || item.ui !== "MenuItem" || !item.enable()){
+                return that;
+            }
+            if((that._currentItem = item.addClass("selected")).D.open){
+                item.showChild();
+            }
+            return that;
+        },
+        /*
+         * insert item
+        */
+        insert:function(data,index){
+            var that = this;
+            var item = that.createItem(data);
+
+            if(isWidget(item)){
+                that[0].insert(item[0],index);
+
+                if(that.renderState){
+                    item.render();
+                }
+                that.items.insert(item.parent(that),index);
+            }
+            return that;
+        },
+        /*
+         * append item
+        */
+        append:Std.func(function(data){
+            this.insert(data);
+        },{
+            each:[isArray]
+        })
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that.items = [];
+
+        if(opts.items != null){
+            that.append(opts.items);
+        }
+
+        that.initEvents();
+        that.initKeyboard();
+    }
+});

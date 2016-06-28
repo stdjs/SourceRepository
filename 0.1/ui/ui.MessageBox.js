@@ -1,1 +1,472 @@
-Std.ui.module("MessageBox",{parent:"widget",events:"ok cancel close yes no abort retry ignore disagree apply buttonClick",option:{defaultClass:"StdUI_MessageBox",boxSizing:"border-box",renderTo:"body",type:"information",acceptEsc:!0,closable:!0,draggable:!0,title:null,value:null,icon:"auto",iconClass:"auto",text:"null",timeout:0,buttons:"ok",buttonsAlign:"right",inputType:null,inputWidth:"auto",inputHeight:"auto",detailedText:"",defaultButton:"ok",informativeText:null,tabIndex:9},"private":{hasIcon:!1,hasDetail:!1,hasInformativeText:!1},extend:{render:function(){var t=this,n=t.opts;t.initLocker(),t[0].css("zIndex",++Std.ui.status.zIndex),null!==t.input?(t.input.renderTo(t.D.BodyClientContentInput),t.input.focus(100)):n.defaultButton?t.defaultButton(n.defaultButton):t.focus(),t.updateLayout(),t.move("central")},remove:function(){var t=this,n=t._locker;n&&n.remove(),Std.dom(window).off("keyup",t._keyupHandle)}},"protected":{input:null,initIcon:function(){var t=this;return t.D.BodyClient.prepend(t.D.BodyClientIcon=newDiv("_icon")),t},initKeyboard:function(){var t=this,n=t.opts;return Std.dom(window).on("keyup",t._keyupHandle||(t._keyupHandle=function(e){var i=Std.dom(e.target),o=e.keyCode;if(27===o&&n.acceptEsc)t.remove();else if(39===o);else if(40===o);else if((13==o||32==o)&&i.hasClass("_button")){var u=t._buttons[t._defaultButton];u&&u.emit("click")}})),t},initEvents:function(){var t=this,n=!1;t[0].on("mousedown",function(t){t.stopPropagation()}).focussing(function(){n===!1&&(n=!0,t.initKeyboard()),t[0].css("zIndex",++Std.ui.status.zIndex)},null,!1)},initLocker:function(){var t=this,n="black",e=.1,i=t[0].offsetParent();switch(t.opts.type){case"warning":n="#FF8142",e=.6;break;case"error":n="#FF0505",e=.3;break;case"question":n="#4692D7",e=.2;break;case"success":n="#0CF4AB"}return t._locker=Std.ui("locker",{renderTo:i.contains("body")?"body":i,opacity:e,visible:!0,background:n}),t}},"public":{title:function(t){return this.opt("title",t,function(){this.D.TitleText.html(t)})},text:function(t){return this.opt("text",t,function(){this.D.BodyClientContentText.html(t)})},timeout:function(t){var n=this;return n.opt("timeout",t,function(){Std.func(function(){n.remove()},{delay:t})()})},updateLayout:function(){var t=this,n=t.opts,e=t.D;if("left"!=n.buttonsAlign){var i=e.Buttons.offsetWidth()-e.ButtonGroup.offsetWidth()-2;("warning"==n.type||"center"==n.buttonsAlign)&&(i/=2),e.ButtonSpacing.width(i)}},icon:function(t){var n=this;return n.opt("icon",t,function(){n.D.BodyClientIcon||(n.initIcon(),n.D.BodyClientIcon.html(newDom("img").attr("src",t)))})},iconClass:function(t){var n=this;return n.opt("icon",t,function(){n.D.BodyClientIcon||(n.initIcon(),n.D.BodyClientIcon.className("_icon "+t))})},value:function(t){var n=this,e=n.opts,i=n.input;return void 0===t?i?i.value():e.value:(i&&i.value(t),e.value=t,n)},informativeText:function(t){var n=this;return n.opt("informativeText",t,function(){n._hasInformativeText||(n._hasInformativeText=!0,n.D.BodyClientContent.prepend(n.D.InformativeText=newDiv("_informativeText"))),n.D.InformativeText.html(t)})},inputType:function(t){var n=this;return n.opt("inputType",t,function(){null!==n.input&&n.input.remove(),n.input=Std.ui(t,{width:n.opts.inputWidth,height:n.opts.inputHeight,value:n.value()})})},buttons:Std.func(function(t){var n=this;if(isString(t)){n._buttons[t]&&n._buttons[t].remove();var e=newDiv("_button").mouse({unselect:!0}).html(t.toUpperCase()).attr({tabindex:0,buttonName:t}).on("click",function(){n.emit(t),n.emit("buttonClick",t),n.remove()});n.D.ButtonGroup.append(n._buttons[t]=e)}},{each:[isArray,isString]}),defaultButton:function(t){var n=this;if(void 0==t)return n._defaultButton;var e=n._buttons[n._defaultButton=t];return e&&e.focus(),n},detailedText:function(t){var n=this;return void 0==t?n.D.Detail.html():(n._hasDetail||(n._hasDetail=!0,n.D.Body.append(n.D.Detail=newDiv("_detail"))),n.D.Detail.html(t),n)},closable:function(t){var n=this,e=n.D;return n.opt("closable",t,function(){e.TitleButtons_Close&&e.TitleButtons_Close.remove(),t!==!1&&e.TitleButtons.append(e.TitleButtons_Close=newDiv("_button _close").mouse({down:function(){return!1},click:function(){n.remove()}}))})},draggable:function(t){var n=this;return n.opt("draggable",t,function(){n.plugin("drag")||n.plugin("drag",{handle:n.D.Title}),n.plugin("drag").draggable(t)})}},main:function(t,n,e){t._buttons=[],t.D={Title:newDiv("_title"),TitleText:newDiv("_text"),TitleButtons:newDiv("_buttons"),Body:newDiv("_body"),BodyClient:newDiv("_client"),BodyClientContent:newDiv("_content"),BodyClientContentText:newDiv("_text"),BodyClientContentInput:newDiv("_input"),Buttons:newDiv("_buttons"),ButtonSpacing:newDiv("_buttonSpacing"),ButtonGroup:newDiv("_buttonGroup")},t.D.Title.append([t.D.TitleText,t.D.TitleButtons]),t.D.Body.append([t.D.BodyClient,t.D.Buttons.append([t.D.ButtonSpacing,t.D.ButtonGroup]),t.D.Detail]),t.D.BodyClient.append(t.D.BodyClientContent),t.D.BodyClientContent.append([t.D.BodyClientContentText,t.D.BodyClientContentInput]),e.append([t.D.Title,t.D.Body]),t.title(null===n.title?n.type:n.title),"none"!==n.type&&(t.iconClass(n.type),e.addClass("_"+n.type)),null===n.informativeText&&"warning"==n.type&&(n.informativeText="warning"),t.call_opts({icon:"auto",iconClass:"auto",text:"",buttons:"",timeout:0,draggable:!1,closable:!1,inputType:null,detailedText:"",informativeText:null},!0),t.initEvents()}});
+/**
+ * MessageBox widget module
+ * fixme:type:error,IE css 兼容性未处理
+*/
+Std.ui.module("MessageBox",{
+    /*[#module option:parent]*/
+    parent:"widget",
+    /*[#module option:events]*/
+    events:"ok cancel close yes no abort retry ignore disagree apply buttonClick",
+    /*[#module option:option]*/
+    option:{
+        defaultClass:"StdUI_MessageBox",
+        boxSizing:"border-box",
+        renderTo:"body",
+        type:"information",   //information warning error question
+        acceptEsc:true,
+        closable:true,
+        draggable:true,
+        title:null,
+        value:null,
+        icon:"auto",
+        iconClass:"auto",
+        text:"null",
+        timeout:0,
+        buttons:"ok",
+        buttonsAlign:"right",
+        inputType:null,
+        inputWidth:"auto",
+        inputHeight:"auto",
+        detailedText:"",
+        defaultButton:"ok",
+        informativeText:null,
+        tabIndex:9
+    },
+    /*[#module option:private]*/
+    private:{
+        hasIcon:false,
+        hasDetail:false,
+        hasInformativeText:false
+    },
+    /*[#module option:extend]*/
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.initLocker();
+            that[0].css("zIndex",++Std.ui.status.zIndex);
+
+            if(that.input !== null){
+                that.input.renderTo(that.D.BodyClientContentInput);
+                that.input.focus(100);
+            }else if(opts.defaultButton){
+                that.defaultButton(opts.defaultButton);
+            }else{
+                that.focus();
+            }
+            that.updateLayout();
+            that.move("central");
+        },
+        /*
+         * extend remove
+        */
+        remove:function(){
+            var that   = this;
+            var locker = that._locker;
+
+            if(locker){
+                locker.remove();
+            }
+            Std.dom(window).off("keyup",that._keyupHandle);
+        }
+    },
+    /*[#module option:protected]*/
+    protected:{
+        /*
+         * input
+         */
+        input:null,
+        /*
+         * init icon
+        */
+        initIcon:function(){
+            var that = this;
+
+            that.D.BodyClient.prepend(that.D.BodyClientIcon = newDiv("_icon"));
+
+            return that;
+        },
+        /*
+         * init keyboard
+        */
+        initKeyboard:function(){
+            var that = this;
+            var opts = that.opts;
+
+            Std.dom(window).on("keyup",that._keyupHandle || (that._keyupHandle = function(e){
+                var target  = Std.dom(e.target);
+                var keyCode = e.keyCode;
+
+                if(keyCode === 27 && opts.acceptEsc){
+                    that.remove();
+                }
+                //-----right key
+                else if(keyCode === 39){
+
+                }
+                //-----left key
+                else if(keyCode === 40){
+
+                }
+                //-----center and space
+                else if((keyCode == 13 || keyCode == 32) && target.hasClass("_button")){
+                    var button = that._buttons[that._defaultButton];
+                    button && button.emit("click")
+                }
+            }));
+            return that;
+        },
+        /*
+         * init events
+        */
+        initEvents:function(){
+            var that  = this;
+            var state = false;
+
+            that[0].on("mousedown",function(e){
+                e.stopPropagation();
+            }).focussing(function(e){
+                if(state === false){
+                    state = true;
+                    that.initKeyboard();
+                }
+                that[0].css("zIndex",++Std.ui.status.zIndex);
+            },null,false);
+        },
+        /*
+         * init locker
+        */
+        initLocker:function(){
+            var that    = this;
+            var color   = "black";
+            var opacity = 0.1;
+            var parent  = that[0].offsetParent();
+
+            switch(that.opts.type){
+                case "warning":
+                    color   = "#FF8142";
+                    opacity = 0.6;
+                    break;
+                case "error":
+                    color   = "#FF0505";
+                    opacity = 0.3;
+                    break;
+                case "question":
+                    color   = "#4692D7";
+                    opacity = 0.2;
+                    break;
+                case "success":
+                    color   = "#0CF4AB";
+                    break;
+            }
+
+            that._locker = Std.ui("locker",{
+                renderTo:parent.contains("body") ? "body" : parent,
+                opacity :opacity,
+                visible :true,
+                background:color
+            });
+            return that;
+        }
+    },
+    /*[#module option:public]*/
+    public:{
+        /*
+         * message box title
+        */
+        title:function(title){
+            return this.opt("title",title,function(){
+                this.D.TitleText.html(title);
+            });
+        },
+        /*
+         * text
+        */
+        text:function(text){
+            return this.opt("text",text,function(){
+                this.D.BodyClientContentText.html(text);
+            });
+        },
+        /*
+         * timeout
+        */
+        timeout:function(ms){
+            var that = this;
+
+            return that.opt("timeout",ms,function(){
+                Std.func(function(){
+                    that.remove();
+                },{
+                    delay:ms
+                })();
+            });
+        },
+        /*
+         * update layout
+        */
+        updateLayout:function(){
+            var that = this;
+            var opts = that.opts;
+            var doms = that.D;
+
+            if(opts.buttonsAlign != "left"){
+                var width = doms.Buttons.offsetWidth() - doms.ButtonGroup.offsetWidth() - 2;
+                if(opts.type == "warning" || opts.buttonsAlign == "center"){
+                    width /= 2;
+                }
+                doms.ButtonSpacing.width(width);
+            }
+        },
+        /*
+         * title icon
+        */
+        icon:function(icon){
+            var that = this;
+
+            return that.opt("icon",icon,function(){
+                if(!that.D.BodyClientIcon){
+                    that.initIcon();
+                    that.D.BodyClientIcon.html(
+                        newDom("img").attr("src",icon)
+                    );
+                }
+            });
+        },
+        /*
+         * icon class
+        */
+        iconClass:function(className){
+            var that = this;
+
+            return that.opt("icon",className,function(){
+                if(!that.D.BodyClientIcon){
+                    that.initIcon();
+                    that.D.BodyClientIcon.className("_icon " + className);
+                }
+            });
+        },
+        /*
+         * value
+        */
+        value:function(value){
+            var that  = this;
+            var opts  = that.opts;
+            var input = that.input;
+
+            if(value === undefined){
+                return input ? input.value() : opts.value;
+            }
+            input && input.value(value);
+            opts.value = value;
+
+            return that;
+        },
+        /*
+         * informative text
+        */
+        informativeText:function(text){
+            var that = this;
+
+            return that.opt("informativeText",text,function(){
+                if(!that._hasInformativeText){
+                    that._hasInformativeText = true;
+                    that.D.BodyClientContent.prepend(that.D.InformativeText = newDiv("_informativeText"));
+                }
+                that.D.InformativeText.html(text);
+            });
+        },
+        /*
+         * input type
+        */
+        inputType:function(type){
+            var that = this;
+
+            return that.opt("inputType",type,function(){
+                if(that.input !== null){
+                    that.input.remove();
+                }
+                that.input = Std.ui(type,{
+                    width:that.opts.inputWidth,
+                    height:that.opts.inputHeight,
+                    value:that.value()
+                });
+            });
+        },
+        /*
+         * buttons
+        */
+        buttons:Std.func(function(buttonName){
+            var that = this;
+
+            if(isString(buttonName)){
+                if(that._buttons[buttonName]){
+                    that._buttons[buttonName].remove();
+                }
+                var button = newDiv("_button").mouse({
+                    unselect:true
+                }).html(buttonName.toUpperCase()).attr({
+                    tabindex:0,
+                    buttonName:buttonName
+                }).on("click",function(){
+                    that.emit(buttonName);
+                    that.emit("buttonClick",buttonName);
+                    that.remove();
+                });
+
+                that.D.ButtonGroup.append(that._buttons[buttonName] = button);
+            }
+        },{
+            each:[isArray,isString]
+        }),
+        /*
+         * default button
+        */
+        defaultButton:function(name){
+            var that = this;
+            if(name == undefined){
+                return that._defaultButton;
+            }
+
+            var defaultButton = that._buttons[that._defaultButton = name];
+            if(defaultButton){
+                defaultButton.focus();
+            }
+            return that;
+        },
+        /*
+         * detailed text
+        */
+        detailedText:function(text){
+            var that = this;
+            if(text == undefined){
+                return that.D.Detail.html();
+            }
+            if(!that._hasDetail){
+                that._hasDetail = true;
+                that.D.Body.append(that.D.Detail = newDiv("_detail"));
+            }
+            that.D.Detail.html(text);
+
+            return that;
+        },
+        /*
+         * closable
+        */
+        closable:function(closable){
+            var that = this;
+            var doms = that.D;
+
+            return that.opt("closable",closable,function(){
+                if(doms.TitleButtons_Close){
+                    doms.TitleButtons_Close.remove();
+                }
+                if(closable === false){
+                    return;
+                }
+                doms.TitleButtons.append(
+                    doms.TitleButtons_Close = newDiv("_button _close").mouse({
+                        down:function(){
+                            return false;
+                        },
+                        click:function(){
+                            that.remove();
+                        }
+                    })
+                );
+            });
+        },
+        /*
+         * draggable
+        */
+        draggable:function(state){
+            var that = this;
+
+            return that.opt("draggable",state,function(){
+                if(!that.plugin("drag")){
+                    that.plugin("drag",{
+                        handle:that.D.Title
+                    });
+                }
+                that.plugin("drag").draggable(state);
+            });
+        }
+    },
+    /*[#module option:main]*/
+    main:function(that,opts,dom){
+        that._buttons = [];
+
+        that.D = {
+            Title:newDiv("_title"),
+            TitleText:newDiv("_text"),
+            TitleButtons:newDiv("_buttons"),
+
+            Body:newDiv("_body"),
+            BodyClient:newDiv("_client"),
+            BodyClientContent:newDiv("_content"),
+            BodyClientContentText:newDiv("_text"),
+            BodyClientContentInput:newDiv("_input"),
+
+            Buttons:newDiv("_buttons"),
+            ButtonSpacing:newDiv("_buttonSpacing"),
+            ButtonGroup:newDiv("_buttonGroup")
+        };
+
+        //--------
+        that.D.Title.append([
+            that.D.TitleText,
+            that.D.TitleButtons
+        ]);
+
+        that.D.Body.append([
+            that.D.BodyClient,
+            that.D.Buttons.append([that.D.ButtonSpacing,that.D.ButtonGroup]),
+            that.D.Detail
+        ]);
+
+        that.D.BodyClient.append(that.D.BodyClientContent);
+        that.D.BodyClientContent.append([
+            that.D.BodyClientContentText,
+            that.D.BodyClientContentInput
+        ]);
+
+        //--------
+        dom.append([that.D.Title,that.D.Body]);
+
+        //--------
+        if(opts.title === null){
+            that.title(opts.type);
+        }else{
+            that.title(opts.title);
+        }
+
+        //--------
+        if(opts.type !== "none"){
+            that.iconClass(opts.type);
+            dom.addClass("_" + opts.type);
+        }
+
+        //--------
+        if(opts.informativeText === null && opts.type == "warning"){
+            opts.informativeText = "warning";
+        }
+
+        that.call_opts({
+            icon:"auto",
+            iconClass:"auto",
+            text:"",
+            buttons:"",
+            timeout:0,
+            draggable:false,
+            closable:false,
+            inputType:null,
+            detailedText:"",
+            informativeText:null
+        },true);
+
+        that.initEvents();
+    }
+});

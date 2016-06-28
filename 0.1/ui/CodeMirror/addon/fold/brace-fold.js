@@ -1,1 +1,105 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror")):"function"==typeof define&&define.amd?define(["../../lib/codemirror"],e):e(CodeMirror)}(function(e){"use strict";e.registerHelper("fold","brace",function(r,n){function t(t){for(var i=n.ch,s=0;;){var u=0>=i?-1:f.lastIndexOf(t,i-1);if(-1!=u){if(1==s&&u<n.ch)break;if(o=r.getTokenTypeAt(e.Pos(l,u+1)),!/^(comment|string)/.test(o))return u+1;i=u-1}else{if(1==s)break;s=1,i=f.length}}}var i,o,l=n.line,f=r.getLine(l),s="{",u="}",i=t("{");if(null==i&&(s="[",u="]",i=t("[")),null!=i){var a,d,c=1,g=r.lastLine();e:for(var v=l;g>=v;++v)for(var p=r.getLine(v),m=v==l?i:0;;){var P=p.indexOf(s,m),k=p.indexOf(u,m);if(0>P&&(P=p.length),0>k&&(k=p.length),m=Math.min(P,k),m==p.length)break;if(r.getTokenTypeAt(e.Pos(v,m+1))==o)if(m==P)++c;else if(!--c){a=v,d=m;break e}++m}if(null!=a&&(l!=a||d!=i))return{from:e.Pos(l,i),to:e.Pos(a,d)}}}),e.registerHelper("fold","import",function(r,n){function t(n){if(n<r.firstLine()||n>r.lastLine())return null;var t=r.getTokenAt(e.Pos(n,1));if(/\S/.test(t.string)||(t=r.getTokenAt(e.Pos(n,t.end+1))),"keyword"!=t.type||"import"!=t.string)return null;for(var i=n,o=Math.min(r.lastLine(),n+10);o>=i;++i){var l=r.getLine(i),f=l.indexOf(";");if(-1!=f)return{startCh:t.end,end:e.Pos(i,f)}}}var i,n=n.line,o=t(n);if(!o||t(n-1)||(i=t(n-2))&&i.end.line==n-1)return null;for(var l=o.end;;){var f=t(l.line+1);if(null==f)break;l=f.end}return{from:r.clipPos(e.Pos(n,o.startCh+1)),to:l}}),e.registerHelper("fold","include",function(r,n){function t(n){if(n<r.firstLine()||n>r.lastLine())return null;var t=r.getTokenAt(e.Pos(n,1));return/\S/.test(t.string)||(t=r.getTokenAt(e.Pos(n,t.end+1))),"meta"==t.type&&"#include"==t.string.slice(0,8)?t.start+8:void 0}var n=n.line,i=t(n);if(null==i||null!=t(n-1))return null;for(var o=n;;){var l=t(o+1);if(null==l)break;++o}return{from:e.Pos(n,i+1),to:r.clipPos(e.Pos(o))}})});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.registerHelper("fold", "brace", function(cm, start) {
+  var line = start.line, lineText = cm.getLine(line);
+  var startCh, tokenType;
+
+  function findOpening(openCh) {
+    for (var at = start.ch, pass = 0;;) {
+      var found = at <= 0 ? -1 : lineText.lastIndexOf(openCh, at - 1);
+      if (found == -1) {
+        if (pass == 1) break;
+        pass = 1;
+        at = lineText.length;
+        continue;
+      }
+      if (pass == 1 && found < start.ch) break;
+      tokenType = cm.getTokenTypeAt(CodeMirror.Pos(line, found + 1));
+      if (!/^(comment|string)/.test(tokenType)) return found + 1;
+      at = found - 1;
+    }
+  }
+
+  var startToken = "{", endToken = "}", startCh = findOpening("{");
+  if (startCh == null) {
+    startToken = "[", endToken = "]";
+    startCh = findOpening("[");
+  }
+
+  if (startCh == null) return;
+  var count = 1, lastLine = cm.lastLine(), end, endCh;
+  outer: for (var i = line; i <= lastLine; ++i) {
+    var text = cm.getLine(i), pos = i == line ? startCh : 0;
+    for (;;) {
+      var nextOpen = text.indexOf(startToken, pos), nextClose = text.indexOf(endToken, pos);
+      if (nextOpen < 0) nextOpen = text.length;
+      if (nextClose < 0) nextClose = text.length;
+      pos = Math.min(nextOpen, nextClose);
+      if (pos == text.length) break;
+      if (cm.getTokenTypeAt(CodeMirror.Pos(i, pos + 1)) == tokenType) {
+        if (pos == nextOpen) ++count;
+        else if (!--count) { end = i; endCh = pos; break outer; }
+      }
+      ++pos;
+    }
+  }
+  if (end == null || line == end && endCh == startCh) return;
+  return {from: CodeMirror.Pos(line, startCh),
+          to: CodeMirror.Pos(end, endCh)};
+});
+
+CodeMirror.registerHelper("fold", "import", function(cm, start) {
+  function hasImport(line) {
+    if (line < cm.firstLine() || line > cm.lastLine()) return null;
+    var start = cm.getTokenAt(CodeMirror.Pos(line, 1));
+    if (!/\S/.test(start.string)) start = cm.getTokenAt(CodeMirror.Pos(line, start.end + 1));
+    if (start.type != "keyword" || start.string != "import") return null;
+    // Now find closing semicolon, return its position
+    for (var i = line, e = Math.min(cm.lastLine(), line + 10); i <= e; ++i) {
+      var text = cm.getLine(i), semi = text.indexOf(";");
+      if (semi != -1) return {startCh: start.end, end: CodeMirror.Pos(i, semi)};
+    }
+  }
+
+  var start = start.line, has = hasImport(start), prev;
+  if (!has || hasImport(start - 1) || ((prev = hasImport(start - 2)) && prev.end.line == start - 1))
+    return null;
+  for (var end = has.end;;) {
+    var next = hasImport(end.line + 1);
+    if (next == null) break;
+    end = next.end;
+  }
+  return {from: cm.clipPos(CodeMirror.Pos(start, has.startCh + 1)), to: end};
+});
+
+CodeMirror.registerHelper("fold", "include", function(cm, start) {
+  function hasInclude(line) {
+    if (line < cm.firstLine() || line > cm.lastLine()) return null;
+    var start = cm.getTokenAt(CodeMirror.Pos(line, 1));
+    if (!/\S/.test(start.string)) start = cm.getTokenAt(CodeMirror.Pos(line, start.end + 1));
+    if (start.type == "meta" && start.string.slice(0, 8) == "#include") return start.start + 8;
+  }
+
+  var start = start.line, has = hasInclude(start);
+  if (has == null || hasInclude(start - 1) != null) return null;
+  for (var end = start;;) {
+    var next = hasInclude(end + 1);
+    if (next == null) break;
+    ++end;
+  }
+  return {from: CodeMirror.Pos(start, has + 1),
+          to: cm.clipPos(CodeMirror.Pos(end))};
+});
+
+});

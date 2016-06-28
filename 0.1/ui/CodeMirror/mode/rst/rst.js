@@ -1,1 +1,557 @@
-!function(e){"object"==typeof exports&&"object"==typeof module?e(require("../../lib/codemirror"),require("../python/python"),require("../stex/stex"),require("../../addon/mode/overlay")):"function"==typeof define&&define.amd?define(["../../lib/codemirror","../python/python","../stex/stex","../../addon/mode/overlay"],e):e(CodeMirror)}(function(e){"use strict";e.defineMode("rst",function(t,a){var c=/^\*\*[^\*\s](?:[^\*]*[^\*\s])?\*\*/,n=/^\*[^\*\s](?:[^\*]*[^\*\s])?\*/,r=/^``[^`\s](?:[^`]*[^`\s])``/,m=/^(?:[\d]+(?:[\.,]\d+)*)/,o=/^(?:\s\+[\d]+(?:[\.,]\d+)*)/,s=/^(?:\s\-[\d]+(?:[\.,]\d+)*)/,h="[Hh][Tt][Tt][Pp][Ss]?://",l="(?:[\\d\\w.-]+)\\.(?:\\w{2,6})",i="(?:/[\\d\\w\\#\\%\\&\\-\\.\\,\\/\\:\\=\\?\\~]+)*",p=new RegExp("^"+h+l+i),d={token:function(e){if(e.match(c)&&e.match(/\W+|$/,!1))return"strong";if(e.match(n)&&e.match(/\W+|$/,!1))return"em";if(e.match(r)&&e.match(/\W+|$/,!1))return"string-2";if(e.match(m))return"number";if(e.match(o))return"positive";if(e.match(s))return"negative";if(e.match(p))return"link";for(;!(null==e.next()||e.match(c,!1)||e.match(n,!1)||e.match(r,!1)||e.match(m,!1)||e.match(o,!1)||e.match(s,!1)||e.match(p,!1)););return null}},u=e.getMode(t,a.backdrop||"rst-base");return e.overlayMode(u,d,!0)},"python","stex"),e.defineMode("rst-base",function(t){function a(e){var t=Array.prototype.slice.call(arguments,1);return e.replace(/{(\d+)}/g,function(e,a){return"undefined"!=typeof t[a]?t[a]:e})}function c(t,a){var r=null;if(t.sol()&&t.match(V,!1))l(a,s,{mode:d,local:e.startState(d)});else if(t.sol()&&t.match($))l(a,n),r="meta";else if(t.sol()&&t.match(v))l(a,c),r="header";else if(p(a)==P||t.match(P,!1))switch(i(a)){case 0:l(a,c,h(P,1)),t.match(/^:/),r="meta";break;case 1:l(a,c,h(P,2)),t.match(b),r="keyword",t.current().match(/^(?:math|latex)/)&&(a.tmp_stex=!0);break;case 2:l(a,c,h(P,3)),t.match(/^:`/),r="meta";break;case 3:if(a.tmp_stex&&(a.tmp_stex=void 0,a.tmp={mode:u,local:e.startState(u)}),a.tmp){if("`"==t.peek()){l(a,c,h(P,4)),a.tmp=void 0;break}r=a.tmp.mode.token(t,a.tmp.local);break}l(a,c,h(P,4)),t.match(_),r="string";break;case 4:l(a,c,h(P,5)),t.match(/^`/),r="meta";break;case 5:l(a,c,h(P,6)),t.match(k);break;default:l(a,c)}else if(p(a)==z||t.match(z,!1))switch(i(a)){case 0:l(a,c,h(z,1)),t.match(/^`/),r="meta";break;case 1:l(a,c,h(z,2)),t.match(_),r="string";break;case 2:l(a,c,h(z,3)),t.match(/^`:/),r="meta";break;case 3:l(a,c,h(z,4)),t.match(b),r="keyword";break;case 4:l(a,c,h(z,5)),t.match(/^:/),r="meta";break;case 5:l(a,c,h(z,6)),t.match(k);break;default:l(a,c)}else if(p(a)==B||t.match(B,!1))switch(i(a)){case 0:l(a,c,h(B,1)),t.match(/^:/),r="meta";break;case 1:l(a,c,h(B,2)),t.match(b),r="keyword";break;case 2:l(a,c,h(B,3)),t.match(/^:/),r="meta";break;case 3:l(a,c,h(B,4)),t.match(k);break;default:l(a,c)}else if(p(a)==j||t.match(j,!1))switch(i(a)){case 0:l(a,c,h(j,1)),t.match(G),r="variable-2";break;case 1:l(a,c,h(j,2)),t.match(/^_?_?/)&&(r="link");break;default:l(a,c)}else if(t.match(I))l(a,c),r="quote";else if(t.match(A))l(a,c),r="quote";else if(t.match(C))l(a,c),(!t.peek()||t.peek().match(/^\W$/))&&(r="link");else if(p(a)==H||t.match(H,!1))switch(i(a)){case 0:!t.peek()||t.peek().match(/^\W$/)?l(a,c,h(H,1)):t.match(H);break;case 1:l(a,c,h(H,2)),t.match(/^`/),r="link";break;case 2:l(a,c,h(H,3)),t.match(_);break;case 3:l(a,c,h(H,4)),t.match(/^`_/),r="link";break;default:l(a,c)}else t.match(U)?l(a,m):t.next()&&l(a,c);return r}function n(t,a){var m=null;if(p(a)==W||t.match(W,!1))switch(i(a)){case 0:l(a,n,h(W,1)),t.match(G),m="variable-2";break;case 1:l(a,n,h(W,2)),t.match(J);break;case 2:l(a,n,h(W,3)),t.match(K),m="keyword";break;case 3:l(a,n,h(W,4)),t.match(L),m="meta";break;default:l(a,c)}else if(p(a)==M||t.match(M,!1))switch(i(a)){case 0:l(a,n,h(M,1)),t.match(D),m="keyword",t.current().match(/^(?:math|latex)/)?a.tmp_stex=!0:t.current().match(/^python/)&&(a.tmp_py=!0);break;case 1:l(a,n,h(M,2)),t.match(F),m="meta",(t.match(/^latex\s*$/)||a.tmp_stex)&&(a.tmp_stex=void 0,l(a,s,{mode:u,local:e.startState(u)}));break;case 2:l(a,n,h(M,3)),(t.match(/^python\s*$/)||a.tmp_py)&&(a.tmp_py=void 0,l(a,s,{mode:d,local:e.startState(d)}));break;default:l(a,c)}else if(p(a)==S||t.match(S,!1))switch(i(a)){case 0:l(a,n,h(S,1)),t.match(N),t.match(O),m="link";break;case 1:l(a,n,h(S,2)),t.match(Q),m="meta";break;default:l(a,c)}else t.match(q)?(l(a,c),m="quote"):t.match(T)?(l(a,c),m="quote"):(t.eatSpace(),t.eol()?l(a,c):(t.skipToEnd(),l(a,r),m="comment"));return m}function r(e,t){return o(e,t,"comment")}function m(e,t){return o(e,t,"meta")}function o(e,t,a){return e.eol()||e.eatSpace()?(e.skipToEnd(),a):(l(t,c),null)}function s(e,t){return t.ctx.mode&&t.ctx.local?e.sol()?(e.eatSpace()||l(t,c),null):t.ctx.mode.token(e,t.ctx.local):(l(t,c),null)}function h(e,t,a,c){return{phase:e,stage:t,mode:a,local:c}}function l(e,t,a){e.tok=t,e.ctx=a||{}}function i(e){return e.ctx.stage||0}function p(e){return e.ctx.phase}var d=e.getMode(t,"python"),u=e.getMode(t,"stex"),f="\\s+",x="(?:\\s*|\\W|$)",k=new RegExp(a("^{0}",x)),w="(?:[^\\W\\d_](?:[\\w!\"#$%&'()\\*\\+,\\-\\./:;<=>\\?]*[^\\W_])?)",b=new RegExp(a("^{0}",w)),g="(?:[^\\W\\d_](?:[\\w\\s!\"#$%&'()\\*\\+,\\-\\./:;<=>\\?]*[^\\W_])?)",E=a("(?:{0}|`{1}`)",w,g),R="(?:[^\\s\\|](?:[^\\|]*[^\\s\\|])?)",y="(?:[^\\`]+)",_=new RegExp(a("^{0}",y)),v=new RegExp("^([!'#$%&\"()*+,-./:;<=>?@\\[\\\\\\]^_`{|}~])\\1{3,}\\s*$"),$=new RegExp(a("^\\.\\.{0}",f)),S=new RegExp(a("^_{0}:{1}|^__:{1}",E,x)),M=new RegExp(a("^{0}::{1}",E,x)),W=new RegExp(a("^\\|{0}\\|{1}{2}::{3}",R,f,E,x)),q=new RegExp(a("^\\[(?:\\d+|#{0}?|\\*)]{1}",E,x)),T=new RegExp(a("^\\[{0}\\]{1}",E,x)),j=new RegExp(a("^\\|{0}\\|",R)),I=new RegExp(a("^\\[(?:\\d+|#{0}?|\\*)]_",E)),A=new RegExp(a("^\\[{0}\\]_",E)),C=new RegExp(a("^{0}__?",E)),H=new RegExp(a("^`{0}`_",y)),P=new RegExp(a("^:{0}:`{1}`{2}",w,y,x)),z=new RegExp(a("^`{1}`:{0}:{2}",w,y,x)),B=new RegExp(a("^:{0}:{1}",w,x)),D=new RegExp(a("^{0}",E)),F=new RegExp(a("^::{0}",x)),G=new RegExp(a("^\\|{0}\\|",R)),J=new RegExp(a("^{0}",f)),K=new RegExp(a("^{0}",E)),L=new RegExp(a("^::{0}",x)),N=new RegExp("^_"),O=new RegExp(a("^{0}|_",E)),Q=new RegExp(a("^:{0}",x)),U=new RegExp("^::\\s*$"),V=new RegExp("^\\s+(?:>>>|In \\[\\d+\\]:)\\s");return{startState:function(){return{tok:c,ctx:h(void 0,0)}},copyState:function(t){var a=t.ctx,c=t.tmp;return a.local&&(a={mode:a.mode,local:e.copyState(a.mode,a.local)}),c&&(c={mode:c.mode,local:e.copyState(c.mode,c.local)}),{tok:t.tok,ctx:a,tmp:c}},innerMode:function(e){return e.tmp?{state:e.tmp.local,mode:e.tmp.mode}:e.ctx.mode?{state:e.ctx.local,mode:e.ctx.mode}:null},token:function(e,t){return t.tok(e,t)}}},"python","stex"),e.defineMIME("text/x-rst","rst")});
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../python/python"), require("../stex/stex"), require("../../addon/mode/overlay"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../python/python", "../stex/stex", "../../addon/mode/overlay"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+"use strict";
+
+CodeMirror.defineMode('rst', function (config, options) {
+
+  var rx_strong = /^\*\*[^\*\s](?:[^\*]*[^\*\s])?\*\*/;
+  var rx_emphasis = /^\*[^\*\s](?:[^\*]*[^\*\s])?\*/;
+  var rx_literal = /^``[^`\s](?:[^`]*[^`\s])``/;
+
+  var rx_number = /^(?:[\d]+(?:[\.,]\d+)*)/;
+  var rx_positive = /^(?:\s\+[\d]+(?:[\.,]\d+)*)/;
+  var rx_negative = /^(?:\s\-[\d]+(?:[\.,]\d+)*)/;
+
+  var rx_uri_protocol = "[Hh][Tt][Tt][Pp][Ss]?://";
+  var rx_uri_domain = "(?:[\\d\\w.-]+)\\.(?:\\w{2,6})";
+  var rx_uri_path = "(?:/[\\d\\w\\#\\%\\&\\-\\.\\,\\/\\:\\=\\?\\~]+)*";
+  var rx_uri = new RegExp("^" + rx_uri_protocol + rx_uri_domain + rx_uri_path);
+
+  var overlay = {
+    token: function (stream) {
+
+      if (stream.match(rx_strong) && stream.match (/\W+|$/, false))
+        return 'strong';
+      if (stream.match(rx_emphasis) && stream.match (/\W+|$/, false))
+        return 'em';
+      if (stream.match(rx_literal) && stream.match (/\W+|$/, false))
+        return 'string-2';
+      if (stream.match(rx_number))
+        return 'number';
+      if (stream.match(rx_positive))
+        return 'positive';
+      if (stream.match(rx_negative))
+        return 'negative';
+      if (stream.match(rx_uri))
+        return 'link';
+
+      while (stream.next() != null) {
+        if (stream.match(rx_strong, false)) break;
+        if (stream.match(rx_emphasis, false)) break;
+        if (stream.match(rx_literal, false)) break;
+        if (stream.match(rx_number, false)) break;
+        if (stream.match(rx_positive, false)) break;
+        if (stream.match(rx_negative, false)) break;
+        if (stream.match(rx_uri, false)) break;
+      }
+
+      return null;
+    }
+  };
+
+  var mode = CodeMirror.getMode(
+    config, options.backdrop || 'rst-base'
+  );
+
+  return CodeMirror.overlayMode(mode, overlay, true); // combine
+}, 'python', 'stex');
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+CodeMirror.defineMode('rst-base', function (config) {
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function format(string) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return string.replace(/{(\d+)}/g, function (match, n) {
+      return typeof args[n] != 'undefined' ? args[n] : match;
+    });
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  var mode_python = CodeMirror.getMode(config, 'python');
+  var mode_stex = CodeMirror.getMode(config, 'stex');
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  var SEPA = "\\s+";
+  var TAIL = "(?:\\s*|\\W|$)",
+  rx_TAIL = new RegExp(format('^{0}', TAIL));
+
+  var NAME =
+    "(?:[^\\W\\d_](?:[\\w!\"#$%&'()\\*\\+,\\-\\.\/:;<=>\\?]*[^\\W_])?)",
+  rx_NAME = new RegExp(format('^{0}', NAME));
+  var NAME_WWS =
+    "(?:[^\\W\\d_](?:[\\w\\s!\"#$%&'()\\*\\+,\\-\\.\/:;<=>\\?]*[^\\W_])?)";
+  var REF_NAME = format('(?:{0}|`{1}`)', NAME, NAME_WWS);
+
+  var TEXT1 = "(?:[^\\s\\|](?:[^\\|]*[^\\s\\|])?)";
+  var TEXT2 = "(?:[^\\`]+)",
+  rx_TEXT2 = new RegExp(format('^{0}', TEXT2));
+
+  var rx_section = new RegExp(
+    "^([!'#$%&\"()*+,-./:;<=>?@\\[\\\\\\]^_`{|}~])\\1{3,}\\s*$");
+  var rx_explicit = new RegExp(
+    format('^\\.\\.{0}', SEPA));
+  var rx_link = new RegExp(
+    format('^_{0}:{1}|^__:{1}', REF_NAME, TAIL));
+  var rx_directive = new RegExp(
+    format('^{0}::{1}', REF_NAME, TAIL));
+  var rx_substitution = new RegExp(
+    format('^\\|{0}\\|{1}{2}::{3}', TEXT1, SEPA, REF_NAME, TAIL));
+  var rx_footnote = new RegExp(
+    format('^\\[(?:\\d+|#{0}?|\\*)]{1}', REF_NAME, TAIL));
+  var rx_citation = new RegExp(
+    format('^\\[{0}\\]{1}', REF_NAME, TAIL));
+
+  var rx_substitution_ref = new RegExp(
+    format('^\\|{0}\\|', TEXT1));
+  var rx_footnote_ref = new RegExp(
+    format('^\\[(?:\\d+|#{0}?|\\*)]_', REF_NAME));
+  var rx_citation_ref = new RegExp(
+    format('^\\[{0}\\]_', REF_NAME));
+  var rx_link_ref1 = new RegExp(
+    format('^{0}__?', REF_NAME));
+  var rx_link_ref2 = new RegExp(
+    format('^`{0}`_', TEXT2));
+
+  var rx_role_pre = new RegExp(
+    format('^:{0}:`{1}`{2}', NAME, TEXT2, TAIL));
+  var rx_role_suf = new RegExp(
+    format('^`{1}`:{0}:{2}', NAME, TEXT2, TAIL));
+  var rx_role = new RegExp(
+    format('^:{0}:{1}', NAME, TAIL));
+
+  var rx_directive_name = new RegExp(format('^{0}', REF_NAME));
+  var rx_directive_tail = new RegExp(format('^::{0}', TAIL));
+  var rx_substitution_text = new RegExp(format('^\\|{0}\\|', TEXT1));
+  var rx_substitution_sepa = new RegExp(format('^{0}', SEPA));
+  var rx_substitution_name = new RegExp(format('^{0}', REF_NAME));
+  var rx_substitution_tail = new RegExp(format('^::{0}', TAIL));
+  var rx_link_head = new RegExp("^_");
+  var rx_link_name = new RegExp(format('^{0}|_', REF_NAME));
+  var rx_link_tail = new RegExp(format('^:{0}', TAIL));
+
+  var rx_verbatim = new RegExp('^::\\s*$');
+  var rx_examples = new RegExp('^\\s+(?:>>>|In \\[\\d+\\]:)\\s');
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function to_normal(stream, state) {
+    var token = null;
+
+    if (stream.sol() && stream.match(rx_examples, false)) {
+      change(state, to_mode, {
+        mode: mode_python, local: CodeMirror.startState(mode_python)
+      });
+    } else if (stream.sol() && stream.match(rx_explicit)) {
+      change(state, to_explicit);
+      token = 'meta';
+    } else if (stream.sol() && stream.match(rx_section)) {
+      change(state, to_normal);
+      token = 'header';
+    } else if (phase(state) == rx_role_pre ||
+               stream.match(rx_role_pre, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_normal, context(rx_role_pre, 1));
+        stream.match(/^:/);
+        token = 'meta';
+        break;
+      case 1:
+        change(state, to_normal, context(rx_role_pre, 2));
+        stream.match(rx_NAME);
+        token = 'keyword';
+
+        if (stream.current().match(/^(?:math|latex)/)) {
+          state.tmp_stex = true;
+        }
+        break;
+      case 2:
+        change(state, to_normal, context(rx_role_pre, 3));
+        stream.match(/^:`/);
+        token = 'meta';
+        break;
+      case 3:
+        if (state.tmp_stex) {
+          state.tmp_stex = undefined; state.tmp = {
+            mode: mode_stex, local: CodeMirror.startState(mode_stex)
+          };
+        }
+
+        if (state.tmp) {
+          if (stream.peek() == '`') {
+            change(state, to_normal, context(rx_role_pre, 4));
+            state.tmp = undefined;
+            break;
+          }
+
+          token = state.tmp.mode.token(stream, state.tmp.local);
+          break;
+        }
+
+        change(state, to_normal, context(rx_role_pre, 4));
+        stream.match(rx_TEXT2);
+        token = 'string';
+        break;
+      case 4:
+        change(state, to_normal, context(rx_role_pre, 5));
+        stream.match(/^`/);
+        token = 'meta';
+        break;
+      case 5:
+        change(state, to_normal, context(rx_role_pre, 6));
+        stream.match(rx_TAIL);
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (phase(state) == rx_role_suf ||
+               stream.match(rx_role_suf, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_normal, context(rx_role_suf, 1));
+        stream.match(/^`/);
+        token = 'meta';
+        break;
+      case 1:
+        change(state, to_normal, context(rx_role_suf, 2));
+        stream.match(rx_TEXT2);
+        token = 'string';
+        break;
+      case 2:
+        change(state, to_normal, context(rx_role_suf, 3));
+        stream.match(/^`:/);
+        token = 'meta';
+        break;
+      case 3:
+        change(state, to_normal, context(rx_role_suf, 4));
+        stream.match(rx_NAME);
+        token = 'keyword';
+        break;
+      case 4:
+        change(state, to_normal, context(rx_role_suf, 5));
+        stream.match(/^:/);
+        token = 'meta';
+        break;
+      case 5:
+        change(state, to_normal, context(rx_role_suf, 6));
+        stream.match(rx_TAIL);
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (phase(state) == rx_role || stream.match(rx_role, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_normal, context(rx_role, 1));
+        stream.match(/^:/);
+        token = 'meta';
+        break;
+      case 1:
+        change(state, to_normal, context(rx_role, 2));
+        stream.match(rx_NAME);
+        token = 'keyword';
+        break;
+      case 2:
+        change(state, to_normal, context(rx_role, 3));
+        stream.match(/^:/);
+        token = 'meta';
+        break;
+      case 3:
+        change(state, to_normal, context(rx_role, 4));
+        stream.match(rx_TAIL);
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (phase(state) == rx_substitution_ref ||
+               stream.match(rx_substitution_ref, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_normal, context(rx_substitution_ref, 1));
+        stream.match(rx_substitution_text);
+        token = 'variable-2';
+        break;
+      case 1:
+        change(state, to_normal, context(rx_substitution_ref, 2));
+        if (stream.match(/^_?_?/)) token = 'link';
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (stream.match(rx_footnote_ref)) {
+      change(state, to_normal);
+      token = 'quote';
+    } else if (stream.match(rx_citation_ref)) {
+      change(state, to_normal);
+      token = 'quote';
+    } else if (stream.match(rx_link_ref1)) {
+      change(state, to_normal);
+      if (!stream.peek() || stream.peek().match(/^\W$/)) {
+        token = 'link';
+      }
+    } else if (phase(state) == rx_link_ref2 ||
+               stream.match(rx_link_ref2, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        if (!stream.peek() || stream.peek().match(/^\W$/)) {
+          change(state, to_normal, context(rx_link_ref2, 1));
+        } else {
+          stream.match(rx_link_ref2);
+        }
+        break;
+      case 1:
+        change(state, to_normal, context(rx_link_ref2, 2));
+        stream.match(/^`/);
+        token = 'link';
+        break;
+      case 2:
+        change(state, to_normal, context(rx_link_ref2, 3));
+        stream.match(rx_TEXT2);
+        break;
+      case 3:
+        change(state, to_normal, context(rx_link_ref2, 4));
+        stream.match(/^`_/);
+        token = 'link';
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (stream.match(rx_verbatim)) {
+      change(state, to_verbatim);
+    }
+
+    else {
+      if (stream.next()) change(state, to_normal);
+    }
+
+    return token;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function to_explicit(stream, state) {
+    var token = null;
+
+    if (phase(state) == rx_substitution ||
+        stream.match(rx_substitution, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_explicit, context(rx_substitution, 1));
+        stream.match(rx_substitution_text);
+        token = 'variable-2';
+        break;
+      case 1:
+        change(state, to_explicit, context(rx_substitution, 2));
+        stream.match(rx_substitution_sepa);
+        break;
+      case 2:
+        change(state, to_explicit, context(rx_substitution, 3));
+        stream.match(rx_substitution_name);
+        token = 'keyword';
+        break;
+      case 3:
+        change(state, to_explicit, context(rx_substitution, 4));
+        stream.match(rx_substitution_tail);
+        token = 'meta';
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (phase(state) == rx_directive ||
+               stream.match(rx_directive, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_explicit, context(rx_directive, 1));
+        stream.match(rx_directive_name);
+        token = 'keyword';
+
+        if (stream.current().match(/^(?:math|latex)/))
+          state.tmp_stex = true;
+        else if (stream.current().match(/^python/))
+          state.tmp_py = true;
+        break;
+      case 1:
+        change(state, to_explicit, context(rx_directive, 2));
+        stream.match(rx_directive_tail);
+        token = 'meta';
+
+        if (stream.match(/^latex\s*$/) || state.tmp_stex) {
+          state.tmp_stex = undefined; change(state, to_mode, {
+            mode: mode_stex, local: CodeMirror.startState(mode_stex)
+          });
+        }
+        break;
+      case 2:
+        change(state, to_explicit, context(rx_directive, 3));
+        if (stream.match(/^python\s*$/) || state.tmp_py) {
+          state.tmp_py = undefined; change(state, to_mode, {
+            mode: mode_python, local: CodeMirror.startState(mode_python)
+          });
+        }
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (phase(state) == rx_link || stream.match(rx_link, false)) {
+
+      switch (stage(state)) {
+      case 0:
+        change(state, to_explicit, context(rx_link, 1));
+        stream.match(rx_link_head);
+        stream.match(rx_link_name);
+        token = 'link';
+        break;
+      case 1:
+        change(state, to_explicit, context(rx_link, 2));
+        stream.match(rx_link_tail);
+        token = 'meta';
+        break;
+      default:
+        change(state, to_normal);
+      }
+    } else if (stream.match(rx_footnote)) {
+      change(state, to_normal);
+      token = 'quote';
+    } else if (stream.match(rx_citation)) {
+      change(state, to_normal);
+      token = 'quote';
+    }
+
+    else {
+      stream.eatSpace();
+      if (stream.eol()) {
+        change(state, to_normal);
+      } else {
+        stream.skipToEnd();
+        change(state, to_comment);
+        token = 'comment';
+      }
+    }
+
+    return token;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function to_comment(stream, state) {
+    return as_block(stream, state, 'comment');
+  }
+
+  function to_verbatim(stream, state) {
+    return as_block(stream, state, 'meta');
+  }
+
+  function as_block(stream, state, token) {
+    if (stream.eol() || stream.eatSpace()) {
+      stream.skipToEnd();
+      return token;
+    } else {
+      change(state, to_normal);
+      return null;
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function to_mode(stream, state) {
+
+    if (state.ctx.mode && state.ctx.local) {
+
+      if (stream.sol()) {
+        if (!stream.eatSpace()) change(state, to_normal);
+        return null;
+      }
+
+      return state.ctx.mode.token(stream, state.ctx.local);
+    }
+
+    change(state, to_normal);
+    return null;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  function context(phase, stage, mode, local) {
+    return {phase: phase, stage: stage, mode: mode, local: local};
+  }
+
+  function change(state, tok, ctx) {
+    state.tok = tok;
+    state.ctx = ctx || {};
+  }
+
+  function stage(state) {
+    return state.ctx.stage || 0;
+  }
+
+  function phase(state) {
+    return state.ctx.phase;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+
+  return {
+    startState: function () {
+      return {tok: to_normal, ctx: context(undefined, 0)};
+    },
+
+    copyState: function (state) {
+      var ctx = state.ctx, tmp = state.tmp;
+      if (ctx.local)
+        ctx = {mode: ctx.mode, local: CodeMirror.copyState(ctx.mode, ctx.local)};
+      if (tmp)
+        tmp = {mode: tmp.mode, local: CodeMirror.copyState(tmp.mode, tmp.local)};
+      return {tok: state.tok, ctx: ctx, tmp: tmp};
+    },
+
+    innerMode: function (state) {
+      return state.tmp      ? {state: state.tmp.local, mode: state.tmp.mode}
+      : state.ctx.mode ? {state: state.ctx.local, mode: state.ctx.mode}
+      : null;
+    },
+
+    token: function (stream, state) {
+      return state.tok(stream, state);
+    }
+  };
+}, 'python', 'stex');
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+CodeMirror.defineMIME('text/x-rst', 'rst');
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+});

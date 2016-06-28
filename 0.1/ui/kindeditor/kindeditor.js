@@ -1,1 +1,94 @@
-Std.ui.module("KindEditor",{parent:"widget",option:{level:4,height:200,value:""},"private":{timer:null},extend:{render:function(){var t=this,e=t.opts;t.editor=KindEditor.create(t[0].dom,{width:t.width()-2,height:t.height()}),e.value&&t.value(e.value)},remove:function(){this.editor.remove()},width:function(){var t=this;t.updateEditorSize()},height:function(){var t=this;t.updateEditorSize()}},"protected":{updateEditorSize:function(){var t=this,e="";return null!==t._timer&&(clearTimeout(t._timer),t._timer=null),t._timer=setTimeout(function(){t.editor&&(e=t.value(),t.editor.remove()),t.editor=KindEditor.create(t[0].dom,{width:t.width()-2,height:t.height()}),t.value(e),t._timer=null},1),t}},"public":{value:function(t){var e=this;return void 0===t?e.editor.html():(e.editor.html(t),e)}},main:function(){}});
+Std.ui.module("KindEditor",{
+    parent:"widget",
+    option:{
+        level:4,
+        height:200,
+        value:""
+    },
+    private:{
+        timer:null
+    },
+    extend:{
+        /*
+         * render
+        */
+        render:function(){
+            var that = this;
+            var opts = that.opts;
+
+            that.editor = KindEditor.create(that[0].dom,{
+                width:that.width() - 2,
+                height:that.height()
+            });
+
+            if(opts.value){
+                that.value(opts.value);
+            }
+        },
+        /*
+         * remove
+        */
+        remove:function(){
+            this.editor.remove();
+        },
+        /*
+         * width
+        */
+        width:function(){
+            var that = this;
+
+            that.updateEditorSize();
+        },
+        /*
+         * height
+        */
+        height:function(){
+            var that = this;
+
+            that.updateEditorSize();
+        }
+    },
+    protected:{
+        updateEditorSize:function(){
+            var that = this;
+            var data = "";
+
+            if(that._timer !== null){
+                clearTimeout(that._timer);
+                that._timer = null;
+            }
+            that._timer = setTimeout(function(){
+                if(that.editor){
+                    data = that.value();
+                    that.editor.remove();
+                }
+                that.editor = KindEditor.create(that[0].dom,{
+                    width:that.width() - 2,
+                    height:that.height()
+                });
+                that.value(data);
+                that._timer = null;
+            },1);
+
+            return that;
+        }
+    },
+    public:{
+        /*
+         * value
+        */
+        value:function(value){
+            var that = this;
+
+            if(value === undefined){
+                return that.editor.html();
+            }
+            that.editor.html(value);
+
+            return that;
+        }
+    },
+    main:function(that,opts,dom){
+
+    }
+});
