@@ -161,9 +161,11 @@
             position: relative;
             padding: 20px 10px 20px 10px;
         }
-        .example > pre{
+        .example pre{
+            font-family: "Source Code Pro";
+            font-size: 14px;
             margin: 0 auto;
-            padding: 20px;
+            padding:20px;
             width: 860px;
         }
         /*
@@ -298,13 +300,12 @@
 
         <div class="example">
             <h3>常见的用法</h3>
-        <pre>
-            <code>
+            <pre id="home_example" class="brush: js;gutter: false;toolbar: false" >
 /*
  * 引入代码仓库,注意仓库名称StdJS,区分大小写
  * 仓库中的包可以为任意数量,只有在代码引入包的时候,该包才会被真正载入
 */
-Std.source("<script>document.write(Std.source.repositoryName)</script>","<script>document.write(Std.source.latestVersionAddress)</script>");
+Std.source("Std.source.repositoryName","Std.source.latestVersionAddress");
 
 /*
  * 使用仓库中的包,例如 ui.MessageBox
@@ -318,17 +319,15 @@ Std.use("ui.MessageBox",function(){
 Std.main(function(){
     Std.ui("MessageBox").information("MessageBox package loaded");
 });
-
 /*
  * 如果要单独执行一个函数,但是需要使用某个包,可以这样创建函数
  * 被引入的包将会被自动缓存起来,第二次执行函数时候将会跳过加载包的步骤
 */
 var func1 = Std.func(function(){
-    //function code
+    // code...
 },{
     packages:["ui.Window"]
 });
-
 /*
  * 在 Std.main 主函数触发之前载入某个包,还可以这样写
 */
@@ -337,8 +336,22 @@ Std.main(Std.func(function(){
 },{
     packages:["ui.Notify"]
 }));
-            </code>
-        </pre>
+            </pre>
+            <script>
+                (function(){
+                    var exampleElem = Std.dom("#home_example");
+                    var exampleText = exampleElem.html().replace(/\"([^\"]*)\"/g, function(word){
+                        return "<span style='color: #069'>" + word + "</span>";
+                    }).replace(/function/g, function(word){
+                        return "<span style='color: blue'>" + word + "</span>";
+                    }).replace(/\/\*([\s\S]*?)\*\//g, function(word){
+                        return "<span style='color: #008200'>" + word + "</span>";
+                    }).replace("Std.source.repositoryName",Std.source.repositoryName).replace(
+                        "Std.source.latestVersionAddress",Std.source.latestVersionAddress
+                    );
+                    exampleElem.html(exampleText);
+                })();
+            </script>
         </div>
 
         <div class="footer">
@@ -410,43 +423,7 @@ Std.main(Std.func(function(){
                 </div>
             </div>
         </div>
-        <div id="editPackage" std-ui="VBoxLayout" style="display: none">
-            <div std-ui="TabPanel" std-option="{valueType:'map',deferRender:false}">
-                <ul std-content="layout">
-                    <li>基础配置</li>
-                    <li std-ui="VBoxLayout">
-                        <span>包名称:</span>
-                        <div std-ui="LineEdit" std-name="packageName" std-option="{placeHolder:'包的名称,必须为唯一名称',showState:true,validator:'String'}"></div>
 
-                        <span>版本号:</span>
-                        <div std-ui="LineEdit" std-name="version" std-option="{placeHolder:'包的版本号'}"></div>
-
-                        <span>文档地址:</span>
-                        <div std-ui="LineEdit" std-name="documentation" std-option="{placeHolder:'相关文档地址,可以为空'}"></div>
-
-                        <span>依赖包:</span>
-                        <div std-ui="TextEdit" std-name="basics" std-theme="white"  std-option="{placeHolder:'依赖包的名称,多个包用换行分开'}"></div>
-                    </li>
-                </ul>
-
-                <ul std-content="layout">
-                    <li>文件列表</li>
-                    <li std-ui="VBoxLayout">
-                        <div std-ui="TextEdit" std-name="files" std-theme="white" std-option="{placeHolder:'多个文件路径用换行分开'}"></div>
-                    </li>
-                </ul>
-
-                <ul std-content="layout">
-                    <li>包描述</li>
-                    <li std-ui="VBoxLayout">
-                        <div std-ui="TextEdit" std-name="description" std-theme="white"  std-option="{placeHolder:'包的描述'}"></div>
-                    </li>
-                </ul>
-            </div>
-            <div std-ui="HArrayLayout" std-option="{align:'right'}">
-                <div std-ui="Button" std-name="save" std-icon="add" std-option="{styleType:'textBesideIcon'}">确定</div>
-            </div>
-        </div>
     </div>
 
     <script type="text/std-template" std-name="grid_rowContent">
@@ -462,7 +439,6 @@ Std.main(Std.func(function(){
             </div>
         </div>
     </script>
-
     <script type="text/std-template" std-name="grid_example">
         <pre>
 <code>//-------全局只需要设置一次仓库源地址
@@ -476,428 +452,611 @@ Std.use("<?=packageName?>",function(){
         </pre>
     </script>
 
-
     <script type="text/std-icon" std-name="add">
         data:image/png;base64,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
     </script>
-
     <script type="text/std-icon" std-name="edit">
         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAGySURBVDjLhdJLbIxRGMbxn3b0ohUjoWjUNGgqYuNSl4W1RJCIVWOBdGNTuhUbC6EbsSOhadKEkAjdkKnEpkTY0NEFIU3jlrIhjaK3mX4Wnfn6db5Ove/mnPc8/3N5zks0Khxx35BP+p21yn+iygWjgnxO6ZVaHGgzHspns0dVaflKL4rkgVH7i2Vl4WizLbFNVthXGqhTs8C560sDgWABYKY08N2fBYAvpYGPhmPy316VBn7qiwEDMhaJrYbnmTrpVGS1XCKOtJuIAHfUhitJV3VrLAaq3Q7lQ5rDesohvQJ9muYfM+5DOP4aOpS0y3ldAkddK4/Ikw44Y3V+VmvEWzkNbqj3RJt7plUWxHVOe+5v5AXTLklo8FAg67oOGa3qocIxL2WLHOpUbYNH+XnWTSdth+UuGivq0imXVUlJR2oDNs5eptNkrK0fWKbR40hl0J7C7X/E5DknLNEjZyZfeWP3nDcTMWBEs036tboiJ5DREvU+He5TyLSE4+4qc9CEjJ1ReblnstapMfcj3Z5q12Kbw97r8DoKJHx2Tpe9dmiyVlKld5ZaY8w3twz6Nb97/gEUK80rmeMobwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNS0wNy0yNVQyMTo0OTozMyswODowMN9MHmQAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTQtMDYtMDlUMTg6MTI6NTYrMDg6MDD70V/pAAAATnRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjguOC0xMCBRMTYgeDg2XzY0IDIwMTUtMDctMTkgaHR0cDovL3d3dy5pbWFnZW1hZ2ljay5vcmcFDJw1AAAAGHRFWHRUaHVtYjo6RG9jdW1lbnQ6OlBhZ2VzADGn/7svAAAAGHRFWHRUaHVtYjo6SW1hZ2U6OkhlaWdodAA1MTKPjVOBAAAAF3RFWHRUaHVtYjo6SW1hZ2U6OldpZHRoADUxMhx8A9wAAAAZdEVYdFRodW1iOjpNaW1ldHlwZQBpbWFnZS9wbmc/slZOAAAAF3RFWHRUaHVtYjo6TVRpbWUAMTQwMjMwODc3NlsrOfoAAAATdEVYdFRodW1iOjpTaXplADkuMTRLQkL1jHAxAAAAWnRFWHRUaHVtYjo6VVJJAGZpbGU6Ly8vaG9tZS93d3dyb290L3d3dy5lYXN5aWNvbi5uZXQvY2RuLWltZy5lYXN5aWNvbi5jbi9zcmMvMTE3MDIvMTE3MDIyMC5wbmcEYB+ZAAAAAElFTkSuQmCC
     </script>
-
     <script type="text/std-icon" std-name="delete">
         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAfCAQAAABXe8XLAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAAAGQAAABkAA+Wxd0AAAISSURBVDjLjdS7a1RBFMfxz73Z7OaxWbM2iWjwgStYKEkK/Q9EG0klCAq2goV/gYWVlZV/gYiNjViJrULsTBcLwUTxAdnsrvtw37kWd11vNFnzGxjOnDnfmXPPZQ5JXfZJ9Nf45EoyJJWwx9y04LtGwjdlwU2v9PcCJhT03PY24bvomYKJP4ekkHbCNGZVvRM5sivNNVUXVNCwqZ1y0j2XTGLdDfMemkmE1931zRNn0fTK/ZQHrg02Wz777LogAUS+2NGUR94t04GGqcHmF3d8sGO3Qqc9cnSwagZeGh8sAvVdFfqtaVnRwO4GJuwMTw3srWh4WxjguMXhLaPUtWaTglVdvQOMrlWFlEXLu37fKC1bCtV0DhhOVy1lW0tW0wtlZK0IPVdFzoodz9WRd9WkpiKnfRQpWwLHbPjqFDjlq00LYFFJZEMhVFNDWm5Q2GBY3uSck0FNLfRTJQHsp5xxVDRCLSWMmR0JzEqhpBXqKSL4LxCgqBeKFAeu0QAURSG2QH4kEO9uEQPRgW6IfgPbepg1tm94XJKe7RgoaQ8Lt7fGHUJbKQZ++Imc9L5A2gyaKjFQVUdWBvFjiYZWPGdkUVeL20xDFVlzOnJCoZxDJOw5M6hqxEBLGfOeakubE3isjYzDIk91ZMyjrBkDHSWMOzfM+Vwi//NDq6QTf0PfuoPo/Z8Oe8Zr/X/6dnL0vXEGfgEr0sSfB0PYXwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNS0wNy0yNVQyMTo0OTo0MiswODowMHP+HMkAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTQtMDUtMDFUMjE6MDk6NTArMDg6MDCK3ngxAAAATnRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjguOC0xMCBRMTYgeDg2XzY0IDIwMTUtMDctMTkgaHR0cDovL3d3dy5pbWFnZW1hZ2ljay5vcmcFDJw1AAAAJXRFWHRzdmc6Y29tbWVudAAgR2VuZXJhdGVkIGJ5IEljb01vb24uaW8gMMvLSAAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABh0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQANzExFQDWVQAAABd0RVh0VGh1bWI6OkltYWdlOjpXaWR0aAA1MzYpJ6VHAAAAGXRFWHRUaHVtYjo6TWltZXR5cGUAaW1hZ2UvcG5nP7JWTgAAABd0RVh0VGh1bWI6Ok1UaW1lADEzOTg5NDk3OTAfMnouAAAAE3RFWHRUaHVtYjo6U2l6ZQAxMS42S0JCfFpGwAAAAFp0RVh0VGh1bWI6OlVSSQBmaWxlOi8vL2hvbWUvd3d3cm9vdC93d3cuZWFzeWljb24ubmV0L2Nkbi1pbWcuZWFzeWljb24uY24vc3JjLzExNTgxLzExNTgxNDgucG5nCKddggAAAABJRU5ErkJggg==
     </script>
-
     <script type="text/std-icon" std-name="reload">
         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JQAAgIMAAPn/AACA6QAAdTAAAOpgAAA6mAAAF2+SX8VGAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAIbSURBVEjH1dXLS1VhFAXw373XwpSSIE29CQ1qEhGEPZDSELT6AxoEETZpVJPmjSJolFEZTqIIm0QJ1TSCHlRENQo0UFR84C2J7Kmm954Gvs65HvM27NuTw9p7re/bm7U5/PcnUUBNUql1At/8kvtXgdXqHbVNBT7pdsdTvwt/X6U2XwShGNeueuW2SqVVqXFPLkKfjYeq/kbeqdUzPT54byaGHgi0WR1PL3LK8DKkaCON8bef9q0AeiBwNW78tYYKpAdeWDv/6MVzzKY8yUlfUaZ4yWUblfkeFShVGynJuOWRYQmbHHJSWSSbE+RrpvWEnvhOvaSUchvQZEzWdCj/w2UV4fFtd9nPhfSoBjTo1K3LHe8F2t2MTCHn7rxEygkDkeQFNOgPIU9USXuZN8rWWT+05Nl1QrOkzhAyqA4cyHPJZ4dT9mgLWTMno891geNKlEgg64rHJiRNKVYnuVC9RpJrEc2s86oVKZJ2UXYOG/XIelu9NTKHzceAyOwDgSH7QKORENqBgyaWGGqKySXgc2k1XoeQXrvRFuPISTGqgRtuC7xyW7duHfagWSamsp/eGHha1kf7JZQrl5LQpCt2JzpStti7xOlJCTNyZkwrsdMZZ22O2d8vzrFL37I7NyEjE9tknpHGC17jcDxQOb/SLQb/kTzu0iw9MdfzDkc0qLTKSmfamDfue2VqUWD2q0SZ1IoC2fgfzH98/gDHF7rGydnMhAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNS0wNy0yNVQyMTo1MDoxNiswODowMPLKwrQAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTQtMDYtMjlUMjE6MjQ6MTIrMDg6MDAw4NyyAAAATnRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjguOC0xMCBRMTYgeDg2XzY0IDIwMTUtMDctMTkgaHR0cDovL3d3dy5pbWFnZW1hZ2ljay5vcmcFDJw1AAAAGHRFWHRUaHVtYjo6RG9jdW1lbnQ6OlBhZ2VzADGn/7svAAAAGHRFWHRUaHVtYjo6SW1hZ2U6OkhlaWdodAAyNTbpw0QZAAAAF3RFWHRUaHVtYjo6SW1hZ2U6OldpZHRoADI1NnoyFEQAAAAZdEVYdFRodW1iOjpNaW1ldHlwZQBpbWFnZS9wbmc/slZOAAAAF3RFWHRUaHVtYjo6TVRpbWUAMTQwNDA0ODI1Mnh/vN4AAAATdEVYdFRodW1iOjpTaXplADE5LjJLQkIfa1P6AAAAWnRFWHRUaHVtYjo6VVJJAGZpbGU6Ly8vaG9tZS93d3dyb290L3d3dy5lYXN5aWNvbi5uZXQvY2RuLWltZy5lYXN5aWNvbi5jbi9zcmMvMTE3MTkvMTE3MTkwNC5wbmcIQxLjAAAAAElFTkSuQmCC
     </script>
-
     <script type="text/std-icon" std-name="save">
         data:image/png;base64,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
     </script>
-
     <script type="text/std-icon" std-name="build">
         data:image/png;base64,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
     </script>
 
     <script>
-        /**
-         *  main
-        */
         Std.main(function(){
-            var header         = Std.dom(".header");
-            var packages       = {};
-            var packagesGrid   = null;
-            var currentPage    = "page_home";
-            var packagesPage   = null;
-            var packagesLoaded = false;
-            var loading        = false;
-            var lastPassword   = "";
-            var skipPassword   = false;
-            /*
-             * build index code
-            */
-            var buildIndexCode = function(){
-                var code      = 'Std.source.response("'+Std.source.repositoryName+'",function(){';
-                var codeMap   = {at:3,func:{},variable:{}};
-                var analysis  = {paths:{}, basics:{}};
-                var formatUrl = function(file){
-                    var url  = Std.url(file);
-                    var text = file;
+            var dom_header   = Std.dom(".header");
+            var packages     = {};
+            var lastPassword = "";
+            var skipPassword = false;
 
-                    if(url.suffix === "css"){
-                        url.file = url.basename;
-                        text = '"' + escape(url.toUrl()) + '"+C';
-                    }else if(url.suffix === "js"){
-                        url.file = url.basename;
-                        text = '"' + escape(url.toUrl()) + '"+B';
-                    }else{
-                        return '"' + escape(text) + '"';
-                    }
-                    return text;
-                };
-                code += "var B='.js',C='.css';function A(f,b){return {files:f,basics:b}}";
-
-                Std.each(packages,function(name,config){
-                    for(var i=config.files.length-1;i>=0;i--){
-                        var fileAddress = config.files[i].trim();
-                        if(isEmpty(fileAddress)){
-                            config.files.remove(i);
-                            continue;
-                        }
-                        var url  = Std.url(fileAddress);
-                        url.file = "";
-                        url = url.toUrl();
-
-                        if(isEmpty(url.path) === ""){
-                            continue;
-                        }
-                        if(!(url in analysis.paths)){
-                            analysis.paths[url] = 0;
-                        }else{
-                            analysis.paths[url]++;
-                        }
-                    }
-                    for(i=config.basics.length-1;i>=0;i--){
-                        var packageName = config.basics[i].trim();
-                        if(isEmpty(packageName)){
-                            config.basics.remove(i);
-                            continue;
-                        }
-                        if(!(packageName in analysis.basics)){
-                            analysis.basics[packageName] = 0;
-                        }else{
-                            analysis.basics[packageName]++;
-                        }
-                    }
-                });
-                Std.each(analysis.paths,function(path,pathNumber){
-                    if(pathNumber > 1){
-                        var name = Std.convert.ntol(codeMap.at++);
-                        codeMap.func[path] = name;
-                        code += "function " + name + "(s){return '"+path+"'+s}";
-                    }
-                });
-                Std.each(analysis.basics,function(packageName,basicsNumber){
-                    if(basicsNumber > 1){
-                        var name = Std.convert.ntol(codeMap.at++);
-                        codeMap.variable[packageName] = name;
-                        code += "var " + name + "='" + packageName + "';";
-                    }
-                });
-                code += "return{";
-                Std.each(packages,function(packageName,config){
-                    var basics   = config.basics;
-                    var files    = config.files;
-                    var readPath = function(fileAddress){
-                        var url  = Std.url(fileAddress);
-                        url.file = "";
-                        return url.toUrl();
-                    };
-                    var filePath  = function(file){
-                        var url  = Std.url(file);
-                        var path = readPath(file);
-                        var text = "";
-
-                        if(analysis.paths[path] > 1){
-                            text = codeMap.func[path] + '(' + formatUrl(url.file) + ')';
-                        }else{
-                            text = formatUrl(file);
-                        }
-                        return text;
-                    };
-                    var basicPath = function(packageName){
-                        var text = "";
-
-                        if(analysis.basics[packageName] > 1){
-                            text = codeMap.variable[packageName];
-                        }else{
-                            text = '"'+escape(packageName)+'"';
-                        }
-                        return text;
-                    };
-                    var filesPath = function(files){
-                        if(files.length === 1){
-                            return filePath(files[0]);
-                        }
-                        var fileTextArray  = [];
-                        Std.each(files,function(i,path){
-                            fileTextArray.push(filePath(path))
+            var messager   = Std.module({
+                static:{
+                    /*
+                     * text window
+                    */
+                    textWindow:Std.func(function(title,text){
+                        Std.ui("Window",{
+                            width:800,
+                            height:600,
+                            modal:true,
+                            minimizable:false,
+                            title:title,
+                            layout:{
+                                ui:"VBoxLayout",
+                                items:[{
+                                    ui:"CodeMirror",
+                                    mode:"javascript",
+                                    lineNumbers:true,
+                                    value:text
+                                }]
+                            }
+                        })
+                    },{
+                        packages:["ui.Window","code.CodeMirror[mode='javascript']"]
+                    }),
+                    /*
+                     * example
+                    */
+                    example:Std.func(function(packageName,repositoryName,address){
+                        Std.ui("MessageBox").information(Std.template("grid_example").render({
+                            packageName:packageName,
+                            repositoryName:repositoryName,
+                            latestVersionAddress:address
+                        }))
+                    },{
+                        packages:["ui.MessageBox"]
+                    }),
+                    /*
+                     * delete package
+                     */
+                    deletePackage:Std.func(function(callback){
+                        Std.ui("MessageBox").confirm("确定要删除选中的包吗?对应的文件也将会被删除,该操作不可恢复.","提示",callback)
+                    },{
+                        packages:["ui.MessageBox"]
+                    }),
+                    /*
+                     * connect error
+                     */
+                    connectError:Std.func(function(){
+                        Std.ui("Notify").error({
+                            text:"无法连接到12444端口失败,可能是server.js 未运行.<br/> 请尝试到服务器中以 node ./server.js 方式启动服务端.<br/><br/>" +
+                            "如果已经启动服务端还是出现这个错误<br/>则当前浏览器不支持ajax Access-Control-Allow-Origin 跨域请求",
+                            title:"发生错误",
+                            timeout:"8s"
                         });
-                        return "[" + fileTextArray.join(",") + "]";
-                    };
-                    var basicsPath = function(basics){
-                        if(basics.length === 1){
-                            return basicPath(basics[0]);
-                        }
-                        var basicsTextArray  = [];
-                        Std.each(basics,function(i,packageName){
-                            basicsTextArray.push(basicPath(packageName))
+                    },{
+                        packages:["ui.MessageBox"]
+                    }),
+                    /*
+                     * save success
+                    */
+                    saveSuccess:Std.func(function(){
+                        Std.ui("Notify").success({
+                            title:"成功",
+                            text:"packages.json 和 index.js 文件保存成功",
+                            timeout:"2s"
                         });
-                        return "[" + basicsTextArray.join(",") + "]";
-                    };
-                    code += '"'+packageName+'":';
-
-                    if(isEmpty(basics)){
-                        if(files.length > 0){
-                            code += filesPath(files);
-                        }else{
-                            code += "null"
-                        }
-                    }else{
-                        code += "A(" +filesPath(files)+ ","+basicsPath(basics)+")";
-                    }
-                    code += ","
-                });
-                if(code[code.length - 1] === ","){
-                    code = code.substr(0,code.length - 1)
+                    },{
+                        packages:["ui.MessageBox"]
+                    }),
+                    /*
+                     * save error
+                    */
+                    saveError:Std.func(function(text){
+                        Std.ui("Notify").error({
+                            text:"保存失败,服务器返回信息:<br/>" + text,
+                            title:"发生错误",
+                            timeout:"8s"
+                        });
+                    },{
+                        packages:["ui.MessageBox"]
+                    }),
+                    /*
+                     * package duplicate
+                    */
+                    packageDuplicate:Std.func(function(packageName){
+                        Std.ui("MessageBox").information("包: [" + packageName + "] 已经存在,不能重复添加.")
+                    },{
+                        packages:["ui.MessageBox"]
+                    })
                 }
-                return code + "}});";
-            };
-
-            /*
-             * format packages
-            */
-            var formatPackages = function(){
-                Std.each(packages,function(name,data){
-                    packages[name] = formatPackage(name,data);
-                });
-                return packages;
-            };
-            /*
-             * format package
-            */
-            var formatPackage = function(name,data){
-                var config = {
-                    basics:[],
-                    files:[],
-                    packageName:name,
-                    version:data.version || "",
-                    documentation:data.documentation || "",
-                    description:data.description || ""
-                };
-                if(isString(data) && !isEmpty(data)){
-                    config.files.push(data);
-                }
-                if(isArray(data)){
-                    Std.each(data,function(i,fileAddress){
-                        !isEmpty(fileAddress) && config.files.push(fileAddress);
-                    });
-                }
-                if(isString(data.basics) && !isEmpty(data.basics)){
-                    config.basics.push(data.basics);
-                }
-                if(isArray(data.basics)){
-                    Std.each(data.basics,function(i,packageName){
-                        !isEmpty(packageName) && config.basics.push(packageName);
-                    });
-                }
-                if(isString(data.files) && !isEmpty(data.files)){
-                    config.files.push(data.files);
-                }
-                if(isArray(data.files)){
-                    Std.each(data.files,function(i,fileAddress){
-                        !isEmpty(fileAddress) && config.files.push(fileAddress);
-                    });
-                }
-                return config;
-            };
-            /*
-             * edit package
-            */
-            var editPackage  = function(defaultValue,callback){
-                var layout = Std.dom("#editPackage").clone().ui(false);
-                var window = Std.ui("Window",{
-                    title:"添加/编辑 包配置",
-                    width:500,
-                    height:400,
-                    modal:true,
-                    minimizable:false,
-                    layout:layout
-                });
-
-                if(defaultValue !== null){
-                    if(isArray(defaultValue.basics)){
-                        defaultValue.basics = defaultValue.basics.join('\n');
-                    }
-                    if(isArray(defaultValue.files)){
-                        defaultValue.files = defaultValue.files.join('\n');
-                    }
-                    layout.items(0).value(Std.clone(defaultValue));
-                    layout.items(0).items(0).content.layout().map("packageName").enable(false);
-                }
-
-                layout.map("save").on("click",Std.func(function(){
-                    var value = layout.items(0).value();
-                    if(!layout.items(0).valid()){
-                        return Std.ui("MessageBox").information("必要的字段必须填写完整.")
-                    }
-                    if(isFunction(callback)){
-                        value.files  = isEmpty(value.files)  ? [] : value.files.split('\n');
-                        value.basics = isEmpty(value.basics) ? [] : value.basics.split('\n');
-
-                        callback(formatPackage(value.packageName,value),window)
-                    }
-                },{
-                    packages:["ui.MessageBox"]
-                }));
-            };
-            /*
-             * load packages
-            */
-            var loadPackages = function(callback){
-                if(loading){
-                    return;
-                }
-                if(packagesLoaded){
-                    return callback(packages);
-                }
-                loading = true;
-                Std.ajax.json(Std.source.latestVersionAddress + "/packages.json",function(data){
-                    loading        = false;
-                    packagesLoaded = true;
-                    callback(formatPackages(packages = data));
-                });
-            };
-            /*
-             * add package
-            */
-            var addPackageRow     = function(name,data,type,index){
-                packagesGrid[type || "appendRow"]({
-                    value:data,
-                    cells:{
-                        packageName:name,
-                        version:data.version || "",
-                        basics:data.basics.join(" "),
-                        documentation:data.documentation || "",
-                        description:data.description
+            });
+            var mainModule = Std.module({
+                static:{
+                    /*
+                     * stringify
+                    */
+                    stringify:function(jsonObject){
+                        Std.each(jsonObject,function(name,data){
+                            if(isObject(data.attr)){
+                                Std.each(data.attr,function(name,data){
+                                    data.files    = data.files + "";
+                                    data.parallel = !!data.parallel;
+                                });
+                            }
+                        });
+                        return JSON.stringify(jsonObject,null,4);
                     },
-                    content:Std.template("grid_rowContent").render(data)
-                },index);
-            };
-            /*
-             * show resource page
-            */
-            var showResourcePage = function(){
-                 loadPackages(function(data){
-                    var tbody = Std.dom("#resources > tbody").clear();
+                    /*
+                     * save
+                    */
+                    save:function(password,code){
+                        Std.ajax({
+                            url:"http://" + Std.url.location().hostName + ":12444/save",
+                            type:"post",
+                            data:{
+                                version:Std.source.latestVersion,
+                                password:lastPassword = password,
+                                index:code,
+                                packages:mainModule.stringify(packages)
+                            },
+                            error:messager.connectError,
+                            success:function(text){
+                                if(text == "0"){
+                                    messager.saveSuccess();
+                                    skipPassword = true;
+                                }else{
+                                    messager.saveError(text);
+                                }
+                            }
+                        });
+                    }
+                },
+                private:{
+                    /*
+                     * loading
+                     */
+                    loading:false,
+                    /*
+                     * packages loaded
+                     */
+                    packagesLoaded:false,
+                    /*
+                     * packages grid
+                     */
+                    packagesGrid:null,
+                    /*
+                     * packages page loaded
+                    */
+                    packagesPageLoaded:false,
+                    /*
+                     * current page
+                     */
+                    currentPage:"page_home"
+                },
+                initialize:{
+                    /*
+                     * init document state
+                    */
+                    initDocumentState:function(){
+                        Std.source.repository.on({
+                            append:function(){
+                                Std.css.cursor("wait");
+                            },
+                            complete:function(){
+                                Std.css.cursor(null);
+                            }
+                        });
+                    },
+                    /*
+                     * init router
+                    */
+                    initRouter:function(){
+                        var that = this;
 
-                    Std.each(data,function(packageName,packageValue){
-                        tbody.append(newDom("tr").append([
-                            newDom("td").html(packageName),
-                            newDom("td").html(packageValue.version),
-                            newDom("td").html(isArray(packageValue.basics) ? packageValue.basics.join(' ') : packageValue.basics),
-                            newDom("td").append(
-                                newDom("a").html(packageValue.documentation).attr({
-                                    href:packageValue.documentation,
-                                    target:"_blank"
-                                })
-                            ),
-                            newDom("td").html(packageValue.description)
-                        ]));
-                    });
-                });
-            };
 
-            /*
-             * show packages page
-            */
-            var showPackagesPage = Std.func(function(){
-                var dom    = Std.dom("#packages");
-                var resize = function(){
-                    dom.height(Std.dom(window).height() - header.outerHeight() - 1);
-                };
-                if(packagesPage !== null){
-                    resize();
-                    dom.layout().update();
-                    return;
+                        //------ ie fix
+                        if(!("onhashchange" in window)){
+                            var currentHash = location.hash;
+
+                            setInterval(function(){
+                                if(location.hash !== currentHash){
+                                    currentHash = location.hash;
+                                    Std.dom(window).emit("hashchange");
+                                }
+                            },100);
+                        }
+                        /*
+                         * add hash change event listener
+                        */
+                        Std.dom(window).on("hashchange",function(){
+                            var hash        = location.hash;
+                            var changeTheme = false;
+
+                            if(hash === "#page_resource"){
+                                that.showResourcePage();
+                            }else if(hash === "#page_packages"){
+                                changeTheme = true;
+                                that.showPackagesPage();
+                            }else if(hash !== "#page_home"){
+                                return;
+                            }
+                            dom_header.toggleClass("__gray__",changeTheme);
+
+                            Std.dom("#"+that._currentPage).hide();
+                            Std.dom("#"+(that._currentPage = location.hash.substr(1))).show();
+                            Std.dom(">._location.selected",dom_header).removeClass("selected");
+                            Std.dom(">._location[href='#"+that._currentPage+"']",dom_header).addClass("selected");
+                        });
+                        /*
+                         * check current url hash
+                        */
+                        if(location.hash !== ""){
+                            Std.dom(window).emit("hashchange")
+                        }
+                    }
+                },
+                protected:{
+                    /*
+                     * load packages
+                    */
+                    loadPackages:function(callback){
+                        var that = this;
+
+                        if(that._loading){
+                            return;
+                        }
+                        if(that._packagesLoaded){
+                            return callback(packages);
+                        }
+                        (that._loading = true) && Std.ajax.json(Std.source.latestVersionAddress + "/packages.json",function(data){
+                            that._loading        = false;
+                            that._packagesLoaded = true;
+                            callback(that.formatPackages(packages = data));
+                        });
+                    },
+                    /*
+                     * show resource page
+                    */
+                    showResourcePage:function(){
+                        this.loadPackages(function(data){
+                            var tbody = Std.dom("#resources > tbody").clear();
+
+                            Std.each(data,function(packageName,packageValue){
+                                tbody.append(newDom("tr").append([
+                                    newDom("td").html(packageName),
+                                    newDom("td").html(packageValue.version),
+                                    newDom("td").html(isArray(packageValue.basics) ? packageValue.basics.join(' ') : packageValue.basics),
+                                    newDom("td").append(
+                                        newDom("a").html(packageValue.documentation).attr({
+                                            href:packageValue.documentation,
+                                            target:"_blank"
+                                        })
+                                    ),
+                                    newDom("td").html(packageValue.description)
+                                ]));
+                            });
+                        });
+                    },
+                    /*
+                     * show packages page
+                    */
+                    showPackagesPage:Std.func(function(){
+                        var that   = this;
+                        var dom    = Std.dom("#packages");
+                        var resize = function(){
+                            dom.height(Std.dom(window).height() - dom_header.outerHeight() - 1);
+                        };
+                        if(that._packagesPageLoaded){
+                            resize();
+                            dom.layout().update();
+                            return;
+                        }
+                        var layout = resize() || dom.layout("VBoxLayout",{
+                            paddingTop:3
+                        });
+                        Std.dom(window).on("resize",function(){
+                            if(that._currentPage === "page_packages"){
+                                resize() || layout.update()
+                            }
+                        });
+                        that._packagesGrid = layout.find("Grid")[0];
+                        that._packagesGrid.rowContextMenu({
+                            items:[
+                                Std.action("addPackage"),
+                                Std.action("editPackage"),
+                                Std.action("deletePackage"),
+                                {ui:"sep"},
+                                Std.action("reload"),
+                                Std.action("showExample")
+                            ]
+                        });
+                        that._packagesGrid.on("rowEvent",function(type){
+                            if(type === "dblclick"){
+                                Std.action("editPackage").call();
+                            }
+                        });
+                        that.loadPackages(function(packages){
+                            Std.each(packages,function(name,data){
+                                that.addPackageRow(name,data);
+                            });
+                        });
+                        that._packagesPageLoaded = true;
+                    },{
+                        delay:1,
+                        packages:["ui.ToolBar","ui.Grid","ui.ComboBox","ui.Menu"]
+                    })
+                },
+                public:{
+                    /*
+                     * update default values
+                    */
+                    updateDefaultValue:function(){
+                        Std.dom("#git_address").value(Std.source.gitAddress).prevSibling().get(0).attr("href",Std.source.gitAddress);
+                        Std.dom("#source_address").value(Std.source.latestVersionAddress).prevSibling().get(0).attr("href",Std.source.latestVersionAddress);
+                        Std.dom(".addresses").on("click","input",function(){
+                            this.select()
+                        });
+                    },
+                    /*
+                     * build index code
+                    */
+                    buildIndexCode:function(){
+                        var code      = 'Std.source.response("'+Std.source.repositoryName+'",function(){';
+                        var codeMap   = {at:3,func:{},variable:{}};
+                        var analysis  = {paths:{}, basics:{}};
+                        var formatUrl = function(file){
+                            var url  = Std.url(file);
+                            var text = file;
+
+                            if(url.suffix === "css"){
+                                url.file = url.basename;
+                                text = '"' + escape(url.toUrl()) + '"+C';
+                            }else if(url.suffix === "js"){
+                                url.file = url.basename;
+                                text = '"' + escape(url.toUrl()) + '"+B';
+                            }else{
+                                return '"' + escape(text) + '"';
+                            }
+                            return text;
+                        };
+                        code += "var B='.js',C='.css';function A(f,b,a){return {files:f,basics:b,attr:a}}";
+
+
+                        Std.each(packages,function(name,config){
+                            for(var i=config.files.length-1;i>=0;i--){
+                                var fileAddress = config.files[i].trim();
+                                if(isEmpty(fileAddress)){
+                                    config.files.remove(i);
+                                    continue;
+                                }
+                                var url  = Std.url(fileAddress);
+                                url.file = "";
+                                url = url.toUrl();
+
+                                if(isEmpty(url.path) === ""){
+                                    continue;
+                                }
+                                if(!(url in analysis.paths)){
+                                    analysis.paths[url] = 0;
+                                }else{
+                                    analysis.paths[url]++;
+                                }
+                            }
+                            for(i=config.basics.length-1;i>=0;i--){
+                                var packageName = config.basics[i].trim();
+                                if(isEmpty(packageName)){
+                                    config.basics.remove(i);
+                                    continue;
+                                }
+                                if(!(packageName in analysis.basics)){
+                                    analysis.basics[packageName] = 0;
+                                }else{
+                                    analysis.basics[packageName]++;
+                                }
+                            }
+                        });
+                        Std.each(analysis.paths,function(path,pathNumber){
+                            if(pathNumber > 1){
+                                var name = Std.convert.ntol(codeMap.at++);
+                                codeMap.func[path] = name;
+                                code += "function " + name + "(s){return '"+path+"'+s}";
+                            }
+                        });
+                        Std.each(analysis.basics,function(packageName,basicsNumber){
+                            if(basicsNumber > 1){
+                                var name = Std.convert.ntol(codeMap.at++);
+                                codeMap.variable[packageName] = name;
+                                code += "var " + name + "='" + packageName + "';";
+                            }
+                        });
+                        code += "return{";
+                        Std.each(packages,function(packageName,config){
+                            var basics   = config.basics;
+                            var attrs    = config.attr;
+                            var files    = config.files;
+                            var readPath = function(fileAddress){
+                                var url  = Std.url(fileAddress);
+                                url.file = "";
+                                return url.toUrl();
+                            };
+                            var filePath  = function(file){
+                                var url  = Std.url(file);
+                                var path = readPath(file);
+                                var text = "";
+
+                                if(analysis.paths[path] > 1){
+                                    text = codeMap.func[path] + '(' + formatUrl(url.file) + ')';
+                                }else{
+                                    text = formatUrl(file);
+                                }
+                                return text;
+                            };
+                            var basicPath = function(packageName){
+                                var text = "";
+
+                                if(analysis.basics[packageName] > 1){
+                                    text = codeMap.variable[packageName];
+                                }else{
+                                    text = '"'+escape(packageName)+'"';
+                                }
+                                return text;
+                            };
+                            var filesPath = function(files){
+                                if(files.length === 1){
+                                    return filePath(files[0]);
+                                }
+                                var fileTextArray  = [];
+                                Std.each(files,function(i,path){
+                                    fileTextArray.push(filePath(path))
+                                });
+                                return "[" + fileTextArray.join(",") + "]";
+                            };
+                            var basicsPath = function(basics){
+                                if(basics.length === 1){
+                                    return basicPath(basics[0]);
+                                }
+                                var basicsTextArray  = [];
+                                Std.each(basics,function(i,packageName){
+                                    basicsTextArray.push(basicPath(packageName))
+                                });
+                                return "[" + basicsTextArray.join(",") + "]";
+                            };
+                            code += '"'+packageName+'":';
+
+                            if(isEmpty(basics) && isEmpty(attrs)){
+                                if(files.length > 0){
+                                    code += filesPath(files);
+                                }else{
+                                    code += "null"
+                                }
+                            }else{
+                                var args = [filesPath(files),basicsPath(basics)];
+                                if(!isEmpty(attrs)){
+                                    var attrsCode = [];
+
+                                    Std.each(attrs,function(name,data){
+                                        if(isString(data) || isFunction(data)){
+                                            data = (data + "").trim();
+                                        }
+                                        if(isObject(data)){
+
+                                            if(data.parallel === true){
+                                                attrsCode.push(name + ":"+ data.files);
+                                            }else{
+                                                attrsCode.push(name + ":{parallel:false,files:"+ data.files +"}");
+                                            }
+                                        }else if(isString(data) && !isEmpty(data)){
+                                            attrsCode.push(name + ":"+ data)
+                                        }
+                                    });
+                                    if(!isEmpty(attrsCode)){
+                                        attrsCode = attrsCode.join(",")
+                                    }
+                                    args.push("{"+  attrsCode + "}");
+                                }
+                                code += "A(" +args.join(",")+")";
+                            }
+                            code += ","
+                        });
+                        if(code[code.length - 1] === ","){
+                            code = code.substr(0,code.length - 1)
+                        }
+                        return code + "}});";
+                    },
+                    /*
+                     * format package
+                    */
+                    formatPackage:function(name,data){
+                        var config = {
+                            basics:[],
+                            files:[],
+                            attr:data.attr || null,
+                            packageName:name,
+                            version:data.version || "",
+                            documentation:data.documentation || "",
+                            description:data.description || ""
+                        };
+                        if(isString(data) && !isEmpty(data)){
+                            config.files.push(data);
+                        }
+                        if(isArray(data)){
+                            Std.each(data,function(i,fileAddress){
+                                !isEmpty(fileAddress) && config.files.push(fileAddress);
+                            });
+                        }
+                        if(isString(data.basics) && !isEmpty(data.basics)){
+                            config.basics.push(data.basics);
+                        }
+                        if(isArray(data.basics)){
+                            Std.each(data.basics,function(i,packageName){
+                                !isEmpty(packageName) && config.basics.push(packageName);
+                            });
+                        }
+                        if(isString(data.files) && !isEmpty(data.files)){
+                            config.files.push(data.files);
+                        }
+                        if(isArray(data.files)){
+                            Std.each(data.files,function(i,fileAddress){
+                                !isEmpty(fileAddress) && config.files.push(fileAddress);
+                            });
+                        }
+                        if(isObject(data.attr)){
+                            for(var name in data.attr){
+                                if(isFunction(data.attr[name])){
+                                    data.attr[name] = {parallel:true,files:data.attr[name] + ""}
+                                }
+                            }
+                        }
+                        return config;
+                    },
+                    /*
+                     * format packages
+                     */
+                    formatPackages:function(){
+                        var that = this;
+                        Std.each(packages,function(name,data){
+                            packages[name] = that.formatPackage(name,data);
+                        });
+                        return packages;
+                    },
+                    /*
+                     * add package row
+                    */
+                    addPackageRow:function(name,data,type,index){
+                        this._packagesGrid[type || "appendRow"]({
+                            value:data,
+                            cells:{
+                                packageName:name,
+                                version:data.version || "",
+                                basics:data.basics.join(" "),
+                                documentation:data.documentation || "",
+                                description:data.description
+                            },
+                            content:Std.template("grid_rowContent").render(data)
+                        },index);
+                    },
+                    /*
+                     * edit package
+                    */
+                    editPackage:function(defaultValue,callback){
+                        Std.stl.cache     = false;
+                        Std.stl.fileCache = false;
+                        Std.stl.load("editPackage.stl",function(error,stl,exports){
+                            if(!error){
+                                exports(defaultValue,callback);
+                            }
+                        })
+                    }
+                },
+                main:function(){
+                    this.initRouter();
+                    this.initDocumentState();
+                    this.updateDefaultValue();
                 }
-                var layout = resize() || dom.layout("VBoxLayout",{
-                    paddingTop:3
-                });
-                Std.dom(window).on("resize",function(){
-                    if(currentPage === "page_packages"){
-                        resize() || layout.update()
-                    }
-                });
-                packagesGrid = layout.find("Grid")[0];
-                packagesGrid.rowContextMenu({
-                    items:[
-                        Std.action("addPackage"),
-                        Std.action("editPackage"),
-                        Std.action("deletePackage"),
-                        {ui:"sep"},
-                        Std.action("reload"),
-                        Std.action("showExample")
-                    ]
-                });
-                packagesGrid.on("rowEvent",function(type){
-                    if(type === "dblclick"){
-                        Std.action("editPackage").call();
-                    }
-                });
-                loadPackages(function(packages){
-                    Std.each(packages,function(name,data){
-                        addPackageRow(name,data);
-                    });
-                });
-                packagesPage = true;
-            },{
-                delay:1,
-                packages:["ui.ToolBar","ui.Grid","ui.ComboBox","ui.Menu"]
             });
 
-            /*
-             * default values
-            */
-            Std.dom("#git_address").value(Std.source.gitAddress).prevSibling().get(0).attr("href",Std.source.gitAddress);
-            Std.dom("#source_address").value(Std.source.latestVersionAddress).prevSibling().get(0).attr("href",Std.source.latestVersionAddress);
-            Std.dom(".addresses").on("click","input",function(){
-                this.select()
-            });
+            var mainInstance = new mainModule();
 
-            /*
-             * add hash change event listener
-            */
-            Std.dom(window).on("hashchange",function(){
-                var hash        = location.hash;
-                var changeTheme = false;
-
-                if(hash === "#page_resource"){
-                    showResourcePage();
-                }else if(hash === "#page_packages"){
-                    changeTheme = true;
-                    showPackagesPage();
-                }else if(hash !== "#page_home"){
-                    return;
-                }
-                header.toggleClass("__gray__",changeTheme);
-                Std.dom("#"+currentPage).hide();
-                Std.dom("#"+(currentPage = location.hash.substr(1))).show();
-                Std.dom(".header >._location.selected").removeClass("selected");
-                Std.dom(".header >._location[href='#"+currentPage+"']").addClass("selected");
-            });
-
-            /*
-             * check current url hash
-            */
-            if(location.hash !== ""){
-                Std.dom(window).emit("hashchange")
-            }
-            /*
-             * ie fix
-            */
-            if(!("onhashchange" in window)){
-                var currentHash = location.hash;
-
-                setInterval(function(){
-                    if(location.hash !== currentHash){
-                        currentHash = location.hash;
-                        Std.dom(window).emit("hashchange");
-                    }
-                },100);
-            }
             /**
              *  actions
             */
@@ -906,30 +1065,26 @@ Std.use("<?=packageName?>",function(){
                     icon:"add",
                     text:"添加包",
                     hotKey:"Ctrl+N",
-                    main:Std.func(function(){
-                        editPackage(null,function(values,window){
+                    main:function(){
+                        mainInstance.editPackage(null,function(values,window){
                             if(values.packageName in packages){
-                                Std.ui("MessageBox").information("包: [" + values.packageName + "] 已经存在,不能重复添加.")
-                            }else{
-                                window.close();
-                                addPackageRow(
-                                    values.packageName,
-                                    packages[values.packageName] = formatPackage(values.packageName,values),"insertRow",
-                                    0
-                                );
-                                packagesGrid.selectRow(0);
+                                return messager.packageDuplicate(values.packageName);
                             }
+                            var packageData = packages[values.packageName] = mainInstance.formatPackage(values.packageName,values);
+
+                            mainInstance.addPackageRow(values.packageName, packageData, "insertRow", 0);
+                            mainInstance._packagesGrid.selectRow(0);
+                            window.close();
                         });
-                    },{
-                        packages:["ui.Window","ui.Edit","ui.List","ui.TabPanel"]
-                    })
+                    }
                 },
                 editPackage:{
                     icon:"edit",
                     text:"编辑选中包",
-                    main:Std.func(function(){
-                        var selectedRow = packagesGrid.selectedRow(true);
-                        selectedRow && editPackage(Std.clone(selectedRow.value),function(values,window){
+                    main:function(){
+                        var selectedRow = mainInstance._packagesGrid.selectedRow(true);
+
+                        selectedRow && mainInstance.editPackage(Std.extend({},selectedRow.value,3),function(values,window){
                             Std.extend(selectedRow.value,values);
 
                             selectedRow.cells.basics  = values["basics"].join(' ');
@@ -938,45 +1093,40 @@ Std.use("<?=packageName?>",function(){
                             selectedRow.cells.description   = values["description"];
                             selectedRow.content = Std.template("grid_rowContent").render(values);
 
-                            packagesGrid.refresh();
+                            mainInstance._packagesGrid.refresh();
                             window.close();
                         });
-                    },{
-                        packages:["ui.Window","ui.Edit","ui.List","ui.TabPanel"]
-                    })
+                    }
                 },
                 deletePackage:{
                     icon:"delete",
                     text:"删除包",
                     hotKey:"delete",
-                    main:Std.func(function(){
-                        var rows    = packagesGrid.selectedRows(true);
+                    main:function(){
+                        var rows    = mainInstance._packagesGrid.selectedRows(true);
                         var names   = [];
                         var indexes = [];
 
-                        if(isEmpty(rows)){
-                            return;
+                        if(!isEmpty(rows)){
+                            messager.deletePackage(function(){
+                                Std.each(rows,function(i,row){
+                                    indexes.push(mainInstance._packagesGrid.indexOf(row));
+                                    delete packages[names[i] = row.value.packageName];
+                                },true);
+                                mainInstance._packagesGrid.removeRow(indexes);
+                            });
                         }
-                        Std.ui("MessageBox").confirm("确定要删除选中的包吗?对应的文件也将会被删除,该操作不可恢复.","提示",function(){
-                            Std.each(rows,function(i,row){
-                                indexes.push(packagesGrid.indexOf(row));
-                                delete packages[names[i] = row.value.packageName];
-                            },true);
-                            packagesGrid.removeRow(indexes);
-                        })
-                    },{
-                        packages:["ui.MessageBox"]
-                    })
+                    }
                 },
                 reload:{
                     icon:"reload",
                     text:"重新载入",
                     main:function(){
-                        packagesGrid.clearRows();
-                        packagesLoaded = false;
-                        loadPackages(function(packages){
+                        mainInstance._packagesGrid.clearRows();
+                        mainInstance._packagesLoaded = false;
+                        mainInstance.loadPackages(function(packages){
                             Std.each(packages,function(name,data){
-                                addPackageRow(name,data);
+                                mainInstance.addPackageRow(name,data);
                             });
                         });
                     }
@@ -985,45 +1135,7 @@ Std.use("<?=packageName?>",function(){
                     icon:"save",
                     text:"保存配置",
                     main:Std.func(function(){
-                        var code  = buildIndexCode();
-                        var error = function(){
-                            Std.ui("Notify").error({
-                                text:"保存失败,无法连接到12444端口,可能是server.js 未运行.<br/> 请尝试到服务器中以 node ./server.js 方式启动服务端.<br/><br/>" +
-                                     "如果已经启动服务端还是出现这个错误<br/>则当前浏览器不支持ajax Access-Control-Allow-Origin 跨域请求",
-                                title:"发生错误",
-                                timeout:"8s"
-                            });
-                        };
-                        var success = function(text){
-                            if(text == "0"){
-                                Std.ui("Notify").success({
-                                    title:"成功",
-                                    text:"packages.json 和 index.js 文件保存成功",
-                                    timeout:"2s"
-                                });
-                                skipPassword = true;
-                            }else{
-                                Std.ui("Notify").error({
-                                    text:"保存失败,服务器返回信息:<br/>" + text,
-                                    title:"发生错误",
-                                    timeout:"8s"
-                                });
-                            }
-                        };
-                        var ajaxSend = function(password){
-                            Std.ajax({
-                                url:"http://" + Std.url.location().hostName + ":12444/save",
-                                type:"post",
-                                data:{
-                                    version:Std.source.latestVersion,
-                                    password:lastPassword = password,
-                                    index:code,
-                                    packages:JSON.stringify(packages)
-                                },
-                                error:error,
-                                success:success
-                            });
-                        };
+                        var code = mainInstance.buildIndexCode();
 
                         try{
                             new Function(code);
@@ -1034,9 +1146,11 @@ Std.use("<?=packageName?>",function(){
                             return Std.ui("Notify").error("浏览器版本过低");
                         }
                         if(skipPassword){
-                            ajaxSend(lastPassword);
+                            mainModule.save(lastPassword,code)
                         }else{
-                            Std.ui("MessageBox").prompt("请输入密码:",null,"密码验证",ajaxSend);
+                            Std.ui("MessageBox").prompt("请输入密码:",null,"密码验证",function(password){
+                                mainModule.save(lastPassword = password,code)
+                            });
                         }
                     },{
                         packages:["ui.Notify","ui.MessageBox","ui.Edit"]
@@ -1044,78 +1158,39 @@ Std.use("<?=packageName?>",function(){
                 },
                 showExample:{
                     text:"使用例子",
-                    main:Std.func(function(){
-                        var rowIndex = packagesGrid.selectedRow();
+                    main:function(){
+                        var rowIndex = mainInstance._packagesGrid.selectedRow();
 
-                        if(rowIndex === -1){
-                            return;
+                        if(rowIndex !== -1){
+                            messager.example(
+                                mainInstance._packagesGrid.cell(rowIndex,0),
+                                Std.source.repositoryName,
+                                Std.source.latestVersionAddress
+                            )
                         }
-                        Std.ui("MessageBox").information(
-                            Std.template("grid_example").render({
-                                packageName:packagesGrid.cell(rowIndex,0),
-                                repositoryName:Std.source.repositoryName,
-                                latestVersionAddress:Std.source.latestVersionAddress
-                            })
-                        );
-                    },{
-                        packages:["ui.MessageBox"]
-                    })
+                    }
                 },
                 buildPackagesText:{
                     icon:"build",
                     text:"packages.json",
-                    main:Std.func(function(){
-                        Std.ui("Window",{
-                            width:800,
-                            height:600,
-                            modal:true,
-                            minimizable:false,
-                            title:"packages.json",
-                            layout:{
-                                ui:"VBoxLayout",
-                                items:[
-                                    {
-                                        ui:"TextEdit",
-                                        value:function(){
-                                            if(typeof JSON === "object"){
-                                                return JSON.stringify(packages,null,4)
-                                            }
-                                            return "";
-                                        }()
-                                    }
-                                ]
+                    main:function(){
+                        messager.textWindow("packages.json",function(){
+                            if(typeof JSON === "object"){
+                                return mainModule.stringify(packages)
                             }
-                        })
-                    },{
-                        packages:["ui.Window","ui.Edit"]
-                    })
+                            return "";
+                        }())
+                    }
                 },
                 buildIndexText:{
                     icon:"build",
                     text:"index.js",
-                    main:Std.func(function(){
-                        Std.ui("Window",{
-                            width:800,
-                            height:600,
-                            modal:true,
-                            minimizable:false,
-                            title:"index.js",
-                            layout:{
-                                ui:"VBoxLayout",
-                                items:[
-                                    {
-                                        ui:"TextEdit",
-                                        value:buildIndexCode()
-                                    }
-                                ]
-                            }
-                        })
-                    },{
-                        packages:["ui.Window","ui.Edit"]
-                    })
+                    main:function(){
+                        messager.textWindow("index.js",mainInstance.buildIndexCode())
+                    }
                 }
             });
-        });
+        })
     </script>
 </body>
 </html>

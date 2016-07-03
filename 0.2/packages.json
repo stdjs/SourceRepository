@@ -1,1 +1,621 @@
-{"ui.Image":{"basics":[],"files":["ui/theme/ui.Image.js"],"packageName":"ui.Image","version":"0.2","documentation":"","description":"Std UI Kit 图片组件"},"ui.Item":{"basics":[],"files":["ui/theme/ui.Item.css","ui/ui.Item.js"],"packageName":"ui.Item","version":"0.2","documentation":"","description":"Std UI Kit 子项组建,包含Item,TemplateItem"},"ui.FieldSet":{"basics":[],"files":["ui/theme/ui.FieldSet.css","ui/ui.FieldSet.js"],"packageName":"ui.FieldSet","version":"0.2","documentation":"","description":"Std UI Kit 分组组件"},"ui.ToolTip":{"basics":[],"files":["ui/theme/ui.ToolTip.css","ui/ui.ToolTip.js"],"packageName":"ui.ToolTip","version":"0.2","documentation":"","description":"Std UI Kit 工具提示组件,包含 ToolTip组件,ToolTip插件"},"ui.CheckBox":{"basics":[],"files":["ui/theme/ui.CheckBox.css","ui/ui.CheckBox.js"],"packageName":"ui.CheckBox","version":"0.2","documentation":"","description":"Std UI Kit 复选框组件"},"ui.RadioBox":{"basics":[],"files":["ui/theme/ui.RadioBox.css","ui/ui.RadioBox.js"],"packageName":"ui.RadioBox","version":"0.2","documentation":"","description":"Std UI Kit 单选框组件"},"ui.SwitchBox":{"basics":[],"files":["ui/theme/ui.SwitchBox.css","ui/ui.SwitchBox.js"],"packageName":"ui.SwitchBox","version":"0.2","documentation":"","description":"Std UI Kit 切换按钮组件"},"ui.Button":{"basics":[],"files":["ui/theme/ui.Button.css","ui/ui.Button.js"],"packageName":"ui.Button","version":"0.2","documentation":"","description":"Std UI Kit 按钮组件,包含Button,ToolButton,ButtonGroup和ToolButtonGroup组件"},"ui.SpinBox":{"basics":["ui.Text"],"files":["ui/theme/ui.SpinBox.css","ui/ui.SpinBox.js"],"packageName":"ui.SpinBox","version":"0.2","documentation":"","description":"Std UI Kit 数字编辑框组件"},"ui.DateTimeEdit":{"basics":["ui.Text","ui.DatePicker"],"files":["ui/theme/ui.DateTimeEdit.css","ui/ui.DateTimeEdit.js"],"packageName":"ui.DateTimeEdit","version":"0.2","documentation":"","description":"Std UI Kit 时间日期编辑框组件"},"ui.DateTimeView":{"basics":[],"files":["ui/theme/ui.DateTimeView.css","ui/ui.DateTimeView.js"],"packageName":"ui.DateTimeView","version":"0.2","documentation":"","description":"Std UI Kit 时间日期查看组件"},"ui.ColorPicker":{"basics":[],"files":["ui/theme/ui.ColorPicker.css","ui/ui.ColorPicker.js"],"packageName":"ui.ColorPicker","version":"0.2","documentation":"","description":"Std UI Kit 颜色选择器组件"},"ui.DatePicker":{"basics":[],"files":["ui/theme/ui.DatePicker.css","ui/ui.DatePicker.js"],"packageName":"ui.DatePicker","version":"0.2","documentation":"","description":"Std UI Kit 日期选择器组件"},"ui.List":{"basics":["ui.Item"],"files":["ui/theme/ui.List.css","ui/ui.List.js"],"packageName":"ui.List","version":"0.2","documentation":"","description":"Std UI Kit 列表组件"},"ui.Menu":{"basics":["ui.Item"],"files":["ui/theme/ui.Menu.css","ui/ui.Menu.js"],"packageName":"ui.Menu","version":"0.2","documentation":"","description":"Std UI Kit 菜单组件"},"ui.MenuBar":{"basics":["ui.Menu"],"files":["ui/theme/ui.MenuBar.css","ui/ui.Menu.js"],"packageName":"ui.MenuBar","version":"0.2","documentation":"","description":"Std UI Kit 菜单栏组件"},"ui.PathBar":{"basics":[],"files":["ui/theme/ui.PathBar.css","ui/ui.PathBar.js"],"packageName":"ui.PathBar","version":"0.2","documentation":"","description":"Std UI Kit 路径组件"},"ui.ComboBox":{"basics":["ui.Item"],"files":["ui/theme/ui.ComboBox.css","ui/ui.ComboBox.js"],"packageName":"ui.ComboBox","version":"0.2","documentation":"","description":"Std UI Kit 组合框组件,包含ComboBox,ComboBoxItem组件"},"ui.ToolBar":{"basics":["ui.Button"],"files":["ui/theme/ui.ToolBar.css","ui/ui.ToolBar.js"],"packageName":"ui.ToolBar","version":"0.2","documentation":"","description":"Std UI Kit工具栏组件"},"ui.Panel":{"basics":["ui.ToolBar"],"files":["ui/theme/ui.Panel.css","ui/ui.Panel.js"],"packageName":"ui.Panel","version":"0.2","documentation":"","description":"Std UI Kit 面板组件"},"ui.Window":{"basics":["ui.Panel","ui.Menu"],"files":["ui/theme/ui.Window.css","ui/ui.Window.js"],"packageName":"ui.Window","version":"0.2","documentation":"","description":"Std UI Kit 窗体组件"},"ui.MessageBox":{"basics":[],"files":["ui/theme/ui.MessageBox.css","ui/ui.MessageBox.js"],"packageName":"ui.MessageBox","version":"0.2","documentation":"","description":"Std UI Kit 消息框组件"},"ui.Pagination":{"basics":["ui.ComboBox"],"files":["ui/theme/ui.Pagination.css","ui/ui.Pagination.js"],"packageName":"ui.Pagination","version":"0.2","documentation":"","description":"Std UI Kit 分页栏组件"},"ui.Progress":{"basics":[],"files":["ui/theme/ui.Progress.css","ui/ui.Progress.js"],"packageName":"ui.Progress","version":"0.2","documentation":"","description":"Std UI Kit 进度条组件,包含VProgress(垂直滚动条),HProgress(水平滚动条)组件"},"ui.Accordion":{"basics":["ui.Item"],"files":["ui/theme/ui.Accordion.css","ui/ui.Accordion.js"],"packageName":"ui.Accordion","version":"0.2","documentation":"","description":"Std UI Kit 手风琴组件"},"ui.TabPanel":{"basics":["ui.Button"],"files":["ui/theme/ui.TabPanel.css","ui/ui.TabPanel.js"],"packageName":"ui.TabPanel","version":"0.2","documentation":"","description":"Std UI Kit tab面板组件"},"ui.Slider":{"basics":["ui.ToolTip"],"files":["ui/theme/ui.Slider.css","ui/ui.Slider.js"],"packageName":"ui.Slider","version":"0.2","documentation":"","description":"Std UI Kit 数字滚轮组件,包含VSlider(垂直),HSlider(水平)"},"ui.Tree":{"basics":[],"files":["ui/theme/ui.Tree.css","ui/ui.Tree.js"],"packageName":"ui.Tree","version":"0.2","documentation":"","description":"Std UI Kit 树组件"},"ui.Grid":{"basics":[],"files":["ui/theme/ui.Grid.css","ui/ui.Grid.js"],"packageName":"ui.Grid","version":"0.2","documentation":"","description":"Std UI Kit 表格组件"},"ui.TaskBar":{"basics":["ui.Item"],"files":["ui/theme/ui.TaskBar.css","ui/ui.TaskBar.js"],"packageName":"ui.TaskBar","version":"0.2","documentation":"","description":"Std UI Kit 任务栏组件"},"ui.Notify":{"basics":[],"files":["ui/theme/ui.Notify.css","ui/ui.Notify.js"],"packageName":"ui.Notify","version":"0.2","documentation":"","description":"Std UI Kit 消息通知组件"},"ui.Tray":{"basics":[],"files":["ui/theme/ui.Tray.css","ui/ui.Tray.js"],"packageName":"ui.Tray","version":"0.2","documentation":"","description":"Std UI Kit 任务托盘组件"},"ui.ImageCutter":{"basics":["ui.Slider","ui.Button"],"files":["ui/theme/ui.ImageCutter.css","ui/ui.ImageCutter.js"],"packageName":"ui.ImageCutter","version":"0.2","documentation":"","description":"Std UI Kit 图片剪裁组件"},"crypto.sha1":{"basics":[],"files":["crypto/sha1.js"],"packageName":"crypto.sha1","version":"0.1","documentation":"","description":"sha1 编码模块"},"crypto.sha256":{"basics":[],"files":["crypto/sha256.js"],"packageName":"crypto.sha256","version":"0.1","documentation":"","description":"sha256 编码模块"},"crypto.base64":{"basics":[],"files":["crypto/base64.js"],"packageName":"crypto.base64","version":"0.1","documentation":"","description":"base64编码解码模块"},"crypto.md5":{"basics":[],"files":["crypto/md5.js"],"packageName":"crypto.md5","version":"0.1","documentation":"","description":"md5编码模块"},"crypto.md6":{"basics":[],"files":["crypto/md6.js"],"packageName":"crypto.md6","version":"0.1","documentation":"","description":"md6编码模块"},"crypto.aes":{"basics":["crypto.base64"],"files":["crypto/aes.js"],"packageName":"crypto.aes","version":"0.1","documentation":"","description":"aes编码模块"},"plugin.upload":{"basics":[],"files":["plugin/upload.js"],"packageName":"plugin.upload","version":"0.1","documentation":"","description":"文件上传插件"},"plugin.smoothWheel":{"basics":[],"files":["plugin/smoothWheel.js"],"packageName":"plugin.smoothWheel","version":"0.1","documentation":"","description":"平滑滚动条插件"},"io.websocket":{"basics":[],"files":["io/websocket.js"],"packageName":"io.websocket","version":"0.1","documentation":"","description":"websocket客户端模块"},"ui.Edit":{"basics":[],"files":["ui/theme/ui.Edit.css","ui/ui.Edit.js"],"packageName":"ui.Edit","version":"0.2","documentation":"","description":"Std UI Kit编辑框,包含LineEdit组件,TextEdit组件和Std.dom的扩展editText"},"ui.Label":{"basics":[],"files":["ui/ui.Label.js"],"packageName":"ui.Label","version":"0.2","documentation":"","description":"Std UI Kit 文本标签组件"}}
+{
+    "ui.Image": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Image.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Image",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 图片组件"
+    },
+    "ui.Item": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Item.css",
+            "ui/ui.Item.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Item",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 子项组建,包含Item,TemplateItem"
+    },
+    "ui.FieldSet": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.FieldSet.css",
+            "ui/ui.FieldSet.js"
+        ],
+        "attr": null,
+        "packageName": "ui.FieldSet",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 分组组件"
+    },
+    "ui.ToolTip": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.ToolTip.css",
+            "ui/ui.ToolTip.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ToolTip",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 工具提示组件,包含 ToolTip组件,ToolTip插件"
+    },
+    "ui.CheckBox": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.CheckBox.css",
+            "ui/ui.CheckBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.CheckBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 复选框组件"
+    },
+    "ui.RadioBox": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.RadioBox.css",
+            "ui/ui.RadioBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.RadioBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 单选框组件"
+    },
+    "ui.SwitchBox": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.SwitchBox.css",
+            "ui/ui.SwitchBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.SwitchBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 切换按钮组件"
+    },
+    "ui.ToggleBox": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.ToggleBox.css",
+            "ui/ui.ToggleBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ToggleBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 双向切换组件(开关组件)"
+    },
+    "ui.Button": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Button.css",
+            "ui/ui.Button.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Button",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 按钮组件,包含Button,ToolButton,ButtonGroup和ToolButtonGroup组件"
+    },
+    "ui.SpinBox": {
+        "basics": [
+            "ui.Text"
+        ],
+        "files": [
+            "ui/theme/ui.SpinBox.css",
+            "ui/ui.SpinBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.SpinBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 数字编辑框组件"
+    },
+    "ui.DateTimeEdit": {
+        "basics": [
+            "ui.Text",
+            "ui.DatePicker"
+        ],
+        "files": [
+            "ui/theme/ui.DateTimeEdit.css",
+            "ui/ui.DateTimeEdit.js"
+        ],
+        "attr": null,
+        "packageName": "ui.DateTimeEdit",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 时间日期编辑框组件"
+    },
+    "ui.DateTimeView": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.DateTimeView.css",
+            "ui/ui.DateTimeView.js"
+        ],
+        "attr": null,
+        "packageName": "ui.DateTimeView",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 时间日期查看组件"
+    },
+    "ui.ColorPicker": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.ColorPicker.css",
+            "ui/ui.ColorPicker.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ColorPicker",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 颜色选择器组件"
+    },
+    "ui.DatePicker": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.DatePicker.css",
+            "ui/ui.DatePicker.js"
+        ],
+        "attr": null,
+        "packageName": "ui.DatePicker",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 日期选择器组件"
+    },
+    "ui.List": {
+        "basics": [
+            "ui.Item"
+        ],
+        "files": [
+            "ui/theme/ui.List.css",
+            "ui/ui.List.js"
+        ],
+        "attr": null,
+        "packageName": "ui.List",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 列表组件"
+    },
+    "ui.Menu": {
+        "basics": [
+            "ui.Item"
+        ],
+        "files": [
+            "ui/theme/ui.Menu.css",
+            "ui/ui.Menu.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Menu",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 菜单组件"
+    },
+    "ui.MenuBar": {
+        "basics": [
+            "ui.Menu"
+        ],
+        "files": [
+            "ui/theme/ui.MenuBar.css",
+            "ui/ui.Menu.js"
+        ],
+        "attr": {},
+        "packageName": "ui.MenuBar",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 菜单栏组件"
+    },
+    "ui.PathBar": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.PathBar.css",
+            "ui/ui.PathBar.js"
+        ],
+        "attr": null,
+        "packageName": "ui.PathBar",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 路径组件"
+    },
+    "ui.ComboBox": {
+        "basics": [
+            "ui.Item"
+        ],
+        "files": [
+            "ui/theme/ui.ComboBox.css",
+            "ui/ui.ComboBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ComboBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 组合框组件,包含ComboBox,ComboBoxItem组件"
+    },
+    "ui.ToolBar": {
+        "basics": [
+            "ui.Button"
+        ],
+        "files": [
+            "ui/theme/ui.ToolBar.css",
+            "ui/ui.ToolBar.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ToolBar",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit工具栏组件"
+    },
+    "ui.Panel": {
+        "basics": [
+            "ui.ToolBar"
+        ],
+        "files": [
+            "ui/theme/ui.Panel.css",
+            "ui/ui.Panel.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Panel",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 面板组件"
+    },
+    "ui.Window": {
+        "basics": [
+            "ui.Panel",
+            "ui.Menu"
+        ],
+        "files": [
+            "ui/theme/ui.Window.css",
+            "ui/ui.Window.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Window",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 窗体组件"
+    },
+    "ui.MessageBox": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.MessageBox.css",
+            "ui/ui.MessageBox.js"
+        ],
+        "attr": null,
+        "packageName": "ui.MessageBox",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 消息框组件"
+    },
+    "ui.Pagination": {
+        "basics": [
+            "ui.ComboBox"
+        ],
+        "files": [
+            "ui/theme/ui.Pagination.css",
+            "ui/ui.Pagination.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Pagination",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 分页栏组件"
+    },
+    "ui.Progress": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Progress.css",
+            "ui/ui.Progress.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Progress",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 进度条组件,包含VProgress(垂直滚动条),HProgress(水平滚动条)组件"
+    },
+    "ui.Accordion": {
+        "basics": [
+            "ui.Item"
+        ],
+        "files": [
+            "ui/theme/ui.Accordion.css",
+            "ui/ui.Accordion.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Accordion",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 手风琴组件"
+    },
+    "ui.TabPanel": {
+        "basics": [
+            "ui.Button"
+        ],
+        "files": [
+            "ui/theme/ui.TabPanel.css",
+            "ui/ui.TabPanel.js"
+        ],
+        "attr": null,
+        "packageName": "ui.TabPanel",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit tab面板组件"
+    },
+    "ui.Slider": {
+        "basics": [
+            "ui.ToolTip"
+        ],
+        "files": [
+            "ui/theme/ui.Slider.css",
+            "ui/ui.Slider.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Slider",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 数字滚轮组件,包含VSlider(垂直),HSlider(水平)"
+    },
+    "ui.Tree": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Tree.css",
+            "ui/ui.Tree.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Tree",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 树组件"
+    },
+    "ui.Grid": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Grid.css",
+            "ui/ui.Grid.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Grid",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 表格组件"
+    },
+    "ui.TaskBar": {
+        "basics": [
+            "ui.Item"
+        ],
+        "files": [
+            "ui/theme/ui.TaskBar.css",
+            "ui/ui.TaskBar.js"
+        ],
+        "attr": null,
+        "packageName": "ui.TaskBar",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 任务栏组件"
+    },
+    "ui.Notify": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Notify.css",
+            "ui/ui.Notify.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Notify",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 消息通知组件"
+    },
+    "ui.Tray": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Tray.css",
+            "ui/ui.Tray.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Tray",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 任务托盘组件"
+    },
+    "ui.ImageCutter": {
+        "basics": [
+            "ui.Slider",
+            "ui.Button"
+        ],
+        "files": [
+            "ui/theme/ui.ImageCutter.css",
+            "ui/ui.ImageCutter.js"
+        ],
+        "attr": null,
+        "packageName": "ui.ImageCutter",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 图片剪裁组件"
+    },
+    "crypto.sha1": {
+        "basics": [],
+        "files": [
+            "crypto/sha1.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.sha1",
+        "version": "0.1",
+        "documentation": "",
+        "description": "sha1 编码模块"
+    },
+    "crypto.sha256": {
+        "basics": [],
+        "files": [
+            "crypto/sha256.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.sha256",
+        "version": "0.1",
+        "documentation": "",
+        "description": "sha256 编码模块"
+    },
+    "crypto.base64": {
+        "basics": [],
+        "files": [
+            "crypto/base64.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.base64",
+        "version": "0.1",
+        "documentation": "",
+        "description": "base64编码解码模块"
+    },
+    "crypto.md5": {
+        "basics": [],
+        "files": [
+            "crypto/md5.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.md5",
+        "version": "0.1",
+        "documentation": "",
+        "description": "md5编码模块"
+    },
+    "crypto.md6": {
+        "basics": [],
+        "files": [
+            "crypto/md6.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.md6",
+        "version": "0.1",
+        "documentation": "",
+        "description": "md6编码模块"
+    },
+    "crypto.aes": {
+        "basics": [
+            "crypto.base64"
+        ],
+        "files": [
+            "crypto/aes.js"
+        ],
+        "attr": null,
+        "packageName": "crypto.aes",
+        "version": "0.1",
+        "documentation": "",
+        "description": "aes编码模块"
+    },
+    "plugin.upload": {
+        "basics": [],
+        "files": [
+            "plugin/upload.js"
+        ],
+        "attr": null,
+        "packageName": "plugin.upload",
+        "version": "0.1",
+        "documentation": "",
+        "description": "文件上传插件"
+    },
+    "plugin.smoothWheel": {
+        "basics": [],
+        "files": [
+            "plugin/smoothWheel.js"
+        ],
+        "attr": null,
+        "packageName": "plugin.smoothWheel",
+        "version": "0.1",
+        "documentation": "",
+        "description": "平滑滚动条插件"
+    },
+    "io.websocket": {
+        "basics": [],
+        "files": [
+            "io/websocket.js"
+        ],
+        "attr": null,
+        "packageName": "io.websocket",
+        "version": "0.1",
+        "documentation": "",
+        "description": "websocket客户端模块"
+    },
+    "ui.Edit": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.Edit.css",
+            "ui/ui.Edit.js"
+        ],
+        "attr": null,
+        "packageName": "ui.Edit",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit编辑框,包含LineEdit组件,TextEdit组件和Std.dom的扩展editText"
+    },
+    "ui.Label": {
+        "basics": [],
+        "files": [
+            "ui/ui.Label.js"
+        ],
+        "attr": {},
+        "packageName": "ui.Label",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 文本标签组件"
+    },
+    "code.SyntaxHighlighter": {
+        "basics": [],
+        "files": [
+            "code/syntaxhighlighter/src/shCore.js",
+            "code/syntaxhighlighter/styles/shCore.css"
+        ],
+        "attr": {
+            "brush": {
+                "files": "function (v){return \"code/syntaxhighlighter/scripts/shBrush\" + v.camelCase(true) + \".js\"}",
+                "parallel": false
+            },
+            "theme": {
+                "files": "function (v){return \"code/syntaxhighlighter/styles/shTheme\"+v.camelCase(true) + \".css\"}",
+                "parallel": false
+            }
+        },
+        "packageName": "code.SyntaxHighlighter",
+        "version": "2.1.382",
+        "documentation": "http://alexgorbatchev.com/SyntaxHighlighter/manual/configuration/",
+        "description": "SyntaxHighlighter 代码高亮模块"
+    },
+    "code.CodeMirror": {
+        "basics": [],
+        "files": [
+            "code/codemirror/lib/codemirror.js",
+            "code/codemirror/lib/ui.CodeMirror.js",
+            "code/codemirror/lib/codemirror.css"
+        ],
+        "attr": {
+            "mode": {
+                "code": "",
+                "parallel": false,
+                "files": "function (v){return \"code/codemirror/mode/\"+v+\"/\"+v+\".js\"}"
+            },
+            "theme": {
+                "code": "",
+                "parallel": false,
+                "files": "function (v){return \"code/codemirror/theme/\"+v+\".css\"}"
+            },
+            "addonFiles": {
+                "code": "",
+                "parallel": false,
+                "files": "function (b){return Std.each(b.split(\",\"),function(b,c){return\"code/codemirror/addon/\"+c},!0)}"
+            },
+            "hint": {
+                "code": "",
+                "parallel": false,
+                "files": "function (n){var t=\"code/codemirror/addon/hint/\",h=[t+\"show-hint.css\",t+\"show-hint.js\"]\nreturn Std.each(n.split(\",\"),function(n,s){h.push(t+s+\"-hint.js\")}),h}"
+            }
+        },
+        "packageName": "code.CodeMirror",
+        "version": "5.16.0",
+        "documentation": "http://codemirror.net/doc/manual.html",
+        "description": "CodeMirror代码高亮编辑器"
+    }
+}

@@ -1,0 +1,216 @@
+<div std-ui="VBoxLayout">
+    <div std-ui="TabPanel" std-option="{valueType:'map',deferRender:false}">
+        <ul std-content="layout">
+            <li>基础配置</li>
+            <li std-ui="VBoxLayout">
+                <span>包名称:</span>
+                <div std-ui="LineEdit" std-name="packageName" std-option="{placeHolder:'包的名称,必须为唯一名称',showState:true,validator:'String'}"></div>
+
+                <span>版本号:</span>
+                <div std-ui="LineEdit" std-name="version" std-option="{placeHolder:'包的版本号'}"></div>
+
+                <span>文档地址:</span>
+                <div std-ui="LineEdit" std-name="documentation" std-option="{placeHolder:'相关文档地址,可以为空'}"></div>
+
+                <span>依赖包:</span>
+                <div std-ui="TextEdit" std-name="basics" std-theme="white"  std-option="{placeHolder:'依赖包的名称,多个包用换行分开'}"></div>
+
+                <span>包描述:</span>
+                <div std-ui="TextEdit" std-name="description" std-theme="white"  std-option="{placeHolder:'包的描述'}"></div>
+            </li>
+        </ul>
+
+        <ul std-content="layout">
+            <li>文件列表</li>
+            <li std-ui="VBoxLayout">
+                <div std-ui="ToolBar" std-name="filesToolBar">
+                    <div std-icon="add" std-name="addFile">添加文件</div>
+                    <div std-icon="add" std-name="addFileGroup">添加文件组</div>
+                </div>
+                <div std-ui="List" std-name="files" std-theme="white" std-option="{valueType:'list-text',editable:true}"></div>
+            </li>
+        </ul>
+
+        <ul std-content="layout">
+            <li>属性配置</li>
+            <li std-ui="HBoxLayout" std-option="{plugins:{split:null}}">
+                <div std-ui="VBoxLayout" std-option="{width:150}">
+                    <div std-ui="ToolBar" std-name="attrToolBar" std-option="{iconWidth:16,iconHeight:16,styleType:'icon',height:25}">
+                        <div std-icon="add" std-name="add" std-title="添加属性"></div>
+                        <div std-icon="delete" std-name="delete" std-title="删除属性"></div>
+                    </div>
+                    <div std-ui="List" std-name="attr" std-theme="white" std-option="{editable:true,valueType:'text-value'}"></div>
+                </div>
+                <div std-ui="VBoxLayout">
+                    <div std-ui="HBoxLayout" std-option="{height:25}">
+                        <div std-ui="HArrayLayout" std-option="{align:'left',verticalAlign:'middle',height:25}">
+                            <span std-ui="Label">函数属性代码:</span>
+                            <span std-ui="Label"  std-option="{css:{color:'#3684C8',cursor:'default'}}" std-title="
+                        <b>例子</b>:<br/>
+                        <p>一个函数,最终需要返回一个路径,这个路径可以是字符串或数组.</p>
+<pre>function(value){
+    return 'ui/theme/' + value + '.css'
+}</pre>
+                        "> (例子)</span>
+                        </div>
+                        <div std-ui="stretch" std-option="{level:3}"></div>
+                        <div std-ui="HArrayLayout" std-option="{align:'right',verticalAlign:'middle',height:25}">
+                            <span std-ui="Label">并行加载:</span>
+                            <div std-ui="ToggleBox" std-name="parallel" value="true"></div>
+                        </div>
+                    </div>
+
+                    <div std-ui="CodeMirror" std-name="attrCode" std-option="{
+                        autoHint:true,
+                        lineNumbers:true,
+                        mode:{
+                            name:'javascript',
+                            globalVars: true
+                        }
+                    }"></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div std-ui="HArrayLayout" std-option="{align:'right'}">
+        <div std-ui="Button" std-name="save" std-icon="add" std-option="{styleType:'textBesideIcon'}">确定</div>
+    </div>
+</div>
+
+<script>
+    var CodeMirrorPackage    = "code.CodeMirror[mode='javascript'][hint='javascript']";
+
+    Stl.packages = ["ui.Label","ui.MessageBox","ui.Window","ui.Edit","ui.List","ui.TabPanel","ui.ToolTip","ui.ToggleBox",CodeMirrorPackage];
+    Stl.exports  = function(defaultValue,callback){
+        var layout     = Stl.get(0).clone().ui(false);
+        var editWindow = Std.ui("Window",{
+            title:"添加/编辑 包配置",
+            width:800,
+            height:600,
+            modal:true,
+            minimizable:false,
+            layout:layout
+        });
+        var tabPanel    = layout.items(0);
+        var tabPanelMap = tabPanel.map();
+
+        /*
+         * set default value
+        */
+        var setDefaultValue = function(){
+            if(isArray(defaultValue.basics)){
+                defaultValue.basics = defaultValue.basics.join('\n');
+            }
+            if(isString(defaultValue.files)){
+                defaultValue.files = defaultValue.files.split('\n');
+            }
+            if(!isEmpty(defaultValue.attr)){
+                Std.each(defaultValue.attr,function(name,data){
+                    if(isObject(data)){
+                        data.files   += "";
+                        data.parallel = !!data.parallel;
+                    }else{
+                        defaultValue.attr[name] = {
+                            files:data + "",
+                            parallel:true
+                        };
+                    }
+                });
+            }
+            tabPanel.value(Std.clone(defaultValue));
+            tabPanelMap["packageName"].readOnly(true);
+        };
+
+
+        tabPanelMap["attrToolBar"].items("add").on("click",function(){
+            var itemCount = tabPanelMap["attr"].itemCount();
+            tabPanelMap["attr"].append({
+                text:"attr_" + itemCount,
+                value:{
+                    code:"",
+                    parallel:true
+                }
+            });
+            tabPanelMap["attr"].editItem(itemCount)
+        });
+        tabPanelMap["attrToolBar"].items("delete").on("click",function(){
+            var selectedItem = tabPanelMap["attr"].selectedItem();
+            if(selectedItem){
+                tabPanelMap["attr"].remove(selectedItem)
+            }
+        });
+        tabPanelMap["attr"].on("itemSelected",function(index,item){
+            var files    = "";
+            var value    = item.value();
+            var parallel = true;
+
+            if(isObject(value)){
+                files    = value.files + "";
+                parallel = !!value.parallel;
+            }
+            tabPanelMap["attrCode"].value(files);
+            tabPanelMap["parallel"].value(parallel);
+        });
+
+        tabPanelMap["attrCode"].on("change",function(){
+            var selectedItem = tabPanelMap["attr"].selectedItem();
+            if(selectedItem){
+                selectedItem.value().files = this.value();
+            }
+        });
+        tabPanelMap["parallel"].on("change",function(){
+            var selectedItem = tabPanelMap["attr"].selectedItem();
+            if(selectedItem){
+                selectedItem.value().parallel = this.value();
+            }
+        });
+
+        /*
+         * save package data
+        */
+        layout.map("save").on("click",function(){
+            var value = layout.items(0).value();
+
+            Std.each(value,function(name){
+                if(!"basics files attr packageName version documentation description".split(' ').has(name)){
+                    delete value[name];
+                }
+            });
+            if(!layout.items(0).valid()){
+                return Std.ui("MessageBox").information("必要的字段必须填写完整.")
+            }
+            if(isFunction(callback)){
+                value.files  = value.files || [];
+                value.basics = isEmpty(value.basics) ? [] : value.basics.split('\n');
+
+                isObject(value.attr) && Std.each(value.attr,function(name,data){
+                    if(isString(data.files)){
+                        try{
+                            data.files = Std.eval("(" + data.files + ")")
+                        }catch(e){
+                            data.files = "";
+                        }
+                    }
+                    data.parallel = !!data.parallel;
+                });
+                callback(value,editWindow)
+            }
+        });
+
+        /*
+         * default value
+        */
+        if(defaultValue !== null){
+            setDefaultValue();
+        }
+        Std.dom(editWindow).plugin("ToolTip",{
+            delegate:"[std-title]",
+            on:{
+                targetChange:function(target){
+                    this.html(target.attr("std-title"))
+                }
+            }
+        })
+    };
+</script>
