@@ -217,7 +217,7 @@
         ],
         "files": [
             "ui/theme/ui.MenuBar.css",
-            "ui/ui.Menu.js"
+            "ui/ui.MenuBar.js"
         ],
         "attr": {},
         "packageName": "ui.MenuBar",
