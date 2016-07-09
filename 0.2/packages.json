@@ -108,13 +108,13 @@
     },
     "ui.SpinBox": {
         "basics": [
-            "ui.Text"
+            "ui.Edit"
         ],
         "files": [
             "ui/theme/ui.SpinBox.css",
             "ui/ui.SpinBox.js"
         ],
-        "attr": null,
+        "attr": {},
         "packageName": "ui.SpinBox",
         "version": "0.2",
         "documentation": "",
@@ -122,14 +122,14 @@
     },
     "ui.DateTimeEdit": {
         "basics": [
-            "ui.Text",
+            "ui.Edit",
             "ui.DatePicker"
         ],
         "files": [
             "ui/theme/ui.DateTimeEdit.css",
             "ui/ui.DateTimeEdit.js"
         ],
-        "attr": null,
+        "attr": {},
         "packageName": "ui.DateTimeEdit",
         "version": "0.2",
         "documentation": "",

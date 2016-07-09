@@ -87,8 +87,8 @@ Std.ui.module("CodeMirror",{
             var that = this;
             var opts = that.opts;
 
-            that.editor.on("keyup",function(){
-                if(!opts.autoHint){
+            that.editor.on("keyup",function(e){
+                if(!opts.autoHint || e.which === 13){
                     return;
                 }
                 if(that._hintTimer !== null){
@@ -107,7 +107,7 @@ Std.ui.module("CodeMirror",{
                         that.showHint();
                     }
                     that._hintTimer = null;
-                },500);
+                },300);
             });
         }
     },
