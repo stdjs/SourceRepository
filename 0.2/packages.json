@@ -106,6 +106,18 @@
         "documentation": "",
         "description": "Std UI Kit 按钮组件,包含Button,ToolButton,ButtonGroup和ToolButtonGroup组件"
     },
+    "ui.SplitButton": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.SplitButton.css",
+            "ui/ui.SplitButton.js"
+        ],
+        "attr": null,
+        "packageName": "ui.SplitButton",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 风格按钮组件"
+    },
     "ui.SpinBox": {
         "basics": [
             "ui.Edit"
