@@ -2,7 +2,7 @@
     "ui.Image": {
         "basics": [],
         "files": [
-            "ui/theme/ui.Image.js"
+            "ui/ui.Image.js"
         ],
         "attr": null,
         "packageName": "ui.Image",
@@ -197,6 +197,18 @@
         "documentation": "",
         "description": "Std UI Kit 列表组件"
     },
+    "ui.View": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.View.css",
+            "ui/ui.View.js"
+        ],
+        "attr": null,
+        "packageName": "ui.View",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 视图组件"
+    },
     "ui.Menu": {
         "basics": [
             "ui.Item"
@@ -225,17 +237,31 @@
         "documentation": "",
         "description": "Std UI Kit 菜单栏组件"
     },
-    "ui.PathBar": {
-        "basics": [],
+    "ui.AddressBar": {
+        "basics": [
+            "ui.Item"
+        ],
         "files": [
-            "ui/theme/ui.PathBar.css",
-            "ui/ui.PathBar.js"
+            "ui/theme/ui.AddressBar.css",
+            "ui/ui.AddressBar.js"
         ],
         "attr": null,
-        "packageName": "ui.PathBar",
+        "packageName": "ui.AddressBar",
         "version": "0.2",
         "documentation": "",
-        "description": "Std UI Kit 路径组件"
+        "description": "Std UI Kit 地址栏组件"
+    },
+    "ui.StatusBar": {
+        "basics": [],
+        "files": [
+            "ui/theme/ui.StatusBar.css",
+            "ui/ui.StatusBar.js"
+        ],
+        "attr": null,
+        "packageName": "ui.StatusBar",
+        "version": "0.2",
+        "documentation": "",
+        "description": "Std UI Kit 状态栏组件"
     },
     "ui.ComboBox": {
         "basics": [
