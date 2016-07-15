@@ -86,6 +86,7 @@ Std.ui.module("ComboBox",{
         render:function(){
             var that = this;
 
+            alert(1)
             that.initEvents();
             that.call_opts({
                 value:null
@@ -321,13 +322,14 @@ Std.ui.module("ComboBox",{
             if(doms.list !== undefined){
                 return that;
             }
-            doms.list = newDiv("StdUI StdUI_ComboBoxList").appendTo("body").on("mousedown",function(e){
+            alert(1)
+            doms.list = newDiv("StdUI StdUI_ComboBoxList").on("mousedown",function(e){
                 e.preventDefault();
             }).delegate("mouseenter",".StdUI_ComboBoxItem,.StdUI_TemplateItem",function(e){
                 that.itemMouseEnter(this,e);
             });
             that.items.each(function(i,item){
-                item.renderTo(doms.list);
+                item.appendTo(doms.list);
             });
             return that;
         }
@@ -679,7 +681,6 @@ Std.ui.module("ComboBox",{
                     }else{
                         listElem.append(item);
                     }
-                    item.render();
                 }
                 items.insert(item.parent(that),index);
             }
@@ -694,7 +695,7 @@ Std.ui.module("ComboBox",{
 
             if(isWidget(item)){
                 if(that.D.list){
-                    item.renderTo(that.D.list);
+                    item.appendTo(that.D.list);
                 }
                 that.items.push(item.parent(that));
             }
